@@ -27,4 +27,4 @@ ln -sf /etc/nginx/sites-available/yula /etc/nginx/sites-enabled/yula
 nginx -t -q && systemctl reload nginx
 command -v ufw >/dev/null && ufw status | grep -q active && ufw allow "$PORT"/tcp >/dev/null || true
 IP=$(curl -s -4 ifconfig.me || hostname -I | awk '{print $1}')
-echo "Готово: http://$IP:$PORT  (кабінет продавця: http://$IP:$PORT/seller.html)"
+echo "Готово: http://$IP:$PORT  (адмінка: http://$IP:$PORT/admin.html)"

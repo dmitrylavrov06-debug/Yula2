@@ -1,0 +1,1176 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>YULA</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800;900&family=Onest:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: phone-width shop. Graphite sticky header, warm milk ground, white product surfaces, pink only for actions, yellow only for promo. 60/30/10. Light-only by choice (dark theme is stage 2 in the brief). */
+:root{
+  --bg:#F7F4EF; --paper:#FFFFFF; --ink:#111111; --ink2:#2B2926; --muted:#6F6A64; --line:#E6E0D7; --soft:#EFEAE2;
+  --pink:#FF2E7E; --pink-deep:#D3135C; --blush:#FFE9F1;
+  --butter:#FFE14D; --green:#0B7F55; --green-soft:#E1F2E9; --warn:#B4520B;
+  --f-d:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-b:"Onest",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --spring:cubic-bezier(.2,.9,.25,1.15); --out:cubic-bezier(.2,.8,.2,1);
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-b);font-size:15px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--ink)}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0;text-align:inherit}
+button:disabled{cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.app{max-width:460px;margin:0 auto;min-height:100vh;overflow-x:clip;padding-bottom:calc(72px + env(safe-area-inset-bottom,0px));background:var(--bg)}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.view{animation:viewIn .25s var(--out)}
+@keyframes viewIn{from{opacity:.4;transform:translateY(6px)}}
+
+/* header */
+.hdr{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--ink);color:#fff;padding-top:8px}
+.r1{display:flex;align-items:center;gap:10px;height:34px}
+.mark{font:900 20px var(--f-d);letter-spacing:.14em;display:flex;align-items:center;gap:6px}
+.mark b{width:9px;height:9px;background:var(--pink);clip-path:polygon(0 0,100% 0,100% 70%,70% 100%,0 100%);display:inline-block}
+.r1 .sp{flex:1}
+.hb{width:36px;height:36px;display:grid;place-items:center;position:relative;color:#fff}
+.hb svg.i{width:22px;height:22px}
+.hb .dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--pink);box-shadow:0 0 0 2px var(--ink)}
+.r2{display:flex;gap:8px;align-items:center;margin-top:6px}
+.pill{flex:1;min-width:0;height:42px;background:#fff;border-radius:12px;display:flex;align-items:center;position:relative;overflow:hidden;color:var(--ink)}
+.pill input{position:absolute;inset:0 88px 0 14px;border:0;outline:0;background:transparent;font:inherit;font-size:15px;color:var(--ink);z-index:2;width:auto}
+.hint{position:absolute;left:14px;right:88px;top:11px;height:21px;overflow:hidden;color:var(--muted);pointer-events:none;z-index:1}
+.hint span{position:absolute;left:0;top:0;white-space:nowrap;transition:transform .4s var(--spring),opacity .3s}
+.hint span.out{transform:translateY(-110%);opacity:0}.hint span.in{transform:translateY(110%);opacity:0}
+.pill.typing .hint{visibility:hidden}
+.cam{position:absolute;right:50px;top:0;bottom:0;width:36px;display:grid;place-items:center;color:var(--ink2);z-index:3}
+.cam svg.i{width:21px;height:21px}
+.gos{position:absolute;right:4px;top:4px;bottom:4px;width:44px;border-radius:9px;background:var(--pink);color:#fff;display:grid;place-items:center;z-index:3}
+.sugg{display:flex;gap:7px;flex-wrap:wrap;padding-top:10px}
+.sugg small{width:100%;color:rgba(255,255,255,.6);font-size:12px}
+.sugg button{border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:6px 11px;font-size:13px;font-weight:600}
+.ntabs{display:flex;gap:20px;overflow-x:auto;scrollbar-width:none;position:relative;padding-top:10px;padding-bottom:10px}
+.ntabs::-webkit-scrollbar{display:none}
+.nt{color:rgba(255,255,255,.62);font-weight:700;font-size:15px;flex:none;transition:color .2s}
+.nt[aria-selected="true"]{color:#fff}
+.ind{position:absolute;bottom:4px;height:3px;border-radius:3px;background:var(--pink);transition:left .3s var(--spring),width .3s var(--spring)}
+.net{background:var(--warn);color:#fff;font-size:13px;font-weight:700;display:flex;gap:8px;align-items:center;padding-block:8px}
+.ecob{background:var(--soft);font-size:12.5px;font-weight:600;color:var(--ink2);display:flex;gap:8px;align-items:center;padding-block:7px}
+
+/* trust strip */
+.trust{display:flex;gap:16px;overflow-x:auto;scrollbar-width:none;padding-block:11px;font-size:12.5px;font-weight:700;color:var(--ink2)}
+.trust::-webkit-scrollbar{display:none}
+.trust span{display:flex;gap:6px;align-items:center;flex:none}
+.trust svg.i{width:16px;height:16px;color:var(--green)}
+
+/* hero */
+.hero{position:relative;margin-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px));border-radius:16px;overflow:hidden}
+.track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.track::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;scroll-snap-align:start;height:196px;position:relative;overflow:hidden;display:block;width:100%;text-align:left}
+.s1{background:repeating-conic-gradient(from 45deg,var(--pink) 0 25%,#FF4A91 0 50%) 0 0/36px 36px;color:#fff}
+.rib{position:absolute;top:18px;left:-10px;transform:rotate(-6deg);background:var(--ink);color:#fff;font:800 11px var(--f-d);letter-spacing:.12em;padding:7px 18px 7px 24px}
+.mega{position:absolute;left:16px;bottom:22px;font-family:var(--f-d);line-height:.82}
+.mega small{display:block;font:900 19px var(--f-d);margin-bottom:6px}
+.mega b{display:block;font-size:56px;font-weight:900;letter-spacing:-.04em;text-shadow:4px 4px 0 var(--ink)}
+.stk{position:absolute;right:16px;top:30px;width:92px;height:92px;border-radius:50%;background:var(--butter);color:var(--ink);display:grid;place-items:center;text-align:center;font:900 10.5px/1.15 var(--f-d);box-shadow:0 0 0 3px var(--ink)}
+.stk::before{content:"";position:absolute;inset:6px;border:2px dashed var(--ink);border-radius:50%;animation:spin 16s linear infinite}
+.stk span{transform:rotate(10deg)}
+.cta{position:absolute;right:16px;bottom:22px;background:#fff;color:var(--ink);font:800 10.5px var(--f-d);letter-spacing:.08em;padding:9px 13px;border-radius:999px;display:flex;gap:6px;align-items:center}
+.cta em{font-style:normal;display:inline-block;animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateX(4px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.s2{background:var(--blush);color:var(--ink)}
+.s2 h3{position:absolute;left:16px;top:22px;margin:0;font:900 28px/.95 var(--f-d);letter-spacing:-.02em}
+.s2 p{position:absolute;left:16px;bottom:22px;margin:0;font-size:13px;max-width:54%;color:var(--ink2)}
+.s2 p b{display:block;font:900 16px var(--f-d);color:var(--pink-deep);margin-bottom:2px}
+.duo{position:absolute;right:22px;top:46px;width:124px;height:86px}
+.duo i{position:absolute;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font:900 17px var(--f-d);font-style:normal;color:var(--ink);top:10px;box-shadow:0 0 0 3px var(--blush)}
+.duo i:nth-child(1){left:0;background:var(--pink);color:#fff;animation:bob 2.8s ease-in-out infinite}
+.duo i:nth-child(2){right:0;background:var(--butter);animation:bob 2.8s ease-in-out infinite .4s}
+.duo i:nth-child(3){left:50%;top:30px;width:26px;height:26px;margin-left:-13px;background:var(--ink);color:#fff;font-size:15px;z-index:2}
+@keyframes bob{50%{transform:translateY(-6px)}}
+.s3{background:var(--ink);color:#fff}
+.s3 h3{position:absolute;left:16px;top:22px;margin:0;font:900 27px/.95 var(--f-d);letter-spacing:-.02em}
+.s3 p{position:absolute;left:16px;bottom:22px;margin:0;font-size:13px;color:rgba(255,255,255,.78);max-width:58%}
+.spool{position:absolute;right:26px;top:36px;width:84px;height:120px}
+.spool i{position:absolute;left:12px;top:10px;width:60px;height:92px;border-radius:10px;background:repeating-linear-gradient(0deg,var(--pink) 0 4px,#FF5C9B 4px 7px);animation:bob 3s ease-in-out infinite}
+.spool i::before,.spool i::after{content:"";position:absolute;left:-8px;right:-8px;height:12px;border-radius:4px;background:#F2EDE4}
+.spool i::before{top:-6px}.spool i::after{bottom:-6px}
+.spool b{position:absolute;left:41px;top:102px;width:2.5px;height:46px;background:var(--pink);transform-origin:top;animation:sway 3s ease-in-out infinite}
+@keyframes sway{50%{transform:rotate(16deg)}}
+.slide .anim{transition:transform .55s var(--spring),opacity .45s}
+.slide:not(.on) .anim{transform:translateY(16px) scale(.95);opacity:0}
+.dots{position:absolute;bottom:9px;left:0;right:0;display:flex;justify-content:center;gap:5px;pointer-events:none}
+.dots i{width:6px;height:6px;border-radius:6px;background:rgba(127,127,127,.45);overflow:hidden;position:relative;transition:width .3s var(--spring)}
+.dots i.on{width:22px}
+.dots i.on::after{content:"";position:absolute;inset:0;background:#fff;transform-origin:left;animation:fill 4.6s linear forwards}
+.hero.paused .dots i.on::after{animation-play-state:paused}
+@keyframes fill{from{transform:scaleX(0)}}
+
+/* circles */
+.circles{display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,auto);grid-auto-columns:74px;gap:12px 8px;overflow-x:auto;scrollbar-width:none;padding-block:18px 4px}
+.circles::-webkit-scrollbar{display:none}
+.cc{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12.5px;font-weight:600;text-align:center;line-height:1.15}
+.ring{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;transition:transform .2s var(--spring)}
+.cc:active .ring{transform:scale(.92)}
+.ring svg{width:74%;height:74%;filter:drop-shadow(0 4px 4px rgba(0,0,0,.12))}
+
+/* section heads */
+.sh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:22px 0 10px}
+.sh h3{margin:0;font:900 16px var(--f-d);letter-spacing:-.01em;display:flex;gap:8px;align-items:center}
+.sh .more{font-size:12.5px;font-weight:700;color:var(--muted);display:flex;gap:2px;align-items:center}
+.tchips{display:flex;gap:3px;align-items:center;font:800 12px var(--f-d)}
+.tchips b{background:var(--ink);color:#fff;border-radius:6px;padding:4px 5px;min-width:27px;text-align:center}
+.hrow{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.hrow::-webkit-scrollbar{display:none}
+.fc{flex:0 0 116px}
+.fc .tile{aspect-ratio:3/4;border-radius:12px}
+.fc .pr{margin-top:6px;font:800 15px var(--f-d)}
+.fc .pr s{display:block;font:500 11px var(--f-b);color:var(--muted)}
+.left{font-size:11.5px;font-weight:700;color:var(--pink-deep);margin-top:2px}
+.lbar{height:4px;border-radius:4px;background:var(--soft);margin-top:4px;overflow:hidden}
+.lbar i{display:block;height:100%;background:var(--pink);border-radius:4px}
+
+.t3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.t3 button{position:relative}
+.t3 .tile{aspect-ratio:3/4;border-radius:12px}
+.rank{position:absolute;top:0;left:0;z-index:2;background:var(--butter);color:var(--ink);font:900 10px var(--f-d);padding:5px 8px;border-radius:12px 0 10px 0}
+.t3 .pr{font:800 14px var(--f-d);margin-top:6px}
+.t3 small{display:block;color:var(--muted);font-size:11px}
+
+.gcard{flex:0 0 240px;display:flex;gap:10px;align-items:center;background:var(--paper);border-radius:14px;padding:9px;text-align:left}
+.gcard .tile{width:64px;height:76px;border-radius:9px;flex:none}
+.gcard b{font:800 14px var(--f-d);color:var(--pink-deep)}
+.gcard small{display:block;color:var(--muted);font-size:11.5px;line-height:1.3}
+.av{display:flex}
+.av i{width:22px;height:22px;border-radius:50%;border:2px solid var(--paper);display:grid;place-items:center;font:800 9px var(--f-b);font-style:normal;margin-right:-6px}
+
+/* feed */
+.ftabs{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--hh,140px));z-index:15;background:var(--bg);padding-block:10px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-top:14px}
+.ftabs::-webkit-scrollbar{display:none}
+.ft{position:relative;z-index:2;padding:8px 13px;border-radius:999px;font-weight:700;font-size:13.5px;flex:none;transition:color .2s;background:var(--paper);display:flex;gap:5px;align-items:center}
+.ft svg.i{width:15px;height:15px}
+.ft[aria-selected="true"]{color:#fff;background:transparent}
+.find{position:absolute;z-index:1;top:10px;height:calc(100% - 20px);border-radius:999px;background:var(--ink);transition:left .3s var(--spring),width .3s var(--spring)}
+.tile{position:relative;display:grid;place-items:center;overflow:hidden;background:radial-gradient(120% 85% at 50% 28%,hsl(var(--h) 35% 98%),hsl(var(--h) 22% 89%))}
+.tile::after{content:"";position:absolute;left:22%;right:22%;bottom:9%;height:7%;border-radius:50%;background:radial-gradient(closest-side,rgba(40,25,20,.2),transparent)}
+.tile>svg{width:74%;height:74%;position:relative;z-index:1;filter:drop-shadow(0 8px 8px rgba(30,20,10,.15))}
+.mas{columns:2;column-gap:8px}
+.pc{break-inside:avoid;margin-bottom:12px;display:block;background:var(--paper);border-radius:12px;overflow:hidden;animation:cardIn .45s var(--spring) both}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px)}}
+.pc .tile{border-radius:0}
+.bdgs{position:absolute;top:8px;left:8px;z-index:3;display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.bdg{font:800 10.5px var(--f-b);padding:3px 6px;border-radius:5px;display:flex;gap:3px;align-items:center;letter-spacing:.01em}
+.bdg svg.i{width:12px;height:12px;stroke-width:2.4}
+.bdg.td{background:var(--ink);color:#fff}
+.bdg.ua{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.bdg.vf{background:var(--green-soft);color:var(--green)}
+.heart{position:absolute;top:7px;right:7px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.94);display:grid;place-items:center;z-index:3;color:var(--ink)}
+.heart svg.i{width:17px;height:17px}
+.heart.on{color:var(--pink)}
+.heart.on svg.i{fill:var(--pink);animation:pop .4s var(--spring)}
+.heart.on::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--pink);animation:ring .45s ease-out forwards}
+@keyframes pop{0%{transform:scale(.5)}60%{transform:scale(1.3)}}
+@keyframes ring{from{transform:scale(.6);opacity:1}to{transform:scale(1.5);opacity:0}}
+.pbar{position:absolute;left:0;bottom:0;z-index:3;display:flex;align-items:center}
+.pv{background:var(--ink);color:#fff;font:800 14.5px var(--f-d);padding:6px 9px 5px;border-radius:0 10px 0 0;letter-spacing:-.02em}
+.off{background:var(--butter);color:var(--ink);font:800 11px var(--f-b);padding:2px 5px;border-radius:4px;margin-left:5px}
+.add{position:absolute;right:7px;bottom:7px;z-index:3;width:34px;height:34px;border-radius:50%;background:#fff;display:grid;place-items:center;color:var(--ink);box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.add svg.i{width:18px;height:18px}
+.pmeta{padding:8px 9px 10px}
+.pn{font-size:13px;line-height:1.3;color:var(--ink2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ps{display:flex;gap:6px;align-items:center;margin-top:4px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.star{color:var(--ink);font-weight:700;display:inline-flex;gap:2px;align-items:center}
+.star svg{width:12px;height:12px;fill:var(--ink)}
+.newb{font-weight:800;color:var(--ink);background:var(--butter);border-radius:4px;padding:0 5px;font-size:11px}
+.gchip{display:inline-flex;margin-top:6px;font-size:11.5px;font-weight:800;color:var(--pink-deep);background:var(--blush);padding:2px 7px;border-radius:5px}
+.sentinel{height:40px;display:grid;place-items:center;color:var(--muted);font-size:12px}
+.note{font-size:11.5px;color:var(--muted);text-align:center;padding-block:4px 16px}
+
+/* tab bar */
+.tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,460px);background:rgba(255,255,255,.97);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding-top:6px;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));padding-left:max(4px,env(safe-area-inset-left,0px));padding-right:max(4px,env(safe-area-inset-right,0px));z-index:25}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:600;color:var(--muted);position:relative;padding-block:2px;min-height:48px;justify-content:center}
+.tab svg.i{width:24px;height:24px;transition:transform .25s var(--spring)}
+.tab[aria-current="page"]{color:var(--ink);font-weight:800}
+.tab[aria-current="page"] svg.i{transform:translateY(-2px)}
+.tab[aria-current="page"] .fl{fill:var(--ink)}
+.cnt{position:absolute;top:0;left:calc(50% + 5px);background:var(--pink);color:#fff;font-size:10px;font-weight:800;border-radius:999px;min-width:18px;height:18px;display:grid;place-items:center;padding:0 4px;border:2px solid #fff}
+.cnt.bump{animation:bump .45s var(--spring)}
+@keyframes bump{40%{transform:scale(1.45)}}
+
+/* catalog */
+.catv{display:grid;grid-template-columns:104px minmax(0,1fr)}
+.side{background:var(--soft);position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--hh,140px));align-self:start;max-height:calc(100vh - 220px);overflow-y:auto;scrollbar-width:none}
+.side button{display:block;width:100%;padding:13px 10px 13px 13px;font-size:13px;line-height:1.2;color:var(--ink2);position:relative}
+.side button[aria-selected="true"]{background:var(--bg);font-weight:800;color:var(--ink)}
+.side button[aria-selected="true"]::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;background:var(--pink)}
+.cmain{padding:4px 12px 20px;min-width:0}
+.cmain h4{margin:14px 0 10px;font-size:15px;font-weight:800}
+.cgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 8px}
+.cgrid .ring{width:100%;height:auto;aspect-ratio:1;max-width:84px}
+.cgrid .all .ring{background:var(--paper)}
+.cgrid .all svg.i{width:34%;height:34%;filter:none}
+.cban{border-radius:14px;padding:14px;background:var(--ink);color:#fff;display:flex;justify-content:space-between;align-items:center;margin-top:18px;width:100%;gap:10px}
+.cban b{display:block;font:900 14px/1.1 var(--f-d)}
+.cban small{display:block;font-size:12px;opacity:.75;margin-top:4px}
+
+/* listing */
+.lhead{display:flex;align-items:center;gap:10px;padding-block:12px 2px}
+.lhead h2{margin:0;font:900 18px var(--f-d);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.back{width:38px;height:38px;border-radius:50%;background:var(--paper);display:grid;place-items:center;flex:none}
+.fchips{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-block:10px 12px}
+.fchips::-webkit-scrollbar{display:none}
+.fch{flex:none;background:var(--paper);border:1.5px solid var(--line);border-radius:999px;padding:7px 12px;font-size:13px;font-weight:700;display:flex;gap:5px;align-items:center}
+.fch[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:#fff}
+.qnote{background:var(--paper);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--ink2);margin-bottom:10px}
+
+/* common */
+.ph{font:900 21px var(--f-d);margin:18px 0 4px;letter-spacing:-.01em}
+.lead{color:var(--muted);margin:0 0 14px;max-width:60ch;font-size:14px}
+.card{background:var(--paper);border-radius:16px;padding:14px;margin-top:12px}
+.card h4{margin:0 0 10px;font-size:15px;font-weight:800;display:flex;gap:8px;align-items:center}
+.card h4 .n{width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;font:800 11px var(--f-d);display:grid;place-items:center}
+.btn{border-radius:12px;padding:13px 16px;font-weight:800;background:var(--ink);color:#fff;transition:transform .12s;display:inline-flex;gap:6px;align-items:center;justify-content:center;min-height:48px}
+.btn:active{transform:scale(.97)}
+.btn.pink{background:var(--pink)}
+.btn.ghost{background:var(--paper);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.btn.sm{padding:8px 12px;font-size:13px;border-radius:10px;min-height:38px}
+.btn.block{width:100%}
+.btn:disabled{background:var(--soft);color:var(--muted);box-shadow:none}
+.row{display:flex;gap:12px;align-items:flex-start;padding-block:12px;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row .tile{width:76px;height:94px;border-radius:10px;flex:none}
+.row .info{flex:1;min-width:0}
+.row .t{font-weight:600;font-size:13.5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.row .s{font-size:12.5px;color:var(--muted);margin-top:2px}
+.row .pr{font:800 15px var(--f-d)}
+.qty{display:flex;align-items:center;gap:6px}
+.qty button{width:32px;height:32px;border-radius:9px;background:var(--soft);font-weight:800;font-size:16px}
+.sum{display:flex;justify-content:space-between;padding:4px 0;gap:10px;font-size:14px}
+.sum.total{font-weight:800;font-size:17px;border-top:1px dashed var(--line);margin-top:6px;padding-top:10px}
+.minus{color:var(--green);font-weight:700}
+label.f{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:10px}
+label.f input,select.f{display:block;width:100%;margin-top:4px;padding:12px;border:1.5px solid var(--line);border-radius:11px;background:var(--bg);color:var(--ink);font:inherit;font-size:15px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s,background .15s}
+.opt:has(input:checked){border-color:var(--ink);background:var(--bg)}
+.opt:has(input:disabled){opacity:.55;cursor:not-allowed}
+.opt input{accent-color:var(--ink);margin-top:3px;flex:none}
+.opt .ot{flex:1;min-width:0}
+.opt b{font-size:14px}
+.opt small{display:block;color:var(--muted);font-size:12.5px}
+.opt .tag{font-size:11px;font-weight:800;color:var(--green);background:var(--green-soft);border-radius:5px;padding:1px 6px;margin-left:4px;white-space:nowrap}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--soft);border-radius:12px;padding:3px;gap:3px;margin-bottom:12px}
+.seg button{border-radius:9px;padding:9px 4px;font-weight:700;font-size:13px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.seg button small{font-size:11px;color:var(--muted);font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--paper);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.err{color:var(--pink-deep);font-size:13px;font-weight:700;min-height:18px}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--ink2);margin:10px 0}
+.chk input{width:20px;height:20px;accent-color:var(--ink);flex:none;margin:0}
+.chk a{color:var(--ink);font-weight:700}
+.prog{background:var(--paper);border-radius:14px;padding:12px 14px;margin-top:12px;position:relative}
+.prog .tt{font-size:13.5px;font-weight:700;display:flex;justify-content:space-between;gap:8px}
+.prog .bar{height:8px;border-radius:8px;background:var(--soft);margin-top:8px;overflow:hidden}
+.prog .bar i{display:block;height:100%;border-radius:8px;background:var(--ink);transition:width .6s var(--spring)}
+.prog.done .bar i{background:var(--green)}
+.shop{display:flex;gap:8px;align-items:center;font-size:13px;font-weight:800;padding-top:4px}
+.shop small{font-weight:600;color:var(--muted);margin-left:auto;display:flex;gap:4px;align-items:center}
+.shop small.today{color:var(--green)}
+.sw2{position:relative;width:46px;height:28px;border-radius:999px;background:var(--line);flex:none;transition:background .2s}
+.sw2::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .25s var(--spring)}
+.sw2[aria-checked="true"]{background:var(--ink)}
+.sw2[aria-checked="true"]::after{transform:translateX(18px)}
+.line{display:flex;align-items:center;gap:12px;padding-block:13px;border-bottom:1px solid var(--line);width:100%;font-size:14.5px}
+.line:last-child{border-bottom:0}
+.line .ic{width:34px;height:34px;border-radius:10px;background:var(--bg);display:grid;place-items:center;flex:none}
+.line .tx{flex:1;min-width:0}
+.line .tx small{display:block;color:var(--muted);font-size:12.5px}
+.line>svg.i:last-child{color:var(--muted)}
+.line:disabled{opacity:.55}
+.empty{text-align:center;color:var(--muted);padding:44px 10px}
+.empty .bigi{font:900 40px var(--f-d);color:var(--line)}
+.link{display:flex;gap:8px;align-items:center;background:var(--bg);border-radius:11px;padding:7px 7px 7px 12px;margin-top:10px;overflow:hidden}
+.link code{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 13.5px ui-monospace,monospace}
+.timer{font-variant-numeric:tabular-nums;font-weight:800}
+.coupon{display:flex;justify-content:space-between;align-items:center;background:var(--green-soft);color:var(--green);font-weight:800;border-radius:12px;padding:11px 13px;margin-top:12px;font-size:13.5px;gap:8px}
+.drum{display:flex;gap:12px;align-items:center;width:100%;margin-top:12px;background:var(--butter);border-radius:14px;padding:12px}
+.drum i{width:38px;height:38px;border-radius:50%;border:3px solid var(--ink);background:conic-gradient(var(--pink) 0 60deg,#fff 0 120deg,var(--ink) 0 180deg,#fff 0 240deg,var(--pink) 0 300deg,#fff 0);animation:spin 6s linear infinite;flex:none}
+.drum b{display:block;font-size:14px}
+.drum small{font-size:12.5px;color:var(--ink2)}
+.prof{display:flex;align-items:center;gap:12px;padding:16px;border-radius:18px;background:var(--ink);color:#fff;margin-top:16px}
+.ava{width:54px;height:54px;border-radius:50%;background:var(--pink);display:grid;place-items:center;font:900 15px var(--f-d);flex:none}
+.prof .bal{margin-left:auto;text-align:right}
+.prof .bal b{display:block;font:900 20px var(--f-d)}
+.prof .bal small{opacity:.7;font-size:12px}
+.fund .bar{height:8px;border-radius:8px;background:var(--soft);overflow:hidden;margin-top:8px}
+.fund .bar i{display:block;height:100%;background:var(--ink);border-radius:8px}
+
+/* tracking */
+.tl{list-style:none;margin:0;padding:0}
+.tl li{display:grid;grid-template-columns:26px 1fr;gap:10px;position:relative;padding-bottom:16px}
+.tl li::before{content:"";position:absolute;left:12px;top:24px;bottom:0;width:2px;background:var(--line)}
+.tl li:last-child::before{display:none}
+.tl li.done::before{background:var(--ink)}
+.tl .d{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);background:var(--paper);display:grid;place-items:center;color:#fff}
+.tl li.done .d{background:var(--ink);border-color:var(--ink)}
+.tl li.cur .d{border-color:var(--pink);background:var(--pink);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(255,46,126,.18)}}
+.tl .d svg.i{width:14px;height:14px;stroke-width:3}
+.tl b{font-size:14.5px}
+.tl small{display:block;color:var(--muted);font-size:12.5px}
+.tl li:not(.done):not(.cur) b{color:var(--muted);font-weight:600}
+.code{display:flex;gap:6px;justify-content:center;margin:10px 0 4px}
+.code b{font:900 24px var(--f-d);background:var(--bg);border-radius:10px;width:42px;height:54px;display:grid;place-items:center}
+
+/* sheet */
+.ov{position:fixed;inset:0;background:rgba(17,12,8,.5);z-index:40;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.sheet{background:var(--paper);width:min(100%,460px);max-height:94vh;overflow-y:auto;overscroll-behavior:contain;border-radius:22px 22px 0 0;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));animation:up .38s var(--spring);position:relative}
+.sheet.small{max-height:84vh}
+@keyframes up{from{transform:translateY(50%)}}
+.in{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.grab{width:40px;height:4px;border-radius:4px;background:var(--line);margin:10px auto 6px}
+.x{position:absolute;top:12px;right:12px;z-index:6;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.94);display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.gal{position:relative}
+.gtrack{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.gtrack::-webkit-scrollbar{display:none}
+.frame{flex:0 0 100%;scroll-snap-align:start;aspect-ratio:1/1;max-width:100%;position:relative}
+.frame .tile{width:100%;height:100%}
+.frame .tile>svg{width:60%;height:60%}
+.frame.back .tile>svg{transform:scaleX(-1)}
+.frame.zoom .tile>svg{transform:scale(2.7) translateY(6%);filter:none}
+.frame.zoom .tile::after{display:none}
+.lab{position:absolute;left:12px;bottom:12px;z-index:3;background:rgba(255,255,255,.92);font-size:12px;font-weight:700;padding:4px 9px;border-radius:999px}
+.gcount{position:absolute;right:12px;bottom:12px;z-index:3;background:var(--ink);color:#fff;font-size:12px;font-weight:700;padding:4px 9px;border-radius:999px}
+.tagcard{width:100%;height:100%;display:grid;place-items:center;background:var(--soft)}
+.tagcard div{background:#fff;width:58%;padding:18px 16px;border-radius:6px;box-shadow:0 10px 24px rgba(0,0,0,.08);font-size:12px;line-height:1.5;position:relative}
+.tagcard div::before{content:"";position:absolute;top:10px;left:50%;width:10px;height:10px;margin-left:-5px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--line)}
+.tagcard b{display:block;font:900 13px var(--f-d);margin:12px 0 6px;letter-spacing:.1em}
+.dp{display:flex;align-items:baseline;gap:8px;margin-top:14px;flex-wrap:wrap}
+.dp b{font:900 26px var(--f-d);letter-spacing:-.02em}
+.dp s{color:var(--muted)}
+.parts{font-size:13px;color:var(--ink2);margin-top:2px}
+.parts b{font-weight:800}
+.dname{font-size:15.5px;margin:6px 0 0;line-height:1.35}
+.bline{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.bline .bdg{font-size:12px;padding:4px 8px;border-radius:7px}
+.cut{display:flex;gap:8px;align-items:center;background:var(--green-soft);color:var(--green);border-radius:11px;padding:9px 12px;font-size:13px;font-weight:700;margin-top:12px}
+.lbl{font-weight:800;font-size:14px;margin:18px 0 8px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.lbl span{color:var(--muted);font-weight:500;font-size:13px}
+.lbl button{font-size:13px;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.sws{display:flex;gap:10px}
+.sws button{width:38px;height:38px;border-radius:50%;box-shadow:inset 0 0 0 3px #fff;border:2px solid var(--line);transition:transform .2s var(--spring)}
+.sws button[aria-pressed="true"]{border-color:var(--ink);transform:scale(1.08)}
+.sizes{display:flex;flex-wrap:wrap;gap:8px}
+.size{border:1.5px solid var(--line);border-radius:10px;padding:9px 12px;font-weight:700;min-width:52px;min-height:44px;position:relative;transition:all .15s}
+.size[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:#fff}
+.size.oos{color:var(--muted);background:repeating-linear-gradient(135deg,transparent 0 6px,var(--soft) 6px 7px);text-decoration:line-through}
+.size .few{position:absolute;top:-8px;right:-6px;background:var(--pink);color:#fff;font-size:9.5px;font-weight:800;padding:1px 4px;border-radius:4px;text-decoration:none}
+.size .rec{position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);background:var(--butter);color:var(--ink);font-size:9px;font-weight:800;padding:0 4px;border-radius:4px;white-space:nowrap}
+.yula{display:flex;gap:10px;align-items:center;background:var(--bg);border-radius:12px;padding:10px 12px;margin-top:14px;width:100%}
+.yula .ya{width:34px;height:34px;border-radius:50%;background:var(--pink);color:#fff;display:grid;place-items:center;font:900 12px var(--f-d);flex:none}
+.yula b{font-size:13.5px;display:block}
+.yula small{font-size:12.5px;color:var(--muted)}
+.fit{margin-top:4px}
+.fit .scale{position:relative;height:6px;border-radius:6px;background:linear-gradient(90deg,var(--soft),var(--line) 50%,var(--soft));margin:10px 0 6px}
+.fit .mk{position:absolute;top:50%;width:16px;height:16px;border-radius:50%;background:var(--ink);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);transform:translate(-50%,-50%)}
+.fit .ends{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)}
+.blk{border-top:1px solid var(--line);padding-block:16px;margin-top:16px}
+.blk h5{margin:0 0 10px;font-size:15px;font-weight:800}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13.5px;margin:0}
+.dl dt{color:var(--muted)}
+.dl dd{margin:0}
+.seller{display:flex;gap:12px;align-items:center}
+.seller .lg{width:46px;height:46px;border-radius:12px;background:var(--ink);color:#fff;display:grid;place-items:center;font:900 14px var(--f-d);flex:none}
+.seller small{display:block;color:var(--muted);font-size:12.5px}
+.sstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.sstats div{background:var(--bg);border-radius:10px;padding:8px;text-align:center}
+.sstats b{display:block;font:800 14px var(--f-d)}
+.sstats small{font-size:11px;color:var(--muted)}
+.rsum{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center}
+.rsum .big{font:900 34px var(--f-d)}
+.rbars{display:grid;gap:3px;font-size:11.5px;color:var(--muted)}
+.rbars div{display:grid;grid-template-columns:10px 1fr 30px;gap:6px;align-items:center}
+.rbars i{height:5px;border-radius:5px;background:var(--soft);overflow:hidden;display:block}
+.rbars i b{display:block;height:100%;background:var(--ink)}
+.rv{padding-block:12px;border-top:1px solid var(--line)}
+.rv .h{display:flex;gap:8px;align-items:center;font-size:13px;flex-wrap:wrap}
+.rv .h b{font-weight:800}
+.rv .h .ok{color:var(--green);font-weight:700;font-size:12px;display:flex;gap:3px;align-items:center}
+.rv .m{font-size:12px;color:var(--muted);margin-top:2px}
+.rv p{margin:6px 0 0;font-size:13.5px}
+.buybar{position:sticky;bottom:0;background:var(--paper);padding-top:10px;display:grid;grid-template-columns:1fr 1.25fr;gap:8px;border-top:1px solid var(--line);z-index:4}
+.buybar .btn{flex-direction:column;gap:0;padding:8px}
+.buybar .btn b{font:800 14.5px var(--f-d)}
+.buybar .btn span{font-size:11.5px;font-weight:600;opacity:.85}
+.stable{overflow-x:auto;margin-top:8px}
+.stable table{border-collapse:collapse;width:100%;font-size:13px;min-width:300px}
+.stable th,.stable td{padding:8px 6px;text-align:center;border-bottom:1px solid var(--line)}
+.stable th{font-weight:800;background:var(--bg)}
+.stable td:first-child,.stable th:first-child{text-align:left;font-weight:700}
+.rng{width:100%;accent-color:var(--ink)}
+.rlab{display:flex;justify-content:space-between;font-weight:700;font-size:14px;margin-top:14px}
+.result{background:var(--ink);color:#fff;border-radius:16px;padding:16px;margin-top:14px;animation:viewIn .3s var(--out)}
+.result b{font:900 30px var(--f-d);color:var(--butter)}
+.result small{display:block;opacity:.8;font-size:12.5px;margin-top:4px}
+
+/* drum wheel */
+.wheelwrap{position:relative;width:min(270px,74vw);aspect-ratio:1;max-width:100%;margin:12px auto 14px}
+.wheel{width:100%;height:100%;border-radius:50%;border:7px solid var(--ink);position:relative;transition:transform 4.4s cubic-bezier(.15,.7,.1,1)}
+.wheel span{position:absolute;left:50%;top:50%;width:46%;transform-origin:0 50%;font:800 12px var(--f-d);text-align:right;padding-right:12px;margin-top:-9px;line-height:18px}
+.ptr{position:absolute;top:-12px;left:50%;transform:translateX(-50%);border-left:14px solid transparent;border-right:14px solid transparent;border-top:26px solid var(--ink);z-index:2}
+.hub{position:absolute;inset:37%;border-radius:50%;background:var(--butter);border:5px solid var(--ink);display:grid;place-items:center;font:900 11px var(--f-d);letter-spacing:.08em}
+.odds{font-size:12.5px;color:var(--muted);margin-top:12px}
+.odds summary{cursor:pointer;font-weight:700;color:var(--ink)}
+.odds table{width:100%;border-collapse:collapse;margin-top:6px}
+.odds td{padding:4px 0;border-bottom:1px solid var(--line)}
+.odds td:last-child{text-align:right}
+
+/* onboarding */
+.onb{position:fixed;inset:0;z-index:80;background:var(--ink);color:#fff;overflow-y:auto;padding-top:calc(28px + env(safe-area-inset-top,0px));padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+.onb .wrap{max-width:460px;margin:0 auto;display:flex;flex-direction:column;min-height:100%;gap:18px}
+.onb .big{font:900 56px/.9 var(--f-d);letter-spacing:.06em;display:flex;align-items:center;gap:10px;animation:rise .6s var(--spring) both}
+.onb .big b{width:20px;height:20px;background:var(--pink);clip-path:polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)}
+.onb .tag{font-size:20px;line-height:1.25;font-weight:600;max-width:20ch;animation:rise .6s var(--spring) .08s both}
+.onb ul{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.onb li{display:flex;gap:12px;align-items:center;font-size:15px;animation:rise .55s var(--spring) both}
+.onb li:nth-child(1){animation-delay:.16s}.onb li:nth-child(2){animation-delay:.22s}.onb li:nth-child(3){animation-delay:.28s}
+.onb li i{width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.1);display:grid;place-items:center;flex:none}
+.onb li i svg.i{color:var(--butter)}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}}
+.onb .who{display:flex;flex-wrap:wrap;gap:8px}
+.onb .who button{border:1.5px solid rgba(255,255,255,.3);border-radius:999px;padding:9px 15px;font-weight:700}
+.onb .who button[aria-pressed="true"]{background:#fff;color:var(--ink);border-color:#fff}
+.onb .gift{display:flex;gap:12px;align-items:center;background:var(--pink);border-radius:16px;padding:14px;transform:rotate(-1.5deg)}
+.onb .gift b{font:900 26px var(--f-d)}
+.onb .juli{display:flex;gap:10px;align-items:center;font-size:13.5px;color:rgba(255,255,255,.78)}
+.onb .juli .ya{width:36px;height:36px;border-radius:50%;background:var(--butter);color:var(--ink);display:grid;place-items:center;font:900 12px var(--f-d);flex:none}
+.onb .btn{background:#fff;color:var(--ink);margin-top:auto}
+
+.fly{position:fixed;z-index:60;width:66px;height:66px;border-radius:50%;pointer-events:none;overflow:hidden;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.fly>svg{width:80%;height:80%}
+.conf{position:fixed;width:7px;height:11px;z-index:61;pointer-events:none;border-radius:2px}
+.toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 16px;border-radius:13px;font-weight:700;font-size:13.5px;z-index:90;max-width:calc(100% - 32px);text-align:center;animation:toast .3s var(--spring)}
+@keyframes toast{from{transform:translate(-50%,18px);opacity:0}}
+.eco *,.eco *::before,.eco *::after{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+
+<div class="app">
+  <header class="hdr gut" id="hdr">
+    <div class="r1">
+      <div class="mark">YULA<b></b></div><span class="sp"></span>
+      <button class="hb" type="button" data-notif aria-label="Сповіщення"><svg class="i" viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="dot"></span></button>
+      <button class="hb" type="button" data-go="likes" aria-label="Обране"><svg class="i" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-9-9.5C2 7 4.2 4.5 7 4.5c2 0 3.4 1.2 5 3 1.6-1.8 3-3 5-3 2.8 0 5 2.5 4 6C19.5 15.4 12 20 12 20z"/></svg></button>
+    </div>
+    <div class="r2">
+      <label class="pill" id="pill" for="q">
+        <input id="q" type="search" autocomplete="off" aria-label="Пошук товарів">
+        <span class="hint" id="hint"><span>худі фліс</span></span>
+        <button class="cam" type="button" data-photo aria-label="Пошук за фото"><svg class="i" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
+        <button class="gos" type="button" id="goS" aria-label="Шукати"><svg class="i" viewBox="0 0 24 24" style="stroke-width:2.6"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4-4"/></svg></button>
+      </label>
+    </div>
+    <div class="sugg" id="sugg" hidden></div>
+    <div class="ntabs" id="ntabs" role="tablist"></div>
+  </header>
+  <div class="net gut" id="net" hidden><svg class="i" viewBox="0 0 24 24"><path d="M2 8.5a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0M3 3l18 18"/></svg><span id="netT">Немає зв'язку. Показуємо збережене.</span></div>
+  <div class="ecob gut" id="ecob" hidden><svg class="i" viewBox="0 0 24 24"><path d="M5 19c0-9 6-14 14-14 0 8-5 14-14 14z"/><path d="M5 19 13 11"/></svg>Режим економії: без анімацій і автопрокрутки</div>
+  <main id="main"></main>
+</div>
+
+<nav class="tabs" aria-label="Розділи">
+  <button class="tab" data-go="home" type="button"><svg class="i" viewBox="0 0 24 24"><path class="fl" d="M3.5 10.5 12 4l8.5 6.5V20H15v-5.5H9V20H3.5z"/></svg>Головна</button>
+  <button class="tab" data-go="cats" type="button"><svg class="i" viewBox="0 0 24 24"><rect class="fl" x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="3.25"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg>Каталог</button>
+  <button class="tab" data-go="groups" type="button"><svg class="i" viewBox="0 0 24 24"><circle class="fl" cx="9" cy="8.5" r="3.5"/><circle cx="17" cy="9.5" r="2.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M15.5 14.6c2.6-.3 4.9 1.2 5.8 4.4"/></svg>Разом</button>
+  <button class="tab" data-go="cart" id="tabCart" type="button"><svg class="i" viewBox="0 0 24 24"><path class="fl" d="M5 8h14l-1.3 12H6.3z"/><path d="M9 10.5V7a3 3 0 0 1 6 0v3.5"/></svg>Кошик<span class="cnt num" id="cnt" hidden>0</span></button>
+  <button class="tab" data-go="me" type="button"><svg class="i" viewBox="0 0 24 24"><circle class="fl" cx="12" cy="8" r="4"/><path d="M4 21c1-4.4 4.2-6.5 8-6.5s7 2.1 8 6.5"/></svg>Профіль</button>
+</nav>
+<div id="ovHost"></div>
+<div id="onbHost"></div>
+<div id="toastHost"></div>
+
+<script>
+/* ===== icons ===== */
+const IC={
+ bolt:'<path d="M13 3 5 13h6l-1 8 8-10h-6z"/>',
+ ret:'<path d="M4 9h11a5 5 0 0 1 0 10H8"/><path d="m8 5-4 4 4 4"/>',
+ eye:'<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+ truck:'<path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/>',
+ shield:'<path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z"/><path d="m9 12 2 2 4-4"/>',
+ heart:'<path d="M12 20s-7.5-4.6-9-9.5C2 7 4.2 4.5 7 4.5c2 0 3.4 1.2 5 3 1.6-1.8 3-3 5-3 2.8 0 5 2.5 4 6C19.5 15.4 12 20 12 20z"/>',
+ cartp:'<path d="M5 8h14l-1.3 12H6.3z"/><path d="M9 10.5V7a3 3 0 0 1 6 0v3.5M12 12.5v5M9.5 15h5"/>',
+ back:'<path d="M15 5l-7 7 7 7"/>', chev:'<path d="m9 6 6 6-6 6"/>', x:'<path d="M6 6l12 12M18 6 6 18"/>',
+ copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+ ruler:'<rect x="3" y="8" width="18" height="8" rx="1.5"/><path d="M7 8v3M11 8v4M15 8v3M19 8v4"/>',
+ box:'<path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/>',
+ locker:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M4 15h16M12 3v18"/>',
+ chat:'<path d="M4 5h16v11H9l-5 4z"/>', check:'<path d="m5 12 5 5 9-10"/>',
+ bell:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
+ gift:'<rect x="3" y="8" width="18" height="13" rx="1.5"/><path d="M3 12h18M12 8v13M12 8c-2-4-6-4-6-1.5S10 8 12 8zm0 0c2-4 6-4 6-1.5S14 8 12 8z"/>',
+ leaf:'<path d="M5 19c0-9 6-14 14-14 0 8-5 14-14 14z"/><path d="M5 19 13 11"/>',
+ pin:'<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+ grid:'<rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="3.25"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/>',
+ doc:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/>',
+ trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+ camera:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+ flag:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>'
+};
+const ic=(n,st="")=>`<svg class="i" viewBox="0 0 24 24" aria-hidden="true" ${st?`style="${st}"`:""}>${IC[n]}</svg>`;
+const STAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>';
+
+/* ===== garment art ===== */
+const SH={
+ hoodie:{m:['M31 30 43 21q7 6 14 0l12 9 14 22-9 6-5-6v36H31V52l-5 6-9-6z','M40 23q10-17 20 0q-10 11-20 0z'],x:'<rect x="39" y="64" width="22" height="11" rx="3" fill="rgba(0,0,0,.13)"/><path d="M46 31v10M54 31v10" stroke="rgba(255,255,255,.75)" stroke-width="1.6" stroke-linecap="round"/><path d="M31 82h38" stroke="rgba(0,0,0,.12)" stroke-width="4"/>'},
+ sweater:{m:['M31 26 43 20q7 5 14 0l12 6 15 26-9 5-6-8v39H31V49l-6 8-9-5z'],x:'<path d="M31 82h38M16 51l9 5M84 51l-9 5" stroke="rgba(0,0,0,.14)" stroke-width="4"/><path d="M43 20q7 7 14 0" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="3"/>'},
+ tee:{m:['M32 24l12-5q6 5 12 0l12 5 15 13-9 10-6-5v41H32V42l-6 5-9-10z'],x:'<path d="M44 19q6 7 12 0" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="2.5"/>'},
+ dress:{m:['M41 14h18l-1 20 17 52q-25 6-50 0l17-52z'],x:'<path d="M42 35h16" stroke="rgba(0,0,0,.22)" stroke-width="3"/><path d="M45 50 40 84M55 50l5 34M50 50v36" stroke="rgba(0,0,0,.07)" stroke-width="2"/>'},
+ skirt:{m:['M34 24h32l13 58q-29 8-58 0z'],x:'<path d="M34 28h32" stroke="rgba(0,0,0,.2)" stroke-width="5"/><path d="M42 31 36 86M50 31v57M58 31l6 55" stroke="rgba(0,0,0,.09)" stroke-width="2"/>'},
+ pants:{m:['M32 14h36l3 72H55l-5-44-5 44H29z'],x:'<path d="M32 21h36" stroke="rgba(0,0,0,.18)" stroke-width="3"/><path d="M50 21v20" stroke="rgba(0,0,0,.12)" stroke-width="1.5"/>'},
+ jacket:{m:['M30 24 42 15h16l12 9 14 22-9 6-5-5v41H30V51l-5 5-9-6z'],x:'<path d="M50 17v76" stroke="rgba(0,0,0,.22)" stroke-width="2.5"/><path d="M30 38h40M30 52h40M30 66h40M30 80h40" stroke="rgba(0,0,0,.1)" stroke-width="3"/>'},
+ coat:{m:['M32 16l10-6h16l10 6 10 30-7 3-3-5v52H32V54l-3 5-7-3z'],x:'<path d="M42 10l8 24 8-24" fill="none" stroke="rgba(0,0,0,.2)" stroke-width="2.5"/><circle cx="45" cy="50" r="1.8" fill="rgba(0,0,0,.3)"/><circle cx="45" cy="64" r="1.8" fill="rgba(0,0,0,.3)"/><circle cx="55" cy="50" r="1.8" fill="rgba(0,0,0,.3)"/><circle cx="55" cy="64" r="1.8" fill="rgba(0,0,0,.3)"/>'},
+ sneaker:{m:['M10 64q1-17 16-20l14-8q10 12 23 12l17 4q12 4 10 15z'],x:'<rect x="9" y="65" width="82" height="10" rx="4" fill="#fff"/><path d="M9 70h82" stroke="rgba(0,0,0,.1)" stroke-width="1.5"/><path d="M40 42l6 9M47 39l5 9M54 41l4 8" stroke="rgba(255,255,255,.85)" stroke-width="2.4" stroke-linecap="round"/>'},
+ boot:{m:['M36 14h20v46l23 7q8 3 6 12H36z'],x:'<rect x="35" y="79" width="51" height="8" rx="3" fill="rgba(0,0,0,.35)"/><path d="M38 30q9 4 16 0" fill="none" stroke="rgba(0,0,0,.2)" stroke-width="5"/>'},
+ slides:{m:['M14 60q0-18 18-18h36q18 0 18 18v3H14z'],x:'<rect x="11" y="62" width="78" height="9" rx="4.5" fill="rgba(0,0,0,.22)"/><path d="M24 52q26-10 52 0" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="3"/>'},
+ bag:{m:['M22 40h56a6 6 0 0 1 6 6v34a6 6 0 0 1-6 6H22a6 6 0 0 1-6-6V46a6 6 0 0 1 6-6z'],x:'<path d="M38 41q0-19 12-19t12 19" fill="none" stroke="rgba(0,0,0,.45)" stroke-width="4.5"/><rect x="44" y="51" width="12" height="7" rx="2" fill="rgba(255,255,255,.6)"/>'},
+ vest:{m:['M33 18l10-6h14l10 6-3 14v56H36V32z'],x:'<path d="M50 14v74" stroke="rgba(0,0,0,.25)" stroke-width="2.5"/><path d="M36 40h28M36 56h28M36 72h28" stroke="rgba(0,0,0,.1)" stroke-width="3"/><path d="M43 12q7 10 14 0" fill="none" stroke="rgba(0,0,0,.2)" stroke-width="2.5"/>'},
+ tank:{m:['M37 14h6q7 13 14 0h6v13q8 6 8 16v43H29V43q0-10 8-16z'],x:'<path d="M43 14q7 15 14 0" fill="none" stroke="rgba(0,0,0,.15)" stroke-width="2"/>'},
+ shorts:{m:['M28 30h44l5 38H56l-6-18-6 18H23z'],x:'<path d="M28 35h44" stroke="rgba(0,0,0,.2)" stroke-width="4"/><path d="M46 37l-2 5M54 37l2 5" stroke="rgba(255,255,255,.7)" stroke-width="1.6" stroke-linecap="round"/>'},
+ backpack:{m:['M30 32q0-14 20-14t20 14v50a6 6 0 0 1-6 6H36a6 6 0 0 1-6-6z'],x:'<rect x="36" y="56" width="28" height="22" rx="5" fill="rgba(0,0,0,.14)"/><path d="M42 18q8-8 16 0" fill="none" stroke="rgba(0,0,0,.4)" stroke-width="3.5"/>'}
+};
+let uid=0;
+function art(p,h){
+  h=h??p.h;const id=++uid,s=p.sat,l=p.l,sh=SH[p.s];
+  const lt=`hsl(${h} ${s}% ${Math.min(l+13,95)}%)`,dk=`hsl(${h} ${s}% ${Math.max(l-15,7)}%)`;
+  const pat={stripe:`<pattern id="t${id}" width="7" height="7" patternUnits="userSpaceOnUse"><rect width="7" height="3" fill="rgba(255,255,255,.55)"/></pattern>`,
+    dot:`<pattern id="t${id}" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="3.5" cy="3.5" r="1.3" fill="rgba(255,255,255,.7)"/></pattern>`,
+    check:`<pattern id="t${id}" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="5" height="10" fill="rgba(0,0,0,.16)"/><rect width="10" height="5" fill="rgba(0,0,0,.16)"/></pattern>`,
+    rib:`<pattern id="t${id}" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="1.6" height="4" fill="rgba(0,0,0,.09)"/></pattern>`}[p.pat]||"";
+  const paths=sh.m.map(d=>`<path d="${d}"/>`).join("");
+  return `<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="g${id}" x1="0" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="${lt}"/><stop offset="1" stop-color="${dk}"/></linearGradient>${pat}<clipPath id="c${id}">${paths}</clipPath></defs><g fill="url(#g${id})">${paths}</g>${pat?`<rect width="100" height="100" fill="url(#t${id})" clip-path="url(#c${id})"/>`:""}<g clip-path="url(#c${id})"><ellipse cx="30" cy="20" rx="30" ry="50" fill="rgba(255,255,255,.12)"/></g>${sh.x}</svg>`;
+}
+const tile=(p,h,st="")=>`<div class="tile" style="--h:${h??p.h};${st}">${art(p,h)}</div>`;
+
+/* ===== catalog from supplier feed ===== */
+const SELLERS=[{n:"MODAMIXX",lg:"MM",legal:"Постачальник через MyDrop · реквізити ФОП уточнюються",city:"Україна",r:null,on:null,since:2026,vf:0}];
+const CAT={"supplier":"MODAMIXX_ADMIN","items":[{"n":"Футболка + шорти хакі, чорний","raw":"ФУТБОЛКА+ШОРТИ хакі + чорний","s":"tee","sub":"Комплекти","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":190,"p":249,"g":229,"sz":{"XS-S":17,"M-L":2,"XL-XXL":2},"pics":2,"mat":null,"code":"FSHK08"},{"n":"Футболка + шорти білий, чорний","raw":"ФУТБОЛКА+ШОРТИ білий + чорний","s":"tee","sub":"Комплекти","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":190,"p":249,"g":229,"sz":{"XS-S":6,"M-L":4,"XL-XXL":3},"pics":2,"mat":null,"code":"FSHK07"},{"n":"Футболка + шорти графит, чорний","raw":"ФУТБОЛКА+ШОРТИ графит + чорний","s":"tee","sub":"Комплекти","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":190,"p":249,"g":229,"sz":{"XS-S":8,"M-L":1,"XL-XXL":1},"pics":2,"mat":null,"code":"FSHK06"},{"n":"Футболка + шорти меланж, чорний","raw":"ФУТБОЛКА+ШОРТИ меланж + чорний","s":"tee","sub":"Комплекти","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":190,"p":249,"g":229,"sz":{"XS-S":23,"M-L":15,"XL-XXL":30},"pics":2,"mat":null,"code":"FSHK05"},{"n":"Футболка + шорти + чорний, шоколад","raw":"ФУТБОЛКА+ШОРТИ шоколад + чорний","s":"tee","sub":"Комплекти","c":"uni","h":20,"sat":35,"l":26,"pat":"","cost":190,"p":249,"g":229,"sz":{"XS-S":8,"M-L":1,"XL-XXL":10},"pics":2,"mat":null,"code":"FSHK03"},{"n":"Футболка + шорти беж, чорний","raw":"ФУТБОЛКА+ШОРТИ беж+чорний","s":"tee","sub":"Комплекти","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":190,"p":249,"g":229,"sz":{"XS-S":4,"M-L":4,"XL-XXL":5},"pics":2,"mat":null,"code":"FSHK02"},{"n":"Футболка + шорти + чорний, зелений","raw":"ФУТБОЛКА+ШОРТИ зелений+чорний","s":"tee","sub":"Комплекти","c":"uni","h":140,"sat":35,"l":38,"pat":"","cost":190,"p":249,"g":229,"sz":{"XS-S":11,"M-L":12,"XL-XXL":14},"pics":2,"mat":null,"code":"FSHK01"},{"n":"Костюм чорний, варенка","raw":"Костюм варенка ЧОРНИЙ-30%🔥📢","s":"hoodie","sub":"Костюми","c":"uni","h":210,"sat":10,"l":55,"pat":"dot","cost":590,"p":769,"g":709,"sz":{"S":1,"L":4,"XL":4},"pics":3,"mat":"Варена бавовна","code":"KVF04"},{"n":"Костюм сірий, варенка","raw":"Костюм варенка СІРИЙ -30%🔥📢","s":"hoodie","sub":"Костюми","c":"uni","h":210,"sat":10,"l":55,"pat":"dot","cost":590,"p":769,"g":709,"sz":{"M":18,"L":20},"pics":3,"mat":"Варена бавовна","code":"KVF03"},{"n":"Костюм варенка, шоколад","raw":"Костюм варенка ШОКОЛАД-30%🔥📢","s":"hoodie","sub":"Костюми","c":"uni","h":20,"sat":35,"l":26,"pat":"","cost":590,"p":769,"g":709,"sz":{"S":6,"M":13,"L":32,"XL":6,"XXL":2},"pics":3,"mat":"Варена бавовна","code":"KVF02"},{"n":"Костюм графіт, варенка","raw":"Костюм варенка ГРАФІТ -30%🔥📢","s":"hoodie","sub":"Костюми","c":"uni","h":210,"sat":10,"l":55,"pat":"dot","cost":590,"p":769,"g":709,"sz":{"S":9,"M":2,"L":7},"pics":3,"mat":"Варена бавовна","code":"KVF01"},{"n":"Штани фліс, чорний","raw":"Штани Фліс ЧОРНИЙ","s":"pants","sub":"Штани","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":375,"p":489,"g":449,"sz":{"S":25,"M":21,"L":20,"XL":15,"XXL":22,"3XL":25},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"SHF05"},{"n":"Штани фліс, графіт","raw":"Штани Фліс ГРАФІТ","s":"pants","sub":"Штани","c":"uni","h":220,"sat":6,"l":30,"pat":"","cost":375,"p":489,"g":449,"sz":{"S":13,"M":23,"L":17,"XL":19,"XXL":21,"3XL":14},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"SHF04"},{"n":"Штани фліс, меланж","raw":"Штани Фліс МЕЛАНЖ","s":"pants","sub":"Штани","c":"uni","h":0,"sat":0,"l":72,"pat":"rib","cost":375,"p":489,"g":449,"sz":{"S":7,"L":3,"XL":11,"XXL":42,"3XL":23},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"SHF03"},{"n":"Штани фліс, білий","raw":"Штани Фліс БІЛИЙ","s":"pants","sub":"Штани","c":"uni","h":40,"sat":12,"l":94,"pat":"","cost":375,"p":489,"g":449,"sz":{"S":18,"M":17,"L":17,"XL":11,"XXL":23,"3XL":8},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"SHF01"},{"n":"Термобілизна","raw":"Термобілизна","s":"tee","sub":"Термобілизна","c":"uni","h":0,"sat":0,"l":22,"pat":"","cost":300,"p":389,"g":359,"sz":{"XL":10,"XXL":14},"pics":2,"mat":"Термотканина","code":"TER01"},{"n":"Худі фліс з рибаною, темно-синій","raw":"Худі Фліс з рибаною ТЕМНО-СИНІЙ -35%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":225,"sat":45,"l":26,"pat":"","cost":250,"p":329,"g":299,"sz":{"S":2,"M":20,"L":15,"XL":24},"pics":2,"mat":"Фліс з рибаною","code":"FHR04"},{"n":"Худі фліс з рибаною, чорний","raw":"Худі Фліс з рибаною ЧОРНИЙ-35%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":250,"p":329,"g":299,"sz":{"S":27,"M":57,"L":62,"XL":90,"XXL":17,"3XL":3,"4XL":2},"pics":2,"mat":"Фліс з рибаною","code":"FHR03"},{"n":"Худі фліс з рибаною, хакі","raw":"Худі Фліс з рибаною ХАКІ-35%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":250,"p":329,"g":299,"sz":{"S":34,"M":92,"L":98,"XL":117,"XXL":15,"3XL":7,"4XL":5},"pics":2,"mat":"Фліс з рибаною","code":"FHR02"},{"n":"Худі фліс з рибаною, графіт","raw":"Худі Фліс з рибаною ГРАФІТ-35%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":220,"sat":6,"l":30,"pat":"","cost":250,"p":329,"g":299,"sz":{"S":11,"M":28,"L":25,"XL":33,"XXL":3,"4XL":5},"pics":2,"mat":"Фліс з рибаною","code":"FHR01"},{"n":"Жилет, хакі","raw":"Жилет ХАКІ","s":"vest","sub":"Жилети","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":490,"p":639,"g":589,"sz":{"XS":6,"S":3,"L":2},"pics":2,"mat":null,"code":"G08"},{"n":"Жилет, синій","raw":"Жилет СИНІЙ","s":"vest","sub":"Жилети","c":"uni","h":220,"sat":55,"l":40,"pat":"","cost":490,"p":639,"g":589,"sz":{"XS":15,"S":12,"M":36,"L":16,"XL":14,"XXL":21},"pics":2,"mat":null,"code":"G07"},{"n":"Жилет, темно-синій","raw":"Жилет ТЕМНО-СИНІЙ","s":"vest","sub":"Жилети","c":"uni","h":225,"sat":45,"l":26,"pat":"","cost":490,"p":639,"g":589,"sz":{"XS":12,"S":5,"M":9,"L":5,"XL":8,"XXL":4},"pics":2,"mat":null,"code":"G06"},{"n":"Жилет, сірий","raw":"Жилет СІРИЙ","s":"vest","sub":"Жилети","c":"uni","h":0,"sat":0,"l":62,"pat":"","cost":490,"p":639,"g":589,"sz":{"XS":10,"S":16,"M":2,"XL":4,"XXL":11},"pics":2,"mat":null,"code":"G05"},{"n":"Жилет, білий","raw":"Жилет БІЛИЙ","s":"vest","sub":"Жилети","c":"uni","h":40,"sat":12,"l":94,"pat":"","cost":490,"p":639,"g":589,"sz":{"XS":10,"M":1,"L":1,"XL":15,"XXL":33},"pics":2,"mat":null,"code":"G04"},{"n":"Жилет, беж","raw":"Жилет БЕЖ","s":"vest","sub":"Жилети","c":"uni","h":32,"sat":35,"l":78,"pat":"","cost":490,"p":639,"g":589,"sz":{"XS":8,"L":13,"XL":8,"XXL":12},"pics":2,"mat":null,"code":"G03"},{"n":"Жилет, графіт","raw":"Жилет ГРАФІТ","s":"vest","sub":"Жилети","c":"uni","h":220,"sat":6,"l":30,"pat":"","cost":490,"p":639,"g":589,"sz":{"XS":30,"S":24,"L":1,"XXL":1},"pics":2,"mat":null,"code":"G01"},{"n":"Жилет, чорний","raw":"Жилет ЧОРНИЙ","s":"vest","sub":"Жилети","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":490,"p":639,"g":589,"sz":{"XS":22,"XL":3,"XXL":31},"pics":2,"mat":null,"code":"G02"},{"n":"Жіночий костюм топ + шорти, сірий","raw":"жін костюм топ+шорти СІРИЙ","s":"tank","sub":"Комплекти","c":"women","h":0,"sat":0,"l":62,"pat":"","cost":414,"p":539,"g":499,"sz":{"XS-S":12,"M-L":22},"pics":2,"mat":null,"code":"KGL0001"},{"n":"Жіночий костюм топ + шорти, білий","raw":"жін костюм топ+шорти БІЛИЙ","s":"tank","sub":"Комплекти","c":"women","h":40,"sat":12,"l":94,"pat":"","cost":414,"p":539,"g":499,"sz":{"XS-S":20,"M-L":19},"pics":2,"mat":null,"code":"KGL0003"},{"n":"Жіночий костюм топ + шорти, беж","raw":"жін костюм топ+шорти БЕЖ","s":"tank","sub":"Комплекти","c":"women","h":32,"sat":35,"l":78,"pat":"","cost":414,"p":539,"g":499,"sz":{"XS-S":24,"M-L":16},"pics":2,"mat":null,"code":"KGL0002"},{"n":"Жіночий костюм топ + шорти, персик","raw":"жін костюм топ+шорти ПЕРСИК","s":"tank","sub":"Комплекти","c":"women","h":22,"sat":70,"l":78,"pat":"","cost":414,"p":539,"g":499,"sz":{"XS-S":12,"M-L":17},"pics":2,"mat":null,"code":"KGL0004"},{"n":"Футболка CoolMax реглан, білий","raw":"Футболка CoolMax БІЛИЙ Реглан","s":"tee","sub":"Футболки","c":"uni","h":40,"sat":12,"l":94,"pat":"","cost":175,"p":229,"g":209,"sz":{"S":17,"M":33,"L":38,"XL":19,"XXL":15},"pics":3,"mat":"CoolMax (поліестер), швидко сохне","code":"FCM01"},{"n":"Футболка CoolMax реглан, хакі","raw":"Футболка CoolMax ХАКІ Реглан","s":"tee","sub":"Футболки","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":175,"p":229,"g":209,"sz":{"S":40,"M":75,"L":81,"XL":41,"XXL":38},"pics":3,"mat":"CoolMax (поліестер), швидко сохне","code":"FCM02"},{"n":"Футболка CoolMax реглан, чорний","raw":"Футболка CoolMax ЧОРНИЙ Реглан","s":"tee","sub":"Футболки","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":175,"p":229,"g":209,"sz":{"S":60,"M":118,"L":117,"XL":58,"XXL":56},"pics":3,"mat":"CoolMax (поліестер), швидко сохне","code":"FCM03"},{"n":"Футболка CoolMax реглан, темно-синій","raw":"Футболка CoolMax ТЕМНО-СИНІЙ Реглан","s":"tee","sub":"Футболки","c":"uni","h":225,"sat":45,"l":26,"pat":"","cost":175,"p":229,"g":209,"sz":{"S":64,"M":125,"L":129,"XL":59,"XXL":61},"pics":3,"mat":"CoolMax (поліестер), швидко сохне","code":"FCM04"},{"n":"Зіп худі, демісезон, чорний","raw":"демі зіп худі ЧОРНИЙ","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":355,"p":469,"g":429,"sz":{"M":1,"XL":7,"XXL":14,"3XL":30},"pics":4,"mat":null,"code":"ZHD01"},{"n":"Зіп худі, демісезон, графіт","raw":"демі зіп худі ГРАФІТ","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":220,"sat":6,"l":30,"pat":"","cost":355,"p":469,"g":429,"sz":{"XXL":8,"3XL":15},"pics":4,"mat":null,"code":"ZHD02"},{"n":"Зіп худі, демісезон, білий","raw":"демі зіп худі БІЛИЙ","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":40,"sat":12,"l":94,"pat":"","cost":355,"p":469,"g":429,"sz":{"L":5,"XL":12,"XXL":33,"3XL":24},"pics":4,"mat":null,"code":"ZHD04"},{"n":"Зіп худі, демісезон, меланж","raw":"демі зіп худі МЕЛАНЖ","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":0,"sat":0,"l":72,"pat":"rib","cost":355,"p":469,"g":429,"sz":{"S":37,"L":17,"XL":28,"XXL":25,"3XL":10},"pics":4,"mat":null,"code":"ZHD05"},{"n":"Костюм фліс однотон, беж","raw":"Костюм Фліс однотон БЕЖ -45%🔥🔥🔥🔥🔥📢","s":"hoodie","sub":"Костюми","c":"uni","h":32,"sat":35,"l":78,"pat":"","cost":400,"p":519,"g":479,"sz":{"S":50,"M":9,"XL":1,"XXL":41,"3XL":13},"pics":3,"mat":"Фліс, тепла начісна тканина","code":"KFOD05"},{"n":"Шорти вкорочені, чорний","raw":"шорти вкорочені ЧОРНИЙ","s":"shorts","sub":"Шорти","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":160,"p":209,"g":199,"sz":{"S":28,"M":14,"L":9,"XL":18,"XXL":23},"pics":2,"mat":null,"code":"SHVKL4"},{"n":"Штани, демісезон, беж","raw":"демі штани БЕЖ -50%🔥📢","s":"pants","sub":"Штани","c":"uni","h":32,"sat":35,"l":78,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":6,"M":11,"L":14,"XL":25,"XXL":57,"3XL":11},"pics":3,"mat":null,"code":"SHD07"},{"n":"Штани фліс, шоколад","raw":"Штани Фліс ШОКОЛАД-45%🔥📢","s":"pants","sub":"Штани","c":"uni","h":20,"sat":35,"l":26,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":113,"M":23,"XXL":2},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"SHF02"},{"n":"Штани, демісезон, чорний","raw":"демі штани ЧОРНИЙ","s":"pants","sub":"Штани","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":355,"p":469,"g":429,"sz":{"S":40,"M":73,"L":96,"XL":48,"XXL":39,"3XL":54},"pics":4,"mat":null,"code":"SHD01"},{"n":"Костюм спорт, демісезон, чорний","raw":"демі костюм спорт ЧОРНИЙ","s":"hoodie","sub":"Костюми","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":690,"p":899,"g":829,"sz":{"S":36,"M":58,"L":58,"XL":50,"XXL":52,"3XL":53},"pics":6,"mat":null,"code":"SKD01"},{"n":"Майка жіноча, сірий","raw":"Майка жіноча СІРИЙ","s":"tank","sub":"Майки","c":"women","h":0,"sat":0,"l":62,"pat":"","cost":110,"p":149,"g":139,"sz":{"42":49,"44":50,"46":50,"48":49},"pics":2,"mat":null,"code":"MGL09"},{"n":"Футболка + штани, хакі","raw":"Футболка+штани ХАКІ","s":"tee","sub":"Комплекти","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":500,"p":649,"g":599,"sz":{"XS-S":30,"M-L":19,"XL-XXL":19},"pics":2,"mat":null,"code":"FSHTL5"},{"n":"Футболка + шорти, меланж","raw":"Футболка+шорти МЕЛАНЖ","s":"tee","sub":"Комплекти","c":"uni","h":0,"sat":0,"l":72,"pat":"rib","cost":410,"p":539,"g":499,"sz":{"XS-S":17,"M-L":1,"XL":12},"pics":2,"mat":null,"code":"FSHL4"},{"n":"Шорти петля, хакі","raw":"Шорти петля Хакі","s":"shorts","sub":"Шорти","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":5,"M":3,"L":6,"XL":7,"XXL":7,"3XL":9},"pics":2,"mat":"Двонитка, петля","code":"SHPL5"},{"n":"Футболка оранж, леопард","raw":"Футболка леопард ОРАНЖ","s":"tee","sub":"Футболки","c":"uni","h":32,"sat":55,"l":58,"pat":"dot","cost":110,"p":149,"g":139,"sz":{"42":54,"44":61,"46":52,"48":45,"50":30},"pics":2,"mat":null,"code":"FLGL0002"},{"n":"Худі фліс, чорний","raw":"Фліс Худі ЧОРНИЙ","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":375,"p":489,"g":449,"sz":{"S":5,"M":11,"XL":2,"3XL":2},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"FHB09"},{"n":"Худі плюш, білий","raw":"Худі Плюш БІЛИЙ-45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":40,"sat":12,"l":94,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":7,"M":9,"XL":16,"XXL":19,"3XL":45},"pics":2,"mat":"Плюш","code":"HP03"},{"n":"Світшот фліс з рибани, чорний","raw":"Світшот Фліс з рибани ЧОРНИЙ -45%🔥📢","s":"sweater","sub":"Світшоти","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":18,"M":17,"L":4,"XL":28,"XXL":10,"3XL":19,"4XL":19},"pics":2,"mat":"Фліс з рибаною","code":"SFR04"},{"n":"Зіп худі з рибани, чорний","raw":"ЗІП Худі з рибани ЧОРНИЙ-45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":275,"p":359,"g":329,"sz":{"S":1,"M":17,"L":13,"XL":31,"XXL":2,"3XL":8,"4XL":14},"pics":2,"mat":"Фліс з рибаною","code":"HZF01"},{"n":"Костюм фліс однотон, чорний","raw":"Костюм Фліс однотон ЧОРНИЙ","s":"hoodie","sub":"Костюми","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":750,"p":979,"g":899,"sz":{"S":14,"M":34,"L":19,"XL":22,"XXL":9,"3XL":14},"pics":3,"mat":"Фліс, тепла начісна тканина","code":"KFOD01"},{"n":"Шорти чоловічі, чорний","raw":"шорти чоловічі ЧОРНИЙ","s":"shorts","sub":"Шорти","c":"men","h":0,"sat":0,"l":14,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":13,"M":13,"L":5,"XL":41,"XXL":37,"3XL":22},"pics":2,"mat":null,"code":"SHBL1"},{"n":"Футболка оверсайз, чорний","raw":"футболка oversize ЧОРНИЙ","s":"tee","sub":"Футболки","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":210,"p":279,"g":259,"sz":{"XS-S":7,"M-L":5,"XL-XXL":2},"pics":4,"mat":null,"code":"FOVL04"},{"n":"Худі фліс оверсайз, чорний","raw":"Худі фліс oversize ЧОРНИЙ-45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":34,"M":12,"L":27,"XL":28},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"HFOV02"},{"n":"Футболка кулір Epik, чорний","raw":"Футболка КУЛІР ЧОРНИЙ epik","s":"tee","sub":"Футболки","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":190,"p":249,"g":229,"sz":{"S":192,"M":40,"L":40,"XL":34,"XXL":54},"pics":5,"mat":"Кулірна гладь, бавовна","code":"FKUL01"},{"n":"Худі фліс, меланж","raw":"Фліс Худі МЕЛАНЖ","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":0,"sat":0,"l":72,"pat":"rib","cost":375,"p":489,"g":449,"sz":{"S":4,"M":11,"XL":21,"XXL":36,"3XL":2},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"FHB03"},{"n":"Футболка кулір Epik, білий","raw":"Футболка КУЛІР БІЛИЙ epik","s":"tee","sub":"Футболки","c":"uni","h":40,"sat":12,"l":94,"pat":"","cost":190,"p":249,"g":229,"sz":{"S":33,"M":29,"L":26,"XL":52,"XXL":50},"pics":5,"mat":"Кулірна гладь, бавовна","code":"FKUL02"},{"n":"Худі плюш, бордо","raw":"Худі Плюш БОРДО-45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":345,"sat":55,"l":30,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":41,"M":21},"pics":2,"mat":"Плюш","code":"HP08"},{"n":"Костюм спорт, демісезон, графіт","raw":"демі костюм спорт ГРАФІТ","s":"hoodie","sub":"Костюми","c":"uni","h":220,"sat":6,"l":30,"pat":"","cost":690,"p":899,"g":829,"sz":{"S":8,"3XL":1},"pics":6,"mat":null,"code":"SKD02"},{"n":"Шорти вкорочені, меланж","raw":"шорти вкорочені МЕЛАНЖ","s":"shorts","sub":"Шорти","c":"uni","h":0,"sat":0,"l":72,"pat":"rib","cost":160,"p":209,"g":199,"sz":{"S":45,"M":32,"L":44,"XL":24,"XXL":28},"pics":2,"mat":null,"code":"SHVKL3"},{"n":"Футболка + штани, чорний","raw":"Футболка+штани ЧОРНИЙ","s":"tee","sub":"Комплекти","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":500,"p":649,"g":599,"sz":{"XS-S":10,"M-L":18,"XL-XXL":24},"pics":2,"mat":null,"code":"FSHTL4"},{"n":"Штани, демісезон, графіт","raw":"демі штани ГРАФІТ","s":"pants","sub":"Штани","c":"uni","h":220,"sat":6,"l":30,"pat":"","cost":355,"p":469,"g":429,"sz":{"S":1,"M":16,"L":13},"pics":5,"mat":null,"code":"SHD02"},{"n":"Шорти петля, шоколад","raw":"Шорти петля Шоколад","s":"shorts","sub":"Шорти","c":"uni","h":20,"sat":35,"l":26,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":6,"M":11,"L":13,"XL":16,"XXL":14,"3XL":18},"pics":2,"mat":"Двонитка, петля","code":"SHPL4"},{"n":"Костюм фліс однотон, графіт","raw":"Костюм Фліс однотон ГРАФІТ","s":"hoodie","sub":"Костюми","c":"uni","h":220,"sat":6,"l":30,"pat":"","cost":750,"p":979,"g":899,"sz":{"S":13,"M":21,"L":22,"XL":18,"XXL":17,"3XL":12},"pics":3,"mat":"Фліс, тепла начісна тканина","code":"KFOD02"},{"n":"Худі, демісезон, чорний","raw":"демі худі ЧОРНИЙ","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":355,"p":469,"g":429,"sz":{"S":18,"L":29,"XL":4,"XXL":13,"3XL":14},"pics":4,"mat":null,"code":"DH01"},{"n":"Шорти чоловічі, меланж","raw":"шорти чоловічі МЕЛАНЖ","s":"shorts","sub":"Шорти","c":"men","h":0,"sat":0,"l":72,"pat":"rib","cost":180,"p":239,"g":219,"sz":{"S":26,"M":39,"L":48,"XL":56,"XXL":56,"3XL":34},"pics":2,"mat":null,"code":"SHBL2"},{"n":"Штани, демісезон, хакі","raw":"демі штани ХАКІ -50%🔥📢","s":"pants","sub":"Штани","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":8,"M":13,"L":20,"XL":14,"XXL":78,"3XL":66},"pics":3,"mat":null,"code":"SHD05"},{"n":"Худі фліс оверсайз, сірий","raw":"Худі фліс oversize СІРИЙ-45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":0,"sat":0,"l":62,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":42,"M":17,"L":24,"XL":24},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"HFOV01"},{"n":"Футболка оверсайз, меланж","raw":"футболка oversize МЕЛАНЖ","s":"tee","sub":"Футболки","c":"uni","h":0,"sat":0,"l":72,"pat":"rib","cost":210,"p":279,"g":259,"sz":{"XS-S":69,"M-L":15,"XL-XXL":45},"pics":4,"mat":null,"code":"FOVL01"},{"n":"Майка жіноча, чорний","raw":"Майка жіноча ЧОРНИЙ","s":"tank","sub":"Майки","c":"women","h":0,"sat":0,"l":14,"pat":"","cost":110,"p":149,"g":139,"sz":{"42":48,"44":50,"46":50,"48":49},"pics":2,"mat":null,"code":"MGL07"},{"n":"Футболка рожевий, леопард","raw":"Футболка леопард РОЖЕВИЙ","s":"tee","sub":"Футболки","c":"uni","h":32,"sat":55,"l":58,"pat":"dot","cost":110,"p":149,"g":139,"sz":{"42":55,"44":69,"46":76,"48":64,"50":51},"pics":2,"mat":null,"code":"FLGL0001"},{"n":"Штани фліс, хакі","raw":"Штани Фліс ХАКІ-45%🔥📢","s":"pants","sub":"Штани","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":195,"M":71,"L":75,"XL":108,"XXL":93,"3XL":47},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"SHF08"},{"n":"Зіп худі з рибани, хакі","raw":"ЗІП Худі з рибани ХАКІ-45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":275,"p":359,"g":329,"sz":{"S":17,"M":38,"L":32,"XL":38,"XXL":10,"3XL":8,"4XL":24},"pics":2,"mat":"Фліс з рибаною","code":"HZF02"},{"n":"Футболка + шорти, хакі","raw":"Футболка+шорти ХАКІ","s":"tee","sub":"Комплекти","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":410,"p":539,"g":499,"sz":{"XS-S":5,"M-L":4,"XL":8},"pics":2,"mat":null,"code":"FSHL3"},{"n":"Світшот фліс з рибани, хакі","raw":"Світшот ХАКІ Фліс з рибани -45%🔥📢","s":"sweater","sub":"Світшоти","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":70,"M":92,"L":91,"XL":83,"XXL":70,"3XL":58,"4XL":66},"pics":2,"mat":"Фліс з рибаною","code":"SFR01"},{"n":"Шорти чоловічі, графіт","raw":"шорти чоловічі ГРАФІТ","s":"shorts","sub":"Шорти","c":"men","h":220,"sat":6,"l":30,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":3,"M":23,"L":29,"XL":34,"XXL":26},"pics":2,"mat":null,"code":"SHBL4"},{"n":"Футболка оверсайз, графіт","raw":"футболка oversize ГРАФІТ","s":"tee","sub":"Футболки","c":"uni","h":220,"sat":6,"l":30,"pat":"","cost":210,"p":279,"g":259,"sz":{"XS-S":57,"M-L":31,"XL-XXL":30},"pics":4,"mat":null,"code":"FOVL03"},{"n":"Футболка + шорти, чорний","raw":"Футболка+шорти ЧОРНИЙ","s":"tee","sub":"Комплекти","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":410,"p":539,"g":499,"sz":{"XS-S":17,"M-L":35,"XL":14},"pics":2,"mat":null,"code":"FSHL2"},{"n":"Штани, демісезон, блакитний","raw":"демі штани БЛАКИТНИЙ -50%🔥📢","s":"pants","sub":"Штани","c":"uni","h":200,"sat":55,"l":72,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":51,"M":13,"L":2,"XL":12,"XXL":3},"pics":2,"mat":null,"code":"SHD08"},{"n":"Світшот фліс з рибани, темно-синій","raw":"Світшот Фліс з рибани ТЕМНО-СИНІЙ -45%🔥📢","s":"sweater","sub":"Світшоти","c":"uni","h":225,"sat":45,"l":26,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":11,"M":15,"L":13,"XL":16,"XXL":7,"3XL":14,"4XL":11},"pics":2,"mat":"Фліс з рибаною","code":"SFR03"},{"n":"Зіп фліс тактична кофта, хакі","raw":"ЗІП ФЛІС ТАКТИЧНА КОФТА ХАКІ-25%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":450,"p":589,"g":539,"sz":{"S":162,"L":1,"XXL":1,"3XL":189,"4XL":208},"pics":1,"mat":"Фліс, тепла начісна тканина","code":"HZF02"},{"n":"Футболка кулір Epik, графіт","raw":"Футболка КУЛІР ГРАФІТ epik","s":"tee","sub":"Футболки","c":"uni","h":220,"sat":6,"l":30,"pat":"","cost":190,"p":249,"g":229,"sz":{"S":26,"XL":16,"XXL":5},"pics":2,"mat":"Кулірна гладь, бавовна","code":"FKUL03"},{"n":"Футболка рожевий підліток family look, леопард","raw":"Футболка леопард РОЖЕВИЙ (підліток) family look","s":"tee","sub":"Футболки","c":"kids","h":32,"sat":55,"l":58,"pat":"dot","cost":110,"p":149,"g":139,"sz":{"134":7,"140":8,"146":10,"152":8,"158":14},"pics":2,"mat":null,"code":"FLGL0003"},{"n":"Худі фліс, білий","raw":"Фліс Худі Білий","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":40,"sat":12,"l":94,"pat":"","cost":375,"p":489,"g":449,"sz":{"XL":18,"XXL":19,"3XL":2},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"FHB01"},{"n":"Штани фліс, беж","raw":"Штани Фліс БЕЖ-45%🔥📢","s":"pants","sub":"Штани","c":"uni","h":32,"sat":35,"l":78,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":129,"M":67,"L":16,"XL":43,"XXL":56,"3XL":35},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"SHF07"},{"n":"Костюм фліс однотон, меланж","raw":"Костюм Фліс однотон МЕЛАНЖ","s":"hoodie","sub":"Костюми","c":"uni","h":0,"sat":0,"l":72,"pat":"rib","cost":750,"p":979,"g":899,"sz":{"S":2,"M":16,"L":14,"XL":15,"XXL":18,"3XL":35},"pics":3,"mat":"Фліс, тепла начісна тканина","code":"KFOD04"},{"n":"Худі, демісезон, білий","raw":"демі худі БІЛИЙ","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":40,"sat":12,"l":94,"pat":"","cost":355,"p":469,"g":429,"sz":{"L":1,"XL":10,"XXL":34,"3XL":10},"pics":4,"mat":null,"code":"DH02"},{"n":"Костюм спорт, демісезон, меланж","raw":"демі костюм спорт МЕЛАНЖ","s":"hoodie","sub":"Костюми","c":"uni","h":0,"sat":0,"l":72,"pat":"rib","cost":690,"p":899,"g":829,"sz":{"S":2,"L":1},"pics":6,"mat":null,"code":"SKD03"},{"n":"Шорти петля, жовтий","raw":"Шорти петля Жовтий","s":"shorts","sub":"Шорти","c":"uni","h":48,"sat":85,"l":60,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":9,"M":13,"L":11,"XL":14,"XXL":16,"3XL":14},"pics":3,"mat":"Двонитка, петля","code":"SHPL3"},{"n":"Худі плюш, блакитний","raw":"Худі Плюш БЛАКИТНИЙ -45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":200,"sat":55,"l":72,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":51,"M":20,"L":1},"pics":2,"mat":"Плюш","code":"HP06"},{"n":"Футболка + штани, графіт","raw":"Футболка+штани ГРАФІТ","s":"tee","sub":"Комплекти","c":"uni","h":220,"sat":6,"l":30,"pat":"","cost":500,"p":649,"g":599,"sz":{"M-L":4,"XL-XXL":14},"pics":2,"mat":null,"code":"FSHTL3"},{"n":"Шорти вкорочені, мокко","raw":"шорти вкорочені МОККО","s":"shorts","sub":"Шорти","c":"uni","h":25,"sat":25,"l":44,"pat":"","cost":160,"p":209,"g":199,"sz":{"S":55,"M":50,"L":49,"XL":35,"XXL":34},"pics":2,"mat":null,"code":"SHVKL2"},{"n":"Майка жіноча, блакитний","raw":"Майка жіноча БЛАКИТНИЙ","s":"tank","sub":"Майки","c":"women","h":200,"sat":55,"l":72,"pat":"","cost":110,"p":149,"g":139,"sz":{"42":50,"44":49,"46":50,"48":48},"pics":2,"mat":null,"code":"MGL06"},{"n":"Худі фліс, м'ята","raw":"Фліс Худі МЯТА-45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":160,"sat":35,"l":72,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":52,"XL":2,"XXL":39,"3XL":2},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"FHB13"},{"n":"Футболка + шорти, графіт","raw":"Футболка+шорти ГРАФІТ","s":"tee","sub":"Комплекти","c":"uni","h":220,"sat":6,"l":30,"pat":"","cost":410,"p":539,"g":499,"sz":{"XS-S":15,"M-L":1,"XL":12},"pics":2,"mat":null,"code":"FSHL1"},{"n":"Штани, демісезон, білий","raw":"демі штани БІЛИЙ","s":"pants","sub":"Штани","c":"uni","h":40,"sat":12,"l":94,"pat":"","cost":355,"p":469,"g":429,"sz":{"M":9,"L":11,"XL":1,"XXL":5,"3XL":4},"pics":4,"mat":null,"code":"SHD04"},{"n":"Худі плюш, беж","raw":"Худі Плюш БЕЖ-45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":32,"sat":35,"l":78,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":19,"M":25,"3XL":9},"pics":2,"mat":"Плюш","code":"HP07"},{"n":"Штани, демісезон, кемел","raw":"демі штани КЕМЕЛ -50%🔥📢","s":"pants","sub":"Штани","c":"uni","h":32,"sat":42,"l":58,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":27,"M":15,"3XL":2},"pics":2,"mat":null,"code":"SHD09"},{"n":"Футболка оверсайз, хакі","raw":"футболка oversize ХАКІ","s":"tee","sub":"Футболки","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":210,"p":279,"g":259,"sz":{"XS-S":29,"M-L":2},"pics":4,"mat":null,"code":"FOVL05"},{"n":"Шорти чоловічі, мокко","raw":"шорти чоловічі МОККО","s":"shorts","sub":"Шорти","c":"men","h":25,"sat":25,"l":44,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":27,"M":49,"L":56,"XL":53,"XXL":61,"3XL":38},"pics":2,"mat":null,"code":"SHBL5"},{"n":"Худі фліс, малина","raw":"Фліс Худі МАЛИНА -45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":340,"sat":60,"l":48,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":18,"XXL":1},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"FHB22"},{"n":"Шорти вкорочені, графіт","raw":"шорти вкорочені ГРАФІТ","s":"shorts","sub":"Шорти","c":"uni","h":220,"sat":6,"l":30,"pat":"","cost":160,"p":209,"g":199,"sz":{"S":55,"M":39,"L":48,"XL":36,"XXL":32},"pics":2,"mat":null,"code":"SHVKL1"},{"n":"Костюм фліс однотон, шоколад","raw":"Костюм Фліс однотон ШОКОЛАД","s":"hoodie","sub":"Костюми","c":"uni","h":20,"sat":35,"l":26,"pat":"","cost":750,"p":979,"g":899,"sz":{"S":12,"M":12,"L":11,"XL":10,"XXL":10,"3XL":12},"pics":3,"mat":"Фліс, тепла начісна тканина","code":"KFOD03"},{"n":"Світшот фліс з рибани, графіт","raw":"Світшот Фліс з рибани ГРАФІТ -45%🔥📢","s":"sweater","sub":"Світшоти","c":"uni","h":220,"sat":6,"l":30,"pat":"","cost":200,"p":259,"g":239,"sz":{"XXL":1,"3XL":9,"4XL":3},"pics":2,"mat":"Фліс з рибаною","code":"SFR02"},{"n":"Штани фліс, джинс","raw":"Штани Фліс ДЖИНС-45%🔥📢","s":"pants","sub":"Штани","c":"uni","h":215,"sat":40,"l":52,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":150,"M":34,"L":9,"XXL":55,"3XL":19},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"SHF06"},{"n":"Майка жіноча світлий, блакитний","raw":"Майка жіноча БЛАКИТНИЙ(СВІТЛИЙ)","s":"tank","sub":"Майки","c":"women","h":200,"sat":55,"l":72,"pat":"","cost":110,"p":149,"g":139,"sz":{"42":50,"44":50,"46":48,"48":50},"pics":2,"mat":null,"code":"MGL03"},{"n":"Худі, демісезон, графіт","raw":"демі худі ГРАФІТ","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":220,"sat":6,"l":30,"pat":"","cost":355,"p":469,"g":429,"sz":{"S":17,"M":2,"L":6,"XL":9,"XXL":10,"3XL":5},"pics":4,"mat":null,"code":"DH03"},{"n":"Футболка кулір Epik, шоколад","raw":"Футболка КУЛІР ШОКОЛАД epik","s":"tee","sub":"Футболки","c":"uni","h":20,"sat":35,"l":26,"pat":"","cost":190,"p":249,"g":229,"sz":{"S":23,"M":42,"L":16,"XL":58,"XXL":20},"pics":2,"mat":"Кулірна гладь, бавовна","code":"FKUL04"},{"n":"Шорти петля, мокко","raw":"Шорти петля Мокко","s":"shorts","sub":"Шорти","c":"uni","h":25,"sat":25,"l":44,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":8,"M":14,"L":18,"XL":13,"XXL":17,"3XL":16},"pics":3,"mat":"Двонитка, петля","code":"SHPL1"},{"n":"Футболка + штани, олива","raw":"Футболка+штани ОЛИВА","s":"tee","sub":"Комплекти","c":"uni","h":70,"sat":30,"l":40,"pat":"","cost":500,"p":649,"g":599,"sz":{"XS-S":21,"M-L":36,"XL-XXL":20},"pics":2,"mat":null,"code":"FSHTL11"},{"n":"Майка жіноча, беж","raw":"Майка жіноча БЕЖ","s":"tank","sub":"Майки","c":"women","h":32,"sat":35,"l":78,"pat":"","cost":110,"p":149,"g":139,"sz":{"42":48,"44":49,"46":50,"48":50},"pics":2,"mat":null,"code":"MGL01"},{"n":"Футболка оверсайз, білий","raw":"футболка oversize Білий","s":"tee","sub":"Футболки","c":"uni","h":40,"sat":12,"l":94,"pat":"","cost":210,"p":279,"g":259,"sz":{"XS-S":7,"M-L":1,"XL-XXL":3},"pics":4,"mat":null,"code":"FOVL06"},{"n":"Штани, демісезон, шоколад","raw":"демі штани ШОКОЛАД -50%🔥📢","s":"pants","sub":"Штани","c":"uni","h":20,"sat":35,"l":26,"pat":"","cost":180,"p":239,"g":219,"sz":{"3XL":2},"pics":3,"mat":null,"code":"SHD03"},{"n":"Футболка + шорти, мокко","raw":"Футболка+шорти МОККО","s":"tee","sub":"Комплекти","c":"uni","h":25,"sat":25,"l":44,"pat":"","cost":410,"p":539,"g":499,"sz":{"M-L":1,"XL":1},"pics":2,"mat":null,"code":"FSHL5"},{"n":"Шорти чоловічі, зелений","raw":"шорти чоловічі ЗЕЛЕНИЙ","s":"shorts","sub":"Шорти","c":"men","h":140,"sat":35,"l":38,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":24,"M":52,"L":48,"XL":58,"XXL":61,"3XL":38},"pics":2,"mat":null,"code":"SHBL3"},{"n":"Шорти вкорочені, хакі","raw":"шорти вкорочені ХАКІ","s":"shorts","sub":"Шорти","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":160,"p":209,"g":199,"sz":{"S":55,"M":44,"L":45,"XL":29,"XXL":31},"pics":2,"mat":null,"code":"SHVKL5"},{"n":"Худі фліс, шоколад","raw":"Фліс Худі ШОКОЛАД","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":20,"sat":35,"l":26,"pat":"","cost":375,"p":489,"g":449,"sz":{"S":1,"M":1,"XL":2,"XXL":2,"3XL":1},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"FHB04"},{"n":"Худі плюш, шоколад","raw":"Худі Плюш ШОКОЛАД -45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":20,"sat":35,"l":26,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":10,"M":23},"pics":2,"mat":"Плюш","code":"HP010"},{"n":"Худі фліс, джинс","raw":"Фліс Худі ДЖИНС-45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":215,"sat":40,"l":52,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":9},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"FHB06"},{"n":"Футболка кулір Epik, хакі","raw":"Футболка КУЛІР ХАКІ epik","s":"tee","sub":"Футболки","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":165,"p":219,"g":199,"sz":{"S":36,"M":62,"L":48,"XXL":10},"pics":2,"mat":"Кулірна гладь, бавовна","code":"FKUL05"},{"n":"Футболка + штани, зелений","raw":"Футболка+штани ЗЕЛЕНИЙ","s":"tee","sub":"Комплекти","c":"uni","h":140,"sat":35,"l":38,"pat":"","cost":500,"p":649,"g":599,"sz":{"XS-S":17,"M-L":36,"XL-XXL":8},"pics":2,"mat":null,"code":"FSHTL10"},{"n":"Шорти петля, бордо","raw":"Шорти петля Бордо","s":"shorts","sub":"Шорти","c":"uni","h":345,"sat":55,"l":30,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":10,"M":12,"L":14,"XL":12,"XXL":16,"3XL":15},"pics":3,"mat":"Двонитка, петля","code":"SHPL2"},{"n":"Штани фліс варені, графіт","raw":"Штани Фліс ВАРЕНІ ГРАФІТ-45%🔥📢","s":"pants","sub":"Штани","c":"uni","h":220,"sat":6,"l":30,"pat":"","cost":200,"p":259,"g":239,"sz":{"L":5,"XL":2},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"SHF16"},{"n":"Костюм фліс однотон, білий","raw":"Костюм Фліс однотон БІЛИЙ","s":"hoodie","sub":"Костюми","c":"uni","h":40,"sat":12,"l":94,"pat":"","cost":750,"p":979,"g":899,"sz":{"S":2,"M":11,"L":7,"XL":1,"XXL":12,"3XL":7},"pics":3,"mat":"Фліс, тепла начісна тканина","code":"KFOD07"},{"n":"Худі фліс, беж","raw":"Фліс Худі БЕЖ-45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":32,"sat":35,"l":78,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":5,"XL":1},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"FHB05"},{"n":"Футболка кулір Epik, беж","raw":"Футболка КУЛІР БЕЖ epik","s":"tee","sub":"Футболки","c":"uni","h":32,"sat":35,"l":78,"pat":"","cost":165,"p":219,"g":199,"sz":{"S":28,"M":8,"L":11,"XXL":12},"pics":2,"mat":"Кулірна гладь, бавовна","code":"FKUL06"},{"n":"Худі, демісезон, меланж","raw":"демі худі МЕЛАНЖ","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":0,"sat":0,"l":72,"pat":"rib","cost":355,"p":469,"g":429,"sz":{"XL":5,"XXL":12,"3XL":7},"pics":4,"mat":null,"code":"DH06"},{"n":"Костюм фліс однотон, хакі","raw":"Костюм Фліс однотон ХАКІ","s":"hoodie","sub":"Костюми","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":750,"p":979,"g":899,"sz":{"S":2,"M":2,"L":1,"XXL":5,"3XL":11},"pics":3,"mat":"Фліс, тепла начісна тканина","code":"KFOD06"},{"n":"Шорти петля, меланж","raw":"Шорти петля Меланж","s":"shorts","sub":"Шорти","c":"uni","h":0,"sat":0,"l":72,"pat":"rib","cost":180,"p":239,"g":219,"sz":{"S":7,"M":1,"3XL":5},"pics":2,"mat":"Двонитка, петля","code":"SHPL6"},{"n":"Футболка оверсайз, беж","raw":"футболка oversize Беж","s":"tee","sub":"Футболки","c":"uni","h":32,"sat":35,"l":78,"pat":"","cost":210,"p":279,"g":259,"sz":{"XS-S":19},"pics":4,"mat":null,"code":"FOVL02"},{"n":"Футболка + штани, меланж","raw":"Футболка+штани МЕЛАНЖ","s":"tee","sub":"Комплекти","c":"uni","h":0,"sat":0,"l":72,"pat":"rib","cost":500,"p":649,"g":599,"sz":{"XS-S":25,"M-L":2,"XL-XXL":11},"pics":2,"mat":null,"code":"FSHTL2"},{"n":"Штани фліс сірі, варені","raw":"Штани Фліс ВАРЕНІ СІРІ-45%🔥📢","s":"pants","sub":"Штани","c":"uni","h":210,"sat":10,"l":55,"pat":"dot","cost":200,"p":259,"g":239,"sz":{"M":10,"L":8},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"SHF13"},{"n":"Світшот, демісезон, графіт","raw":"демі світшот ГРАФІТ -50%🔥📢","s":"sweater","sub":"Світшоти","c":"uni","h":220,"sat":6,"l":30,"pat":"","cost":175,"p":229,"g":209,"sz":{"S":4,"M":4,"XXL":11},"pics":4,"mat":null,"code":"SVD02"},{"n":"Майка жіноча, зелений","raw":"Майка жіноча ЗЕЛЕНИЙ","s":"tank","sub":"Майки","c":"women","h":140,"sat":35,"l":38,"pat":"","cost":110,"p":149,"g":139,"sz":{"42":3,"44":3,"46":3,"48":2},"pics":2,"mat":null,"code":"MGL08"},{"n":"Шорти чоловічі темний, шоколад","raw":"шорти чоловічі ТЕМНИЙ ШОКОЛАД","s":"shorts","sub":"Шорти","c":"men","h":20,"sat":35,"l":26,"pat":"","cost":180,"p":239,"g":219,"sz":{"L":5,"XL":15,"XXL":33,"3XL":32},"pics":2,"mat":null,"code":"SHBL8"},{"n":"Худі плюш, мокко","raw":"Худі Плюш МОККО -45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":25,"sat":25,"l":44,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":13,"M":21},"pics":2,"mat":"Плюш","code":"HP09"},{"n":"Худі фліс варене, чорний","raw":"Фліс Худі ВАРЕНЕ ЧОРНИЙ-45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":3,"M":4,"XL":1,"XXL":2},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"FHVCH01"},{"n":"Майка жіноча, електрик","raw":"Майка жіноча ЄЛЕКТРИК","s":"tank","sub":"Майки","c":"women","h":225,"sat":80,"l":52,"pat":"","cost":110,"p":149,"g":139,"sz":{"44":1,"46":1,"48":1},"pics":2,"mat":null,"code":"MGL05"},{"n":"Костюм спорт, демісезон, білий","raw":"демі костюм спорт БІЛИЙ","s":"hoodie","sub":"Костюми","c":"uni","h":40,"sat":12,"l":94,"pat":"","cost":690,"p":899,"g":829,"sz":{"S":3,"M":5,"L":13,"XL":12,"XXL":13,"3XL":13},"pics":6,"mat":null,"code":"SKD07"},{"n":"Худі, демісезон, шоколад","raw":"демі худі ШОКОЛАД","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":20,"sat":35,"l":26,"pat":"","cost":355,"p":469,"g":429,"sz":{"S":15,"M":20,"L":24,"XL":1,"XXL":19},"pics":4,"mat":null,"code":"DH07"},{"n":"Шорти чоловічі, димчастий","raw":"шорти чоловічі ДИМЧАСТИЙ","s":"shorts","sub":"Шорти","c":"men","h":210,"sat":8,"l":55,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":25,"M":41,"L":37,"XL":46,"XXL":47,"3XL":31},"pics":2,"mat":null,"code":"SHBL6"},{"n":"Футболка + штани, мокко","raw":"Футболка+штани МОККО","s":"tee","sub":"Комплекти","c":"uni","h":25,"sat":25,"l":44,"pat":"","cost":500,"p":649,"g":599,"sz":{"XS-S":4,"M-L":6},"pics":2,"mat":null,"code":"FSHTL6"},{"n":"Футболка оверсайз, димчастий","raw":"футболка oversize димчастий","s":"tee","sub":"Футболки","c":"uni","h":210,"sat":8,"l":55,"pat":"","cost":210,"p":279,"g":259,"sz":{"XS-S":16},"pics":4,"mat":null,"code":"FOVL07"},{"n":"Шорти петля, чорний","raw":"Шорти петля Чорний","s":"shorts","sub":"Шорти","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":12},"pics":2,"mat":"Двонитка, петля","code":"SHPL7"},{"n":"Футболка кулір Epik, синій","raw":"Футболка КУЛІР СИНІЙ epik","s":"tee","sub":"Футболки","c":"uni","h":220,"sat":55,"l":40,"pat":"","cost":165,"p":219,"g":199,"sz":{"S":27,"M":49,"L":40,"XXL":1},"pics":2,"mat":"Кулірна гладь, бавовна","code":"FKUL07"},{"n":"Світшот, демісезон, чорний","raw":"демі світшот ЧОРНИЙ-50%🔥📢","s":"sweater","sub":"Світшоти","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":175,"p":229,"g":209,"sz":{"S":1,"XXL":3},"pics":4,"mat":null,"code":"SVD01"},{"n":"Худі плюш, сірий","raw":"Худі Плюш СІРИЙ-45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":0,"sat":0,"l":62,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":31,"M":11},"pics":2,"mat":"Плюш","code":"HP02"},{"n":"Худі фліс, графіт","raw":"Фліс Худі ГРАФІТ","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":220,"sat":6,"l":30,"pat":"","cost":375,"p":489,"g":449,"sz":{"S":22,"M":46,"L":22,"XXL":24,"3XL":1},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"FHB02"},{"n":"Худі фліс варене, графіт","raw":"Фліс Худі ВАРЕНЕ ГРАФІТ-45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":220,"sat":6,"l":30,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":1,"L":5},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"FHVCH02"},{"n":"Майка жіноча, рожевий","raw":"Майка жіноча РОЖЕВИЙ","s":"tank","sub":"Майки","c":"women","h":340,"sat":55,"l":72,"pat":"","cost":110,"p":149,"g":139,"sz":{"42":1,"46":1,"48":1},"pics":2,"mat":null,"code":"MGL010"},{"n":"Шорти чоловічі, хакі","raw":"шорти чоловічі ХАКІ","s":"shorts","sub":"Шорти","c":"men","h":75,"sat":25,"l":42,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":30,"M":77,"L":72,"XL":74,"XXL":86,"3XL":46},"pics":2,"mat":null,"code":"SHBL7"},{"n":"Світшот, демісезон, шоколад","raw":"демі світшот ШОКОЛАД-50%🔥📢","s":"sweater","sub":"Світшоти","c":"uni","h":20,"sat":35,"l":26,"pat":"","cost":175,"p":229,"g":209,"sz":{"S":13,"M":10},"pics":4,"mat":null,"code":"SVD03"},{"n":"Штани фліс варені, шоколад","raw":"Штани Фліс ВАРЕНІ ШОКОЛАД-45%🔥📢","s":"pants","sub":"Штани","c":"uni","h":20,"sat":35,"l":26,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":3,"M":10,"L":9},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"SHF12"},{"n":"Футболка + штани, шоколад","raw":"Футболка+штани ШОКОЛАД","s":"tee","sub":"Комплекти","c":"uni","h":20,"sat":35,"l":26,"pat":"","cost":500,"p":649,"g":599,"sz":{"XS-S":24,"M-L":5},"pics":2,"mat":null,"code":"FSHTL8"},{"n":"Футболка кулір Basic подовжена, жовтий","raw":"Футболка КУЛІР ЖОВТИЙ baza подовжена","s":"tee","sub":"Футболки","c":"uni","h":48,"sat":85,"l":60,"pat":"","cost":165,"p":219,"g":199,"sz":{"S":6,"M":7,"L":1,"3XL":4},"pics":4,"mat":"Кулірна гладь, бавовна","code":"FKUL014"},{"n":"Худі плюш, чорний","raw":"Худі Плюш ЧОРНИЙ-45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":4,"M":19},"pics":2,"mat":"Плюш","code":"HP01"},{"n":"Худі фліс, хакі","raw":"Фліс Худі ХАКІ","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":375,"p":489,"g":449,"sz":{"S":22,"M":8,"L":3},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"FHB08"},{"n":"Худі фліс варене, шоколад","raw":"Фліс Худі ВАРЕНЕ ШОКОЛАД-45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":20,"sat":35,"l":26,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":7,"M":10,"L":9},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"FHVCH03"},{"n":"Світшот, демісезон, беж","raw":"демі світшот БЕЖ-50%🔥📢","s":"sweater","sub":"Світшоти","c":"uni","h":32,"sat":35,"l":78,"pat":"","cost":175,"p":229,"g":209,"sz":{"S":8,"XXL":3,"3XL":20},"pics":4,"mat":null,"code":"SVD04"},{"n":"Футболка кулір Basic подовжена, графіт","raw":"Футболка КУЛІР ГРАФІТ baza подовжена","s":"tee","sub":"Футболки","c":"uni","h":220,"sat":6,"l":30,"pat":"","cost":165,"p":219,"g":199,"sz":{"S":23,"M":1,"L":7,"XL":2,"XXL":6},"pics":4,"mat":"Кулірна гладь, бавовна","code":"FKUL016"},{"n":"Футболка + штани, беж","raw":"Футболка+штани БЕЖ","s":"tee","sub":"Комплекти","c":"uni","h":32,"sat":35,"l":78,"pat":"","cost":500,"p":649,"g":599,"sz":{"XS-S":4,"M-L":3,"XL-XXL":1},"pics":2,"mat":null,"code":"FSHTL1"},{"n":"Худі, демісезон, електрик","raw":"демі худі ЕЛЕКТРИК","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":225,"sat":80,"l":52,"pat":"","cost":355,"p":469,"g":429,"sz":{"M":2,"XL":1},"pics":4,"mat":null,"code":"DH09"},{"n":"Майка жіноча, синій","raw":"Майка жіноча СИНІЙ","s":"tank","sub":"Майки","c":"women","h":220,"sat":55,"l":40,"pat":"","cost":110,"p":149,"g":139,"sz":{"42":2,"44":3,"46":1,"48":2},"pics":2,"mat":null,"code":"MGL02"},{"n":"Футболка + штани, димчастий","raw":"Футболка+штани ДИМЧАСТИЙ","s":"tee","sub":"Комплекти","c":"uni","h":210,"sat":8,"l":55,"pat":"","cost":500,"p":649,"g":599,"sz":{"XS-S":11,"M-L":2,"XL-XXL":2},"pics":2,"mat":null,"code":"FSHTL9"},{"n":"Світшот, демісезон, хакі","raw":"демі світшот ХАКІ-50%🔥📢","s":"sweater","sub":"Світшоти","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":175,"p":229,"g":209,"sz":{"S":2,"L":3,"XL":20,"3XL":4},"pics":4,"mat":null,"code":"SVD05"},{"n":"Майка жіноча, бірюза","raw":"Майка жіноча БІРЮЗА","s":"tank","sub":"Майки","c":"women","h":178,"sat":55,"l":48,"pat":"","cost":110,"p":149,"g":139,"sz":{"42":3,"44":3,"46":3,"48":3},"pics":2,"mat":null,"code":"MGL04"},{"n":"Футболка кулір Basic подовжена, беж","raw":"Футболка КУЛІР БЕЖ baza подовжена","s":"tee","sub":"Футболки","c":"uni","h":32,"sat":35,"l":78,"pat":"","cost":165,"p":219,"g":199,"sz":{"S":37,"M":6,"L":19,"XL":27,"XXL":30,"3XL":17},"pics":4,"mat":"Кулірна гладь, бавовна","code":"FKUL010"},{"n":"Худі фліс, червоний","raw":"Фліс Худі ЧЕРВОНИЙ","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":355,"sat":65,"l":48,"pat":"","cost":375,"p":489,"g":449,"sz":{"S":14,"M":14,"L":20,"XL":19,"XXL":1,"3XL":20},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"FHB10"},{"n":"Худі фліс варене, сірий","raw":"Фліс Худі ВАРЕНЕ СІРИЙ-45%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":0,"sat":0,"l":62,"pat":"","cost":200,"p":259,"g":239,"sz":{"M":10,"L":10},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"FHVCH04"},{"n":"Футболка + штани, сірий","raw":"Футболка+штани СІРИЙ","s":"tee","sub":"Комплекти","c":"uni","h":0,"sat":0,"l":62,"pat":"","cost":500,"p":649,"g":599,"sz":{"M-L":6,"XL-XXL":10},"pics":2,"mat":null,"code":"FSHTL7"},{"n":"Світшот, демісезон, меланж","raw":"демі світшот МЕЛАНЖ-50%🔥📢","s":"sweater","sub":"Світшоти","c":"uni","h":0,"sat":0,"l":72,"pat":"rib","cost":175,"p":229,"g":209,"sz":{"S":66,"M":27,"XL":28,"XXL":33,"3XL":18},"pics":4,"mat":null,"code":"SVD06"},{"n":"Футболка кулір Basic подовжена, хакі","raw":"Футболка КУЛІР ХАКІ baza подовжена","s":"tee","sub":"Футболки","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":165,"p":219,"g":199,"sz":{"S":49,"M":21,"L":29,"XL":17,"XXL":24,"3XL":8},"pics":4,"mat":"Кулірна гладь, бавовна","code":"FKUL013"},{"n":"Худі фліс, електрик","raw":"Фліс Худі ЕЛЕКТРИК","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":225,"sat":80,"l":52,"pat":"","cost":375,"p":489,"g":449,"sz":{"S":7,"M":10,"L":3,"XXL":2},"pics":2,"mat":"Фліс, тепла начісна тканина","code":"FHB12"},{"n":"Худі, демісезон, червоний","raw":"демі худі ЧЕРВОНИЙ","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":355,"sat":65,"l":48,"pat":"","cost":355,"p":469,"g":429,"sz":{"S":7,"M":2,"L":2,"XL":9,"XXL":6,"3XL":5},"pics":4,"mat":null,"code":"DH011"},{"n":"Футболка кулір Basic подовжена, димчастий","raw":"Футболка КУЛІР ДИМЧАСТИЙ baza подовжена","s":"tee","sub":"Футболки","c":"uni","h":210,"sat":8,"l":55,"pat":"","cost":165,"p":219,"g":199,"sz":{"S":47,"M":15,"L":25,"XL":13,"XXL":28,"3XL":19},"pics":4,"mat":"Кулірна гладь, бавовна","code":"FKUL012"},{"n":"Світшот, демісезон, білий","raw":"демі світшот БІЛИЙ-50%🔥📢","s":"sweater","sub":"Світшоти","c":"uni","h":40,"sat":12,"l":94,"pat":"","cost":175,"p":229,"g":209,"sz":{"XL":6,"XXL":29,"3XL":4},"pics":4,"mat":null,"code":"SVD07"},{"n":"Зіп худі, демісезон, хакі","raw":"демі зіп худі ХАКІ -50%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":1,"L":2,"3XL":4},"pics":4,"mat":null,"code":"ZHD06"},{"n":"Футболка кулір Basic подовжена, білий","raw":"Футболка КУЛІР БІЛИЙ baza подовжена","s":"tee","sub":"Футболки","c":"uni","h":40,"sat":12,"l":94,"pat":"","cost":165,"p":219,"g":199,"sz":{"XXL":2,"3XL":4},"pics":4,"mat":"Кулірна гладь, бавовна","code":"FKUL09"},{"n":"Зіп худі, демісезон, беж","raw":"демі зіп худі БЕЖ -50%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":32,"sat":35,"l":78,"pat":"","cost":200,"p":259,"g":239,"sz":{"L":5,"XL":9,"XXL":24,"3XL":3},"pics":4,"mat":null,"code":"ZHD07"},{"n":"Футболка кулір Basic подовжена, червоний","raw":"Футболка КУЛІР ЧЕРВОНИЙ baza подовжена","s":"tee","sub":"Футболки","c":"uni","h":355,"sat":65,"l":48,"pat":"","cost":165,"p":219,"g":199,"sz":{"XXL":2},"pics":2,"mat":"Кулірна гладь, бавовна","code":"FKUL015"},{"n":"Зіп худі, демісезон, шоколад","raw":"демі зіп худі ШОКОЛАД -50%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":20,"sat":35,"l":26,"pat":"","cost":200,"p":259,"g":239,"sz":{"S":11,"M":16,"L":4,"XL":9,"XXL":19,"3XL":12},"pics":4,"mat":null,"code":"ZHD03"},{"n":"Футболка кулір Basic подовжена, чорний","raw":"Футболка КУЛІР ЧОРНИЙ baza подовжена","s":"tee","sub":"Футболки","c":"uni","h":0,"sat":0,"l":14,"pat":"","cost":165,"p":219,"g":199,"sz":{"S":6,"XL":2,"XXL":5},"pics":4,"mat":"Кулірна гладь, бавовна","code":"FKUL011"},{"n":"Комбінезон жіночий, демісезон, беж","raw":"Демі Комбінезон жіночий БЕЖ -50%🔥📢","s":"jacket","sub":"Комбінезони","c":"women","h":32,"sat":35,"l":78,"pat":"","cost":260,"p":339,"g":319,"sz":{"42":30,"44":29,"46":30,"48":30},"pics":2,"mat":null,"code":"KGD01"},{"n":"Комбінезон жіночий, демісезон, хакі","raw":"Демі Комбінезон жіночий ХАКІ -50%🔥📢","s":"jacket","sub":"Комбінезони","c":"women","h":75,"sat":25,"l":42,"pat":"","cost":260,"p":339,"g":319,"sz":{"42":30,"44":28,"46":29,"48":30},"pics":2,"mat":null,"code":"KGD02"},{"n":"Худі, демісезон, малина","raw":"демі худі МАЛИНА-50%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":340,"sat":60,"l":48,"pat":"","cost":180,"p":239,"g":219,"sz":{"M":1,"L":11,"XL":3,"XXL":7},"pics":3,"mat":null,"code":"DH020"},{"n":"Худі, демісезон, жовтий","raw":"демі худі ЖОВТИЙ -50%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":48,"sat":85,"l":60,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":1,"M":14,"L":27,"XL":18,"XXL":19,"3XL":15},"pics":4,"mat":null,"code":"DH010"},{"n":"Худі, демісезон, оливка","raw":"демі худі ОЛИВКА-50%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":70,"sat":30,"l":40,"pat":"","cost":180,"p":239,"g":219,"sz":{"M":7,"L":9},"pics":3,"mat":null,"code":"DH021"},{"n":"Худі, демісезон, мокко","raw":"демі худі МОККО -50%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":25,"sat":25,"l":44,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":20,"M":25,"XL":5,"XXL":9},"pics":4,"mat":null,"code":"DH015"},{"n":"Худі, демісезон, беж","raw":"демі худі БЕЖ -50%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":32,"sat":35,"l":78,"pat":"","cost":180,"p":239,"g":219,"sz":{"M":6,"L":21,"XL":58,"XXL":21,"3XL":20},"pics":4,"mat":null,"code":"DH04"},{"n":"Худі, демісезон, хакі","raw":"демі худі ХАКІ -50%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":15,"M":10,"XXL":6},"pics":4,"mat":null,"code":"DH05"},{"n":"Худі, демісезон, блакитний","raw":"демі худі БЛАКИТНИЙ-50%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":200,"sat":55,"l":72,"pat":"","cost":180,"p":239,"g":219,"sz":{"M":1,"XXL":1},"pics":3,"mat":null,"code":"DH016"},{"n":"Худі, демісезон, бузок","raw":"демі худі БУЗОК-50%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":280,"sat":35,"l":70,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":3},"pics":3,"mat":null,"code":"DH014"},{"n":"Худі, демісезон, кемел","raw":"демі худі КЕМЕЛ -50%🔥📢","s":"hoodie","sub":"Худі та зіпки","c":"uni","h":32,"sat":42,"l":58,"pat":"","cost":180,"p":239,"g":219,"sz":{"S":4,"L":8,"XXL":7,"3XL":1},"pics":4,"mat":null,"code":"DH08"},{"n":"Костюм спорт, демісезон, беж","raw":"демі костюм спорт БЕЖ -50%🔥📢","s":"hoodie","sub":"Костюми","c":"uni","h":32,"sat":35,"l":78,"pat":"","cost":360,"p":469,"g":439,"sz":{"S":71,"M":14,"L":12,"XL":20,"XXL":12,"3XL":3},"pics":6,"mat":null,"code":"SKD06"},{"n":"Костюм спорт, демісезон, блакитний","raw":"демі костюм спорт БЛАКИТНИЙ -50%🔥📢","s":"hoodie","sub":"Костюми","c":"uni","h":200,"sat":55,"l":72,"pat":"","cost":360,"p":469,"g":439,"sz":{"XXL":4},"pics":3,"mat":null,"code":"SKD09"},{"n":"Костюм спорт, демісезон, хакі","raw":"демі костюм спорт ХАКІ -50%🔥📢","s":"hoodie","sub":"Костюми","c":"uni","h":75,"sat":25,"l":42,"pat":"","cost":360,"p":469,"g":439,"sz":{"S":13,"M":10},"pics":6,"mat":null,"code":"SKD05"},{"n":"Штани жіночі, демісезон, смужка","raw":"демі штани жіночі смужка -50%🔥📢","s":"pants","sub":"Штани","c":"women","h":0,"sat":0,"l":30,"pat":"stripe","cost":190,"p":249,"g":229,"sz":{"42":49,"44":48,"46":49,"48":47},"pics":4,"mat":null,"code":"SHGD01"},{"n":"Сорочка жіноча, демісезон","raw":"Демі сорочка жіноча -30%🔥💵💰","s":"coat","sub":"Сорочки","c":"women","h":125,"sat":30,"l":55,"pat":"","cost":250,"p":329,"g":299,"sz":{"42":36,"44":35,"46":33,"48":31},"pics":3,"mat":null,"code":"SGD01"}]};
+const AR=["3/4","4/5","3/4","1/1","3/4","4/5"];
+const hash=s=>{let h=7;for(const ch of String(s))h=(h*31+ch.charCodeAt(0))>>>0;return h};
+const P=CAT.items.map((x,i)=>({...x,i,o:null,r:null,rv:0,sold:0,ua:0,sl:0,td:0,ar:AR[i%AR.length],k:x.sub,
+  season:/фліс|плюш|зим|термо|жилет/i.test(x.raw)?"Осінь–зима":/демі/i.test(x.raw)?"Демісезон":/шорт|майка|футболк|топ/i.test(x.raw)?"Літо":"Всесезон",
+  country:"Уточнюється в постачальника"}));
+const BYBASE={};
+P.forEach(p=>{p.base=p.n.replace(/,\s*[^,]+$/,"");p.col=(p.n.match(/,\s*([^,]+)$/)||[,""])[1];p.tot=Object.values(p.sz).reduce((a,b)=>a+b,0);(BYBASE[p.base]=BYBASE[p.base]||[]).push(p.i)});
+P.forEach(p=>{p.sib=BYBASE[p.base].filter(j=>P[j].tot>0||j===p.i).slice(0,8)});
+const SUBS=["Худі та зіпки","Футболки","Комплекти","Костюми","Світшоти","Штани","Шорти","Майки","Жилети","Комбінезони","Сорочки","Термобілизна"].filter(s=>P.some(p=>p.sub===s&&p.tot>0));
+function match(p,cat){if(!cat||cat==="all")return true;if(cat==="women")return p.c==="women"||p.c==="uni";if(cat==="men")return p.c==="men"||p.c==="uni";if(cat==="kids")return p.c==="kids";if(cat==="cheap")return p.p<=300;if(cat==="big")return Object.keys(p.sz).some(s=>/3XL|4XL|XL-XXL/.test(s)&&p.sz[s]>0);if(cat.startsWith("sub:"))return p.sub===cat.slice(4);return true}
+const best=(cat,n=1)=>P.filter(p=>match(p,cat)&&p.tot>0).sort((a,b)=>b.tot-a.tot).slice(0,n);
+const NTABS=[["all","Усе"],["women","Жінкам"],["men","Чоловікам"],...SUBS.slice(0,7).map(s=>["sub:"+s,s.replace(" та зіпки","")])];
+const CIRC=[...SUBS.slice(0,9).map(s=>[s.replace(" та зіпки",""),"sub:"+s,best("sub:"+s)[0].i]),["Великі розміри","big",best("big")[0].i],["До 300 ₴","cheap",best("cheap")[0].i]];
+const SIDE=[["Для тебе",[["Найбільший вибір розмірів",best("all",8).map(p=>p.i)]]],...SUBS.map(s=>[s,[["Усі кольори",P.filter(p=>p.sub===s&&p.tot>0).map(p=>p.i)]]]),["Жінкам",[["Жіночі моделі",P.filter(p=>p.c==="women"&&p.tot>0).map(p=>p.i)]]],["Великі розміри",[["До 4XL",best("big",12).map(p=>p.i)]]]];
+const PRIZES=[{t:"+10 ₴",k:"bonus",v:10,w:30,d:"10 ₴ бонусів"},{t:"−5%",k:"pct",v:5,w:15,d:"−5% на кошик"},{t:"+20 ₴",k:"bonus",v:20,w:25,d:"20 ₴ бонусів"},{t:"Доставка 0",k:"ship",v:0,w:15,d:"Безкоштовна доставка"},{t:"+50 ₴",k:"bonus",v:50,w:10,d:"50 ₴ бонусів"},{t:"−10%",k:"pct",v:10,w:5,d:"−10% на кошик"}];
+const gp=s=>best("sub:"+s)[0]?.i??0;
+const GROUPS=[{who:"Олена",c:"Київ",i:gp("Костюми"),left:5*3600+720},{who:"Максим",c:"Львів",i:gp("Худі та зіпки"),left:2*3600+1500},{who:"Ірина",c:"Одеса",i:gp("Комплекти"),left:11*3600+300},{who:"Андрій",c:"Дніпро",i:gp("Штани"),left:46*60},{who:"Софія",c:"Харків",i:gp("Світшоти"),left:8*3600+2400},{who:"Тарас",c:"Вінниця",i:gp("Шорти"),left:3*3600+90}];
+const HINTS=["худі фліс","костюм фліс","футболка оверсайз","шорти вкорочені","штани фліс","світшот з рибаною"];
+const POP=["худі","костюм","футболка","штани","шорти","жилет"];
+const RU={"худи":"худі","толстовка":"худі","свитшот":"світшот","штаны":"штани","брюки":"штани","шорты":"шорти","футболка":"футболка","майка":"майка","костюм":"костюм","жилет":"жилет","спортивный":"спорт","флис":"фліс","комбинезон":"комбінезон","рубашка":"сорочка"};
+const RVW=[];
+const NOTIF=[["Нові товари","Додано 203 моделі від MODAMIXX","щойно"],["Група майже зібрана","Олена з Києва чекає ще 1 людину","1 год"],["Барабан стилю","Твоє обертання на сьогодні вже доступне","3 год"],["Повернення","Ви можете повернути товар протягом 14 днів","вчора"]];
+const STATUSES=[["Оформлено","Продавець отримав замовлення"],["Пакується","Готуємо до відправки"],["Передано в Нову пошту","ТТН створено"],["В дорозі","Посилка їде до вас"],["У поштоматі","Код для отримання нижче"],["Отримано","Дякуємо! Оцініть покупку"]];
+
+/* ===== state ===== */
+const S={nt:"all",ft:"for",view:"home",cart:[],coupon:null,spun:false,orders:[],joined:new Set(),likes:new Set(),side:0,list:null,bonus:100,useBonus:false,my:{},eco:false,who:"all",co:{del:"locker",pay:"gpay",agree:false},onb:true};
+const LS="yula4";
+try{const d=JSON.parse(localStorage.getItem(LS)||"{}");if(d.onb===false)S.onb=false;if(d.my)S.my=d.my;if(typeof d.eco==="boolean")S.eco=d.eco;if(d.day===new Date().toDateString()){S.spun=!!d.spun;S.coupon=d.coupon||null}if(typeof d.bonus==="number")S.bonus=d.bonus}catch(e){}
+const save=()=>{try{localStorage.setItem(LS,JSON.stringify({onb:S.onb,my:S.my,eco:S.eco,day:new Date().toDateString(),spun:S.spun,coupon:S.coupon,bonus:S.bonus}))}catch(e){}};
+
+const $=s=>document.querySelector(s);
+const uah=n=>Math.round(n).toLocaleString("uk-UA").replace(/ /g," ")+" ₴";
+const off=p=>Math.round((1-p.p/p.o)*100);
+const r1=x=>String(x).replace(".",",");
+const kfmt=n=>n>=1000?r1((n/1000).toFixed(1))+" тис":String(n);
+const hms=s=>[Math.floor(s/3600),Math.floor(s%3600/60),s%60].map(n=>String(n).padStart(2,"0"));
+const sizesFor=p=>Object.keys(p.sz);
+const stock=(p,s)=>p.sz[s]||0;
+const kind=p=>p.c==="kids"?"kids":"wear";
+const motion=()=>!S.eco&&!matchMedia("(prefers-reduced-motion: reduce)").matches;
+function shipInfo(){return{today:false,txt:"",eta:"за 2–3 дні"}}
+function toast(t){$("#toastHost").innerHTML=`<div class="toast" role="status">${t}</div>`;clearTimeout(toast._t);toast._t=setTimeout(()=>$("#toastHost").innerHTML="",2400)}
+function copy(t,msg){try{navigator.clipboard.writeText(t).then(()=>toast(msg||"Скопійовано"),()=>toast(t))}catch(e){toast(t)}}
+
+/* ===== product card ===== */
+function card(p,k=0){
+  const liked=S.likes.has(p.i);
+  return `<div class="pc" style="animation-delay:${Math.min(k,7)*50}ms">
+   <div class="tile" style="--h:${p.h};aspect-ratio:${p.ar}" role="button" tabindex="0" data-open="${p.i}" aria-label="${p.n}">${art(p)}
+     <div class="bdgs">${p.tot<=5?`<span class="bdg td">Лишилось ${p.tot}</span>`:""}</div>
+     <button class="heart ${liked?"on":""}" type="button" data-like="${p.i}" aria-label="В обране" aria-pressed="${liked}">${ic("heart")}</button>
+     <div class="pbar"><span class="pv num">${uah(p.p)}</span>${p.o?`<span class="off">−${off(p)}%</span>`:""}</div>
+     <button class="add" type="button" data-quick="${p.i}" aria-label="Швидко додати в кошик">${ic("cartp")}</button>
+   </div>
+   <div class="pmeta" data-open="${p.i}">
+     <div class="pn">${p.n}</div>
+     <div class="ps">${p.r?`<span class="star">${STAR}${r1(p.r)}</span><span>(${p.rv})</span>`:'<span class="newb">Новинка</span>'}<span>${Object.keys(p.sz).filter(s=>p.sz[s]>0).length} розм.</span>${p.sib.length>1?`<span>${p.sib.length} кольори</span>`:""}</div>
+     <span class="gchip num">Разом ${uah(p.g)}</span>
+   </div></div>`;
+}
+function feedList(k,cat){
+  let l=P.filter(p=>match(p,cat||"all")&&p.tot>0);
+  if(S.who!=="all"&&(!cat||cat==="all"))l=l.filter(p=>match(p,S.who));
+  if(k==="cheap")l=[...l].sort((a,b)=>a.p-b.p);
+  if(k==="grp")l=[...l].sort((a,b)=>(b.p-b.g)-(a.p-a.g));
+  if(k==="big")l=l.filter(p=>match(p,"big"));
+  if(k==="new")l=[...l].reverse();
+  return l;
+}
+function vHome(){
+  const low=P.filter(p=>p.tot>0&&p.tot<=6).sort((a,b)=>a.tot-b.tot).slice(0,8);
+  const picks=[gp("Костюми"),gp("Худі та зіпки"),gp("Комплекти")].map(i=>P[i]);
+  const fleece=P.filter(p=>/фліс/i.test(p.raw)&&p.tot>0),minF=Math.min(...fleece.map(p=>p.p));
+  const gx=P[GROUPS[0].i];
+  return `<section class="view">
+   <div class="trust gut"><span>${ic("truck")}У поштоматі за 2–3 дні</span><span>${ic("ret")}Повернення 14 днів</span><span>${ic("eye")}Огляд на пошті</span><span>${ic("shield")}Безпечна оплата</span></div>
+   <div class="hero" id="hero"><div class="track" id="track">
+     <button class="slide s1 on" type="button" data-list="sub:Худі та зіпки" data-title="Худі та зіпки">
+       <div class="rib anim">ФЛІС-СЕЗОН · ${fleece.length} МОДЕЛЕЙ</div>
+       <div class="mega anim"><small>ВІД</small><b>${minF}₴</b></div>
+       <div class="stk anim"><span>РАЗОМ<br>ЩЕ<br>ДЕШЕВШЕ</span></div>
+       <div class="cta">ДИВИТИСЬ <em>→</em></div>
+     </button>
+     <button class="slide s2" type="button" data-go="groups">
+       <h3 class="anim">КУПУЙ<br>РАЗОМ</h3>
+       <div class="duo anim"><i>ВИ</i><i>?</i><i>+</i></div>
+       <p class="anim"><b>${uah(gx.g)} замість ${uah(gx.p)}</b>Поклич подругу, і ціна впаде для обох</p>
+     </button>
+     <button class="slide s3" type="button" data-list="big" data-title="Великі розміри">
+       <h3 class="anim">РОЗМІРИ<br>ДО 4XL</h3>
+       <div class="spool"><i></i><b></b></div>
+       <p class="anim">${P.filter(p=>match(p,"big")).length} моделей у великих розмірах</p>
+     </button>
+   </div><div class="dots" id="dots"><i class="on"></i><i></i><i></i></div></div>
+
+   <div class="circles gut">${CIRC.map(([n,c,pi])=>{const p=P[pi];return`<button class="cc" type="button" data-list="${c}" data-title="${n}"><span class="ring tile" style="--h:${p.h}">${art(p)}</span>${n}</button>`}).join("")}</div>
+
+   <div class="gut">
+     <div class="sh"><h3>Встигни взяти</h3><span class="more">реальні залишки</span></div>
+     <div class="hrow">${low.map(p=>`<button class="fc" type="button" data-open="${p.i}">${tile(p)}<div class="pr num">${uah(p.p)}</div><div class="left">Залишилось ${p.tot} шт</div></button>`).join("")}</div>
+
+     <div class="sh"><h3>Вибір YULA</h3><span class="more">добірка редакції</span></div>
+     <div class="t3">${picks.map((p,k)=>`<button type="button" data-open="${p.i}"><span class="rank">№ ${k+1}</span>${tile(p)}<div class="pr num">${uah(p.p)}</div><small>${p.sub} · ${Object.keys(p.sz)[0]}–${Object.keys(p.sz).slice(-1)[0]}</small></button>`).join("")}</div>
+
+     <div class="sh"><h3>Разом дешевше</h3><button class="more" type="button" data-go="groups">Усі групи ${ic("chev","width:14px;height:14px")}</button></div>
+     <div class="hrow">${GROUPS.slice(0,3).map(g=>{const p=P[g.i];return`<button class="gcard" type="button" data-go="groups">${tile(p)}<span><b class="num">${uah(p.g)}</b><small>${g.who} з міста ${g.c} чекає 1 людину</small><span class="av" style="margin-top:6px"><i style="background:var(--pink);color:#fff">${g.who[0]}</i><i style="background:var(--soft)">+</i></span></span></button>`}).join("")}</div>
+   </div>
+
+   <div class="ftabs gut" id="ftabs" role="tablist">
+     <span class="find" id="find"></span>
+     ${[["for","Для тебе"],["cheap","Дешевші"],["new","Новинки"],["grp","Разом дешевше"],["big","Великі розміри"]].map(([k,l])=>`<button class="ft" type="button" role="tab" data-ft="${k}" aria-selected="${S.ft===k}">${l}</button>`).join("")}
+   </div>
+   <div class="gut"><div class="mas" id="feed"></div><div class="sentinel" id="more">Підвантажуємо ще…</div>
+   <p class="note">Товари з фіду постачальника MODAMIXX, ціни з націнкою від 30%. Фото в застосунку будуть з фіду; у прототипі — ілюстрації. Люди в групах умовні.</p></div>
+  </section>`;
+}
+function vCats(){
+  const secs=SIDE[S.side][1];
+  return `<section class="view"><div class="catv">
+   <div class="side" role="tablist">${SIDE.map(([n],k)=>`<button type="button" role="tab" data-side="${k}" aria-selected="${k===S.side}">${n}</button>`).join("")}</div>
+   <div class="cmain">${secs.map(([t,ids],si)=>{const show=ids.length>=6?ids.slice(0,5):ids;return`<h4>${t} <span style="color:var(--muted);font-weight:600;font-size:13px">${ids.length}</span></h4><div class="cgrid">
+      <button class="cc all" type="button" data-list="side" data-title="${SIDE[S.side][0]}"><span class="ring">${ic("grid")}</span>Усі</button>
+      ${show.map(i=>{const p=P[i];const cap=SIDE[S.side][0]==="Для тебе"||SIDE[S.side][0]==="Великі розміри"||SIDE[S.side][0]==="Жінкам"?p.sub.replace(" та зіпки",""):(p.col||p.sub);return`<button class="cc" type="button" data-open="${i}"><span class="ring tile" style="--h:${p.h}">${art(p)}</span>${cap.charAt(0).toUpperCase()+cap.slice(1)}</button>`}).join("")}</div>`}).join("")}
+     <button class="cban" type="button" data-wheel><span><b>Барабан стилю</b><small>Бонуси або знижка до −10% щодня</small></span>${ic("chev")}</button>
+   </div></div></section>`;
+}
+function vList(){
+  const L=S.list;let items=L.ids?L.ids.map(i=>P[i]):L.q!=null?P.filter(p=>(p.n+" "+p.raw+" "+p.sub).toLowerCase().includes(L.q)&&p.tot>0):feedList(null,L.cat);
+  if(L.big)items=items.filter(p=>match(p,"big"));if(L.mine&&S.my.wear)items=items.filter(p=>{const s=recSize(p);return s&&p.sz[s]>0});
+  if(L.sort==="cheap")items=[...items].sort((a,b)=>a.p-b.p);
+  return `<section class="view gut">
+    <div class="lhead"><button class="back" type="button" data-back aria-label="Назад">${ic("back")}</button><h2>${L.title}</h2><span style="color:var(--muted);font-size:12.5px">${items.length} шт.</span></div>
+    ${L.note?`<div class="qnote">${L.note}</div>`:""}
+    <div class="fchips">
+      <button class="fch" type="button" data-fs="sort" aria-pressed="${L.sort==="cheap"}">Спочатку дешевші</button>
+      <button class="fch" type="button" data-fs="big" aria-pressed="${!!L.big}">Великі розміри</button>
+      ${S.my.wear?`<button class="fch" type="button" data-fs="mine" aria-pressed="${!!L.mine}">Є мій розмір (${S.my.wear})</button>`:`<button class="fch" type="button" data-sizepick="wear">Вказати мій розмір</button>`}
+    </div>
+    ${items.length?`<div class="mas">${items.map(card).join("")}</div>`:`<div class="empty"><div class="bigi">0</div><p>Нічого не знайшли.<br>Спробуй іншу категорію або слово.</p><button class="btn sm" type="button" data-toast="Повідомимо, щойно з'явиться схоже">Повідомити, коли з'явиться</button></div>`}
+  </section>`;
+}
+function vGroups(){
+  return `<section class="view gut"><h2 class="ph">Разом</h2>
+   <p class="lead">Приєднайся до відкритої групи, і ти та організатор отримаєте нижчу ціну. Групова ціна — справжня знижка від ціни за останні 30 днів.</p>
+   <button class="drum" type="button" data-wheel><i></i><span><b>Барабан стилю</b><small>${S.spun?"Сьогодні вже крутив · приходь завтра":"Одне безкоштовне обертання на день"}</small></span></button>
+   <div class="card" style="padding-block:4px">${GROUPS.map((g,k)=>{const p=P[g.i],j=S.joined.has(k);return`<div class="row">${tile(p)}
+     <div class="info"><div class="t">${p.n}</div><div class="s">${g.who}, ${g.c} · чекає ще 1 людину</div><div class="s">Закриється через <span class="timer" data-left="${k}">${hms(g.left).join(":")}</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px"><span class="pr num">${uah(p.g)} <s style="color:var(--muted);font:500 12px var(--f-b)">${uah(p.p)}</s></span>
+      <button class="btn sm ${j?"":"pink"}" type="button" data-join="${k}" ${j?"disabled":""}>${j?"Ти в групі":"Приєднатися"}</button></div></div></div>`}).join("")}</div>
+  </section>`;
+}
+function totals(pay){
+  const sub=S.cart.reduce((a,x)=>a+(x.group?P[x.i].g:P[x.i].p)*x.q,0);let disc=0;const c=S.coupon;
+  if(c&&sub&&c.k==="pct")disc=Math.round(sub*c.v/100);
+  const bon=S.useBonus?Math.min(S.bonus,Math.floor((sub-disc)*.3)):0;
+  const del=S.co.del,base=del==="courier"?110:del==="branch"?70:60;
+  const ship=!sub?0:(c&&c.k==="ship")||(sub>=1500&&del!=="courier")?0:base;
+  const pre=sub-disc-bon+ship;
+  pay=pay||S.co.pay;const codPart=pay==="cod"?pre:pay==="pre200"?Math.max(pre-200,0):0;
+  const fee=codPart?Math.round(codPart*.02+20):0;
+  return{sub,disc,bon,ship,fee,total:pre+fee,pre};
+}
+function vCart(){
+  if(!S.cart.length)return `<section class="view gut"><h2 class="ph">Кошик</h2><div class="empty"><div class="bigi">0 ₴</div><p>Кошик поки порожній</p><button class="btn pink" type="button" data-go="home">До покупок</button></div></section>`;
+  const t=totals(),si=shipInfo(),need=Math.max(1500-t.sub,0);
+  const bySel={};S.cart.forEach((x,k)=>{const sl=P[x.i].sl;(bySel[sl]=bySel[sl]||[]).push([x,k])});
+  const nSel=Object.keys(bySel).length;
+  const fill=P.filter(p=>p.tot>0&&p.p<=need+250&&p.p>=Math.min(need,150)).sort((a,b)=>b.tot-a.tot).slice(0,6);
+  return `<section class="view gut"><h2 class="ph">Кошик <span style="color:var(--muted);font:600 14px var(--f-b)">${S.cart.reduce((a,x)=>a+x.q,0)} шт.</span></h2>
+   <div class="prog ${need?"":"done"}" id="prog"><div class="tt"><span>${need?`Ще <b class="num">${uah(need)}</b> до безкоштовної доставки`:"Доставка безкоштовна"}</span><span class="num" style="color:var(--muted)">1 500 ₴</span></div><div class="bar"><i style="width:${Math.min(100,t.sub/15)}%"></i></div></div>
+   ${need&&fill.length?`<div class="sh" style="margin-top:14px"><h3 style="font-size:14px">Доповни до 1 500 ₴</h3></div><div class="hrow">${fill.map(p=>`<button class="fc" type="button" data-open="${p.i}" style="flex-basis:96px">${tile(p)}<div class="pr num" style="font-size:13px">${uah(p.p)}</div></button>`).join("")}</div>`:""}
+   ${Object.entries(bySel).map(([sl,items])=>{const s=SELLERS[sl],today=items.every(([x])=>P[x.i].td)&&si.today;return`<div class="card" style="padding-bottom:4px">
+     <div class="shop">${s.n}${s.vf?ic("shield","width:15px;height:15px;color:var(--green)"):""}<small>${ic("truck","width:13px;height:13px")}відправка 1–2 дні</small></div>
+     ${items.map(([x,k])=>{const p=P[x.i];return`<div class="row">${tile(p,x.h)}
+      <div class="info"><div class="t">${p.n}</div><div class="s">Розмір ${x.size}</div>
+      ${x.group?`<div class="s" style="color:var(--pink-deep);font-weight:700">${x.joined?"Група зібрана · групова ціна":"Група: чекаємо 1 людину"}</div>${x.joined?"":`<div class="s">Якщо не зберемо: ${x.fb==="cancel"?"скасуємо й повернемо гроші":"звичайна ціна"}</div>`}`:""}
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span class="pr num">${uah((x.group?p.g:p.p)*x.q)}</span>
+      <div class="qty"><button type="button" data-dec="${k}" aria-label="Менше">−</button><span class="num" style="min-width:16px;text-align:center">${x.q}</span><button type="button" data-inc="${k}" aria-label="Більше">+</button></div></div></div></div>`}).join("")}</div>`}).join("")}
+   ${nSel>1?`<p class="lead" style="margin:10px 0 0;font-size:13px">Речі від ${nSel} продавців прийдуть окремими посилками.</p>`:""}
+   ${S.coupon?`<div class="coupon"><span>Барабан стилю: ${S.coupon.d}</span><span>застосовано</span></div>`:`<button class="drum" type="button" data-wheel><i></i><span><b>Ще без знижки?</b><small>Покрути барабан стилю, результат застосується тут</small></span></button>`}
+   <div class="card">
+     <div class="line" style="padding-top:0"><span class="tx"><b>Списати бонуси</b><small>Доступно ${uah(S.bonus)} · до 30% суми</small></span><button class="sw2" type="button" role="switch" aria-checked="${S.useBonus}" data-bonus aria-label="Списати бонуси"></button></div>
+     <div class="sum"><span>Товари</span><span class="num">${uah(t.sub)}</span></div>
+     ${t.disc?`<div class="sum"><span>Знижка</span><span class="minus num">−${uah(t.disc)}</span></div>`:""}
+     ${t.bon?`<div class="sum"><span>Бонуси</span><span class="minus num">−${uah(t.bon)}</span></div>`:""}
+     <div class="sum"><span>Доставка (поштомат)</span><span class="num">${t.ship?"≈ "+uah(t.ship):'<span class="minus">безкоштовно</span>'}</span></div>
+     <div class="sum total"><span>Разом</span><span class="num">${uah(t.total)}</span></div>
+     <p style="margin:6px 0 12px;font-size:12px;color:var(--muted)">При оплаті на пошті Нова пошта бере 2% + 20 ₴ — покажемо до підтвердження.</p>
+     <button class="btn pink block" type="button" data-go="checkout">Оформити замовлення</button>
+   </div></section>`;
+}
+function vCheckout(){
+  if(!S.cart.length)return vCart();
+  const t=totals(),si=shipInfo(),co=S.co,partsOk=t.pre>=1500,codOk=t.pre<=2000;
+  if(co.pay==="parts"&&!partsOk)co.pay="gpay";if(co.pay==="cod"&&!codOk)co.pay="gpay";
+  const T=totals(),fee=pay=>totals(pay).fee;
+  const delTxt={locker:["Поштомат","≈ 60 ₴"],branch:["Відділення","≈ 70 ₴"],courier:["Кур'єр","≈ 110 ₴"]};
+  return `<section class="view gut">
+   <div class="lhead"><button class="back" type="button" data-go="cart" aria-label="Назад до кошика">${ic("back")}</button><h2>Оформлення</h2></div>
+   <form id="co" novalidate>
+   <div class="card"><h4><span class="n">1</span>Контакти</h4>
+     <label class="f" for="fPhone">Телефон<input id="fPhone" type="tel" inputmode="tel" autocomplete="tel" value="${co.phone||"+380 67 123 45 67"}"></label>
+     <label class="f" for="fName">Прізвище та ім'я отримувача<input id="fName" autocomplete="name" value="${co.name||"Коваленко Марія"}"></label>
+     <p style="margin:0;font-size:12.5px;color:var(--muted)">Надішлемо код у SMS. Реєстрація не потрібна.</p>
+   </div>
+   <div class="card"><h4><span class="n">2</span>Доставка Новою поштою</h4>
+     <div class="seg" role="group" aria-label="Спосіб доставки">${Object.entries(delTxt).map(([k,[l,pr]])=>`<button type="button" data-del="${k}" aria-pressed="${co.del===k}">${l}<small>${t.sub>=1500&&k!=="courier"?"0 ₴":pr}</small></button>`).join("")}</div>
+     ${co.del==="courier"?`<label class="f" for="fAddr">Адреса<input id="fAddr" autocomplete="street-address" value="${co.addr||"Київ, вул. Січових Стрільців, 21, кв. 14"}"></label>`:
+     `<label class="f" for="fCity">Місто<input id="fCity" value="${co.city||"Київ"}"></label>
+      <label class="f" for="fWh">${co.del==="locker"?"Поштомат":"Відділення"}<input id="fWh" value="${co.wh&&co.whFor===co.del?co.wh:(co.del==="locker"?"Поштомат №5521, вул. Хрещатик, 22":"Відділення №12, вул. Шота Руставелі, 33")}"></label>
+      <button type="button" class="fch" data-toast="Збережено як «Мій поштомат»" style="margin-bottom:4px">${ic("pin","width:14px;height:14px")}Зберегти як мій</button>`}
+     <div class="cut" style="margin-top:10px">${ic("truck")}Отримаєте ${si.eta}. Продавець відправляє протягом 1–2 днів.</div>
+   </div>
+   <div class="card"><h4><span class="n">3</span>Оплата</h4>
+     ${[
+      ["gpay","Google Pay / Apple Pay","Миттєво й безпечно","+50 бонусів · без комісії пошти",1],
+      ["card","Картка онлайн","Visa, Mastercard","+50 бонусів",1],
+      ["parts","Оплата частинами",partsOk?`3 × ${uah(Math.ceil(t.pre/3))} · monobank, ПриватБанк · 0% для вас`:"Доступно від 1 500 ₴","",partsOk],
+      ["pre200","Передплата 200 ₴",`Решта ${uah(Math.max(t.pre-200,0))} на пошті + комісія ${uah(fee("pre200"))}`,"",1],
+      ["cod","Повна оплата на пошті",codOk?`Комісія Нової пошти ${uah(fee("cod"))}`:"Доступно для замовлень до 2 000 ₴","",codOk]
+     ].map(([k,b,s,tag,ok])=>`<label class="opt"><input type="radio" name="pay" value="${k}" ${co.pay===k?"checked":""} ${ok?"":"disabled"}><span class="ot"><b>${b}</b>${tag?`<span class="tag">${tag}</span>`:""}<small>${s}</small></span></label>`).join("")}
+     <p style="margin:4px 0 0;font-size:12.5px;color:var(--muted);display:flex;gap:6px;align-items:center">${ic("shield","width:15px;height:15px;color:var(--green)")}Безпечна оплата. Огляд посилки на пошті перед отриманням.</p>
+   </div>
+   <div class="card"><h4><span class="n">4</span>Підтвердження</h4>
+     <div class="sum"><span>Товари</span><span class="num">${uah(T.sub)}</span></div>
+     ${T.disc?`<div class="sum"><span>Знижка</span><span class="minus num">−${uah(T.disc)}</span></div>`:""}
+     ${T.bon?`<div class="sum"><span>Бонуси</span><span class="minus num">−${uah(T.bon)}</span></div>`:""}
+     <div class="sum"><span>Доставка</span><span class="num">${T.ship?"≈ "+uah(T.ship):'<span class="minus">безкоштовно</span>'}</span></div>
+     ${T.fee?`<div class="sum"><span>Комісія пошти за накладений платіж</span><span class="num">${uah(T.fee)}</span></div>`:""}
+     <div class="sum total"><span>До сплати</span><span class="num">${uah(T.total)}</span></div>
+     <p style="margin:6px 0 0;font-size:12.5px;color:var(--muted)">1% (${uah(T.total*.01)}) з цього замовлення YULA передасть на збір для ЗСУ.</p>
+     <label class="chk" for="agree"><input type="checkbox" id="agree" ${co.agree?"checked":""}><span>Погоджуюсь з умовами <a href="#" data-doc="Публічна оферта">публічної оферти</a> та <a href="#" data-doc="Правила повернення">правилами повернення</a></span></label>
+     <div class="err" id="coErr" role="alert"></div>
+     <button class="btn pink block" type="submit">Підтвердити · ${uah(T.total)}</button>
+   </div></form></section>`;
+}
+function vOrder(){
+  const o=S.orders.find(x=>x.no===S.ord);if(!o)return vMe();
+  const st=o.status;
+  return `<section class="view gut">
+   <div class="lhead"><button class="back" type="button" data-go="me" aria-label="Назад">${ic("back")}</button><h2>${o.no}</h2><span class="num" style="font-weight:800">${uah(o.total)}</span></div>
+   ${o.fresh?`<div class="cut">${ic("check")}Замовлення оформлено. Надішлемо SMS на кожному етапі.</div>`:""}
+   <div class="card"><ol class="tl">${STATUSES.map(([b,s],k)=>`<li class="${k<st||st===5?"done":k===st?"cur":""}"><span class="d">${k<=st?ic("check"):""}</span><span><b>${b}</b><small>${k===4&&st===4?"Зберігається ще 5 днів":s}</small></span></li>`).join("")}</ol>
+     ${st<5?`<button class="btn ghost sm block" type="button" data-adv>Показати наступний етап (демо)</button>`:""}</div>
+   ${st>=2?`<div class="card"><h4>${ic("box")}ТТН Нової пошти</h4><div class="link"><code class="num">${o.ttn}</code><button class="btn sm" type="button" data-copy="${o.ttn.replace(/\s/g,"")}" data-msg="ТТН скопійовано">${ic("copy","width:15px;height:15px")}Копіювати</button></div></div>`:""}
+   ${st===4?`<div class="card" style="text-align:center"><h4 style="justify-content:center">${ic("locker")}Код для поштомату</h4><div class="code num">${o.code.split("").map(d=>`<b>${d}</b>`).join("")}</div><p style="margin:4px 0 0;color:var(--muted);font-size:13px">${o.wh}</p></div>`:""}
+   <div class="card" style="padding-block:4px">${o.items.map(x=>{const p=P[x.i];return`<div class="row">${tile(p,x.h)}<div class="info"><div class="t">${p.n}</div><div class="s">Розмір ${x.size} · ${x.q} шт.</div><div class="s">${SELLERS[p.sl].n}</div></div></div>`}).join("")}</div>
+   <div class="card" style="padding-block:2px">
+     ${o.ret?`<div class="cut" style="margin-block:12px">${ic("ret")}<span>${o.ret}</span></div>`:`<button class="line" type="button" data-return ${st<5?"disabled":""}><span class="ic">${ic("ret")}</span><span class="tx"><b>Повернути або обміняти</b><small>${st<5?"Стане доступно після отримання":"14 днів з дня отримання"}</small></span>${ic("chev")}</button>`}
+     <button class="line" type="button" data-toast="Чат з продавцем з'явиться в робочій версії"><span class="ic">${ic("chat")}</span><span class="tx"><b>Продавець затримує?</b><small>Написати продавцю або підтримці</small></span>${ic("chev")}</button>
+   </div></section>`;
+}
+function vMe(){
+  return `<section class="view gut">
+   <div class="prof"><div class="ava">ВИ</div><div><b style="font-size:16px">Гість</b><div style="opacity:.7;font-size:12.5px">Увійти за номером телефону</div></div><div class="bal"><b class="num">${uah(S.bonus)}</b><small>бонуси</small></div></div>
+   <div class="card" style="padding-block:2px">
+     <button class="line" type="button" data-orders><span class="ic">${ic("box")}</span><span class="tx"><b>Мої замовлення</b><small>${S.orders.length?S.orders.length+" · останнє "+S.orders[0].no:"Поки немає"}</small></span>${ic("chev")}</button>
+     <button class="line" type="button" data-sizepick="wear"><span class="ic">${ic("ruler")}</span><span class="tx"><b>Мої розміри</b><small>${S.my.wear?"Одяг "+S.my.wear+(S.my.shoes?" · взуття "+S.my.shoes:""):"Юля підбере за зростом і вагою"}</small></span>${ic("chev")}</button>
+     <button class="line" type="button" data-toast="Поштомат №5521, вул. Хрещатик, 22"><span class="ic">${ic("pin")}</span><span class="tx"><b>Мій поштомат</b><small>Поштомат №5521, Київ</small></span>${ic("chev")}</button>
+     <button class="line" type="button" data-go="likes"><span class="ic">${ic("heart")}</span><span class="tx"><b>Обране</b><small>${S.likes.size} товарів</small></span>${ic("chev")}</button>
+   </div>
+   <div class="card"><h4>${ic("gift")}Запроси подругу — по 100 ₴ обом</h4>
+     <p style="margin:0;color:var(--muted);font-size:13.5px">Подруга отримує 100 ₴ на перше замовлення. Ти отримуєш 100 ₴, коли вона його забере.</p>
+     <div class="link"><code>yula.ua/r/YULA-7Q2</code><button class="btn sm pink" type="button" data-copy="yula.ua/r/YULA-7Q2" data-msg="Посилання скопійовано">Копіювати</button></div></div>
+   <div class="card fund"><h4>${ic("flag")}Збір YULA для ЗСУ</h4>
+     <p style="margin:0;color:var(--muted);font-size:13.5px">1% з кожного замовлення. Звіт з чеками щомісяця.</p>
+     <div class="bar"><i style="width:61%"></i></div>
+     <div class="sum" style="font-size:13px"><span class="num"><b>184 320 ₴</b> з 300 000 ₴</span><span style="color:var(--muted)">приклад</span></div></div>
+   <div class="card" style="padding-block:2px">
+     <div class="line"><span class="ic">${ic("leaf")}</span><span class="tx"><b>Режим економії</b><small>Без анімацій і відео, легші картинки. Для слабкого зв'язку й блекаутів</small></span><button class="sw2" type="button" role="switch" aria-checked="${S.eco}" data-eco aria-label="Режим економії"></button></div>
+     <button class="line" type="button" data-toast="Чат підтримки працює щодня 8:00–22:00"><span class="ic">${ic("chat")}</span><span class="tx"><b>Підтримка</b><small>Чат щодня 8:00–22:00</small></span>${ic("chev")}</button>
+     <button class="line" type="button" data-doc="Юридична інформація"><span class="ic">${ic("doc")}</span><span class="tx"><b>Юридична інформація</b><small>Оферта, конфіденційність, повернення</small></span>${ic("chev")}</button>
+     <button class="line" type="button" data-delacc><span class="ic">${ic("trash")}</span><span class="tx"><b>Видалити акаунт</b><small>Разом з даними замовлень</small></span>${ic("chev")}</button>
+   </div></section>`;
+}
+function vLikes(){
+  const items=[...S.likes].map(i=>P[i]);
+  return `<section class="view gut"><div class="lhead"><button class="back" type="button" data-back aria-label="Назад">${ic("back")}</button><h2>Обране</h2></div>
+   ${items.length?`<div class="mas" style="margin-top:10px">${items.map(card).join("")}</div>`:`<div class="empty"><div class="bigi">${ic("heart","width:40px;height:40px")}</div><p>Натисни сердечко на товарі, щоб зберегти його тут</p></div>`}</section>`;
+}
+
+/* ===== render & nav ===== */
+let feedN=0,io,carT;
+function render(){
+  $("#main").innerHTML={home:vHome,cats:vCats,list:vList,groups:vGroups,cart:vCart,checkout:vCheckout,order:vOrder,me:vMe,likes:vLikes}[S.view]();
+  const map={list:"home",likes:"me",checkout:"cart",order:"me"};
+  document.querySelectorAll(".tab").forEach(t=>{(t.dataset.go===(map[S.view]||S.view))?t.setAttribute("aria-current","page"):t.removeAttribute("aria-current")});
+  clearInterval(carT);if(io)io.disconnect();
+  if(S.view==="home"){feedN=0;fillFeed(true);setupCarousel();moveInd($("#ftabs"),".ft[aria-selected=true]",$("#find"));tickClock();
+    try{io=new IntersectionObserver(e=>{if(e[0].isIntersecting)fillFeed()},{rootMargin:"300px"});io.observe($("#more"))}catch(e){}}
+}
+function fillFeed(reset){
+  const base=feedList(S.ft,S.nt),feed=$("#feed");if(!feed)return;if(feedN>=base.length&&!reset){io&&io.disconnect();$("#more").textContent="Це всі товари. Нові з'являться після наступної синхронізації";return}
+  if(!base.length){feed.innerHTML='<div class="empty" style="column-span:all">Тут поки порожньо</div>';$("#more").textContent="";return}
+  const chunk=base.slice(feedN,feedN+10);feedN+=10;
+  const html=chunk.map((p,k)=>card(p,k)).join("");
+  if(reset)feed.innerHTML=html;else feed.insertAdjacentHTML("beforeend",html);
+  if(feedN>=base.length){io&&io.disconnect();$("#more").textContent="Це всі товари. Нові з'являться після наступної синхронізації"}
+}
+function go(v){S.view=v;render();window.scrollTo({top:0})}
+function openList(o){S.list=o;if(S.view!=="list")S.prev=S.view;go("list")}
+
+$("#ntabs").innerHTML=NTABS.map(([k,l])=>`<button class="nt" type="button" role="tab" data-nt="${k}" aria-selected="${k===S.nt}">${l}</button>`).join("")+'<span class="ind" id="ind"></span>';
+function moveInd(w,sel,i){const a=w&&w.querySelector(sel);if(!a||!i)return;i.style.left=a.offsetLeft+"px";i.style.width=a.offsetWidth+"px"}
+const navInd=()=>moveInd($("#ntabs"),".nt[aria-selected=true]",$("#ind"));
+
+function setupCarousel(){
+  const tr=$("#track"),hero=$("#hero");if(!tr)return;const dots=[...document.querySelectorAll("#dots i")],sl=[...tr.children];let idx=0,paused=false;
+  const set=n=>{idx=n;sl.forEach((s,k)=>s.classList.toggle("on",k===n));dots.forEach((d,k)=>{d.classList.remove("on");void d.offsetWidth;if(k===n)d.classList.add("on")})};
+  const restart=()=>{clearInterval(carT);if(!motion()||paused)return;carT=setInterval(()=>{const n=(idx+1)%sl.length;tr.scrollTo({left:n*tr.clientWidth,behavior:"smooth"});set(n)},4600)};
+  let st;tr.addEventListener("scroll",()=>{clearTimeout(st);st=setTimeout(()=>{const n=Math.round(tr.scrollLeft/tr.clientWidth);if(n!==idx)set(n)},90)},{passive:true});
+  let pt;hero.addEventListener("pointerdown",()=>{paused=true;hero.classList.add("paused");clearInterval(carT);clearTimeout(pt)});
+  const resume=()=>{clearTimeout(pt);pt=setTimeout(()=>{paused=false;hero.classList.remove("paused");restart()},5000)};
+  hero.addEventListener("pointerup",resume);hero.addEventListener("pointercancel",resume);
+  restart();
+}
+
+/* search */
+let hi=0;setInterval(()=>{const h=$("#hint");if(!h||!motion())return;const cur=h.querySelector("span");hi=(hi+1)%HINTS.length;const nx=document.createElement("span");nx.textContent=HINTS[hi];nx.className="in";h.appendChild(nx);requestAnimationFrame(()=>requestAnimationFrame(()=>{cur.classList.add("out");nx.classList.remove("in")}));setTimeout(()=>cur.remove(),450)},3000);
+const qi=$("#q");
+qi.addEventListener("input",()=>$("#pill").classList.toggle("typing",!!qi.value));
+qi.addEventListener("focus",()=>{$("#sugg").innerHTML=`<small>Популярне зараз</small>${POP.map(w=>`<button type="button" data-q="${w}">${w}</button>`).join("")}`;$("#sugg").hidden=false;setHH()});
+qi.addEventListener("blur",()=>setTimeout(()=>{$("#sugg").hidden=true;setHH()},180));
+function doSearch(raw){
+  let q=(raw??qi.value).trim().toLowerCase();if(!q)q=HINTS[hi].toLowerCase();
+  let note="";const tr=q.split(/\s+/).map(w=>RU[w]||w).join(" ");if(tr!==q){note=`Шукаємо «${tr}» замість «${q}»`;q=tr}
+  const key=q.split(" ")[0].slice(0,5);qi.blur();openList({title:"«"+q+"»",q:key,note});
+}
+$("#goS").addEventListener("click",e=>{e.preventDefault();doSearch()});
+qi.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();doSearch()}});
+
+/* ===== sheets ===== */
+function sheet(html,cls=""){clearInterval(sheet._t);$("#ovHost").innerHTML=`<div class="ov" id="ov"><div class="sheet ${cls}" role="dialog" aria-modal="true"><button class="x" type="button" data-close aria-label="Закрити">${ic("x")}</button>${html}</div></div>`}
+function closeSheet(){$("#ovHost").innerHTML="";clearInterval(sheet._t)}
+const CN={0:"чорний",5:"червоний",20:"шоколад",25:"коньяк",28:"беж",30:"карамель",32:"кемел",40:"молочний",48:"сонячний",50:"пісочний",75:"хакі",95:"оливковий",150:"шавлія",190:"блакитний",200:"морський",210:"синій",215:"денім",220:"графіт",225:"темно-синій",280:"лавандовий",300:"бузковий",330:"рожевий",340:"пудровий",350:"малиновий",355:"червоний"};
+function fitSize(p,rec){if(!rec)return null;if(p.sz[rec]!==undefined)return rec;const R={"XS-S":["XS","S"],"M-L":["M","L"],"XL-XXL":["XL","XXL"]};for(const k in R)if(R[k].includes(rec)&&p.sz[k]!==undefined)return k;const U={XS:"42",S:"44",M:"46",L:"48",XL:"50"};if(U[rec]&&p.sz[U[rec]]!==undefined)return U[rec];return null}
+const recSize=p=>fitSize(p,S.my[kind(p)]);
+function openProduct(i){
+  const p=P[i],sz=sizesFor(p),sel=SELLERS[p.sl],si=shipInfo(),rec=recSize(p);let pick=sz.length===1&&stock(p,sz[0])?sz[0]:(rec&&stock(p,rec)?rec:null),hue=p.h;
+  const sim=P.filter(x=>x.sub===p.sub&&x.base!==p.base&&x.tot>0&&x.p<=p.p*1.1).sort((a,b)=>a.p-b.p).slice(0,6);
+  sheet(`<div class="gal"><div class="gtrack" id="gt">
+     <div class="frame"><div class="tile" id="f0" style="--h:${hue}">${art(p,hue)}</div><span class="lab">Спереду</span></div>
+     <div class="frame back"><div class="tile" id="f1" style="--h:${hue}">${art(p,hue)}</div><span class="lab">Ззаду</span></div>
+     <div class="frame zoom"><div class="tile" id="f2" style="--h:${hue}">${art(p,hue)}</div><span class="lab">Тканина зблизька</span></div>
+     <div class="frame"><div class="tagcard"><div><b>YULA</b>${p.mat||"Склад уточнюється"}<br>Артикул: ${p.code}<br>${p.season}<br>${sel.n}</div></div><span class="lab">Бирка</span></div>
+   </div><span class="gcount num" id="gc">1 / 4</span></div>
+   <div class="in">
+    <div class="dp num"><b>${uah(p.p)}</b>${p.o?`<s>${uah(p.o)}</s><span class="off" style="margin:0">−${off(p)}%</span>`:""}</div>
+    <div class="parts">Разом з подругою — <b class="num">${uah(p.g)}</b> · <span style="color:var(--green);font-weight:700">+${Math.max(1,Math.round(p.p*.01))} ₴ бонусами</span></div>
+    <p class="dname">${p.n}</p>
+    <div class="ps" style="font-size:13px;margin-top:6px"><span class="newb">Новинка на YULA</span><span>відгуків ще немає</span></div>
+    <div class="bline"><span class="bdg vf">${ic("box")}В наявності ${p.tot} шт</span>${p.c==="women"?'<span class="bdg ua">Жіноча модель</span>':p.c==="uni"?'<span class="bdg ua">Унісекс</span>':""}</div>
+    <p style="margin:10px 0 0;font-size:12.5px;color:var(--muted)">У застосунку тут будуть ${p.pics} фото від постачальника. У прототипі — ілюстрація.</p>
+    <div class="lbl">Колір <span>${p.col||"—"}</span></div>
+    <div class="sws" id="sw">${p.sib.map(j=>{const q=P[j];return`<button type="button" aria-label="${q.col||q.n}" data-sib="${j}" aria-pressed="${j===i}" style="background:hsl(${q.h} ${q.sat}% ${q.l}%)"></button>`}).join("")}</div>
+    <div class="lbl">Розмір <button type="button" data-stable="${i}">${ic("ruler","width:15px;height:15px;vertical-align:-3px")} Залишки й заміри</button></div>
+    <div class="sizes" id="sz">${sz.map(s=>{const st=stock(p,s);return`<button class="size ${st?"":"oos"}" type="button" data-s="${s}" aria-pressed="${s===pick}" aria-label="${s}${st?"":", немає в наявності"}">${s}${st&&st<=3?`<span class="few">${st} шт</span>`:""}${s===rec?'<span class="rec">Юля радить</span>':""}</button>`}).join("")}</div>
+    <div class="err" id="szErr" style="margin-top:8px" role="alert"></div>
+    <button class="yula" type="button" data-sizepick="${kind(p)}" data-for="${i}"><span class="ya">Ю</span><span><b>${rec?`Твій розмір — ${S.my[kind(p)]}${rec!==S.my[kind(p)]?` (у цієї моделі ${rec})`:""}`:"Не впевнена з розміром?"}</b><small>${rec?"Змінити параметри":"Юля підбере за зростом і вагою за 20 секунд"}</small></span></button>
+    <p style="margin:10px 0 0;font-size:12.5px;color:var(--muted)">Даних про посадку ще немає: з'являться після перших відгуків.</p>
+
+    <div class="blk"><h5>Доставка і повернення</h5>
+      <div class="line" style="padding-top:0"><span class="ic">${ic("locker")}</span><span class="tx"><b>Отримаєш ${si.eta} у поштоматі</b><small>Безкоштовно від 1 500 ₴, інакше ≈ 60 ₴</small></span></div>
+      <div class="line"><span class="ic">${ic("eye")}</span><span class="tx"><b>Огляд на пошті</b><small>Не підійшло — можна не забирати</small></span></div>
+      <div class="line"><span class="ic">${ic("ret")}</span><span class="tx"><b>Повернення 14 днів</b><small>Через будь-яке відділення Нової пошти. Брак — за рахунок продавця</small></span></div>
+    </div>
+    <div class="blk"><h5>Продавець</h5>
+      <div class="seller"><span class="lg">${sel.lg}</span><span style="flex:1;min-width:0"><b>${sel.n}</b><small>${sel.legal}</small></span><button class="btn sm ghost" type="button" data-toast="Чат з продавцем з'явиться в робочій версії">${ic("chat","width:15px;height:15px")}Чат</button></div>
+      <div class="sstats"><div><b>Новий</b><small>рейтинг з'явиться</small></div><div><b class="num">${CAT.items.length}</b><small>моделей</small></div><div><b class="num">з ${sel.since}</b><small>на YULA</small></div></div>
+    </div>
+    <div class="blk"><h5>Про товар</h5><dl class="dl"><dt>Тканина</dt><dd>${p.mat||"Уточнюється в постачальника"}</dd><dt>Сезон</dt><dd>${p.season}</dd><dt>Артикул</dt><dd>${p.code}</dd><dt>Країна</dt><dd>${p.country}</dd></dl></div>
+    <div class="blk"><h5>Відгуки</h5><div style="background:var(--bg);border-radius:12px;padding:14px;text-align:center"><b style="font-size:14px">Відгуків ще немає</b><p style="margin:4px 0 0;font-size:13px;color:var(--muted)">Купи першою і залиш фото-відгук — отримаєш 30 ₴ бонусами.</p></div></div>
+    ${sim.length?`<div class="blk"><h5>Схожі моделі</h5><div class="hrow">${sim.map(x=>`<button class="fc" type="button" data-open="${x.i}" style="flex-basis:100px">${tile(x)}<div class="pr num" style="font-size:13px">${uah(x.p)}</div></button>`).join("")}</div></div>`:""}
+    <div class="buybar"><button class="btn ghost" type="button" id="b1"><b class="num">${uah(p.p)}</b><span>В кошик</span></button><button class="btn pink" type="button" id="b2"><b class="num">${uah(p.g)}</b><span>Купити разом</span></button></div>
+   </div>`);
+  const gt=$("#gt");gt.addEventListener("scroll",()=>{$("#gc").textContent=Math.round(gt.scrollLeft/gt.clientWidth)+1+" / 4"},{passive:true});
+  $("#sw").addEventListener("click",e=>{const b=e.target.closest("[data-sib]");if(!b)return;const j=+b.dataset.sib;if(j!==i)openProduct(j)});
+  $("#sz").addEventListener("click",e=>{const b=e.target.closest(".size");if(!b)return;if(b.classList.contains("oos")){toast(`Повідомимо, щойно ${b.dataset.s} з'явиться`);return}pick=b.dataset.s;$("#sz").querySelectorAll(".size").forEach(x=>x.setAttribute("aria-pressed",x===b));$("#szErr").textContent=""});
+  const need=()=>{if(!pick){$("#szErr").textContent="Оберіть розмір, щоб продовжити";$("#sz").scrollIntoView({block:"center",behavior:motion()?"smooth":"auto"});if(motion())$("#sz").animate([{transform:"translateX(0)"},{transform:"translateX(-6px)"},{transform:"translateX(6px)"},{transform:"translateX(0)"}],{duration:300});return false}return true};
+  $("#b1").onclick=()=>{if(!need())return;fly($("#f0"),p,hue);add(i,pick,false,false,hue);closeSheet();toast("Додано в кошик")};
+  $("#b2").onclick=()=>{if(!need())return;groupSetup(i,pick,hue)};
+}
+function openQuick(i,src){
+  const p=P[i],sz=sizesFor(p),rec=recSize(p);
+  if(sz.length===1){if(!stock(p,sz[0])){toast("Немає в наявності");return}fly(src,p);add(i,sz[0],false);toast("Додано в кошик");return}
+  sheet(`<div class="grab"></div><div class="in" style="padding-top:8px">
+    <div class="row" style="border:0;padding-top:4px">${tile(p)}<div class="info"><div class="t">${p.n}</div><div class="pr num" style="margin-top:4px">${uah(p.p)}</div></div></div>
+    <div class="lbl" style="margin-top:4px">Оберіть розмір</div>
+    <div class="sizes" id="qsz">${sz.map(s=>{const st=stock(p,s);return`<button class="size ${st?"":"oos"}" type="button" data-s="${s}" aria-pressed="false">${s}${st&&st<=3?`<span class="few">${st} шт</span>`:""}${s===rec?'<span class="rec">Юля радить</span>':""}</button>`}).join("")}</div>
+    <button class="btn block" type="button" data-open="${i}" style="margin-top:18px;background:var(--soft);color:var(--ink)">Детальніше про товар</button></div>`,"small");
+  $("#qsz").addEventListener("click",e=>{const b=e.target.closest(".size");if(!b)return;if(b.classList.contains("oos")){toast(`Повідомимо, щойно ${b.dataset.s} з'явиться`);return}closeSheet();fly(src,p);add(i,b.dataset.s,false);toast(`Додано: розмір ${b.dataset.s}`)});
+}
+function sizeTable(i){
+  const p=P[i];
+  sheet(`<div class="grab"></div><div class="in" style="padding-top:8px"><h3 class="ph" style="margin-top:4px">Розміри й залишки</h3><p class="lead">Залишки оновлюються з фіду постачальника. Заміри в см постачальник ще не надав — ми їх запросили.</p>
+    <div class="stable"><table><thead><tr><th>Розмір</th><th>В наявності</th><th>Груди, см</th><th>Довжина, см</th></tr></thead><tbody>${Object.entries(p.sz).map(([s,q])=>`<tr><td>${s}</td><td class="num" style="${q?"":"color:var(--muted)"}">${q?q+" шт":"немає"}</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td></tr>`).join("")}</tbody></table></div>
+    <button class="yula" type="button" data-sizepick="${kind(p)}" data-for="${i}"><span class="ya">Ю</span><span><b>Підібрати розмір</b><small>Юля порадить за зростом і вагою</small></span></button></div>`,"small");
+}
+function sizePicker(k,forI){
+  const isShoe=k==="shoes",isKid=k==="kids";
+  sheet(`<div class="grab"></div><div class="in" style="padding-top:8px">
+   <div style="display:flex;gap:10px;align-items:center;margin-top:4px"><span class="ava" style="width:42px;height:42px;font-size:13px;color:#fff">Ю</span><div><b style="font-size:16px">Юля підбере розмір</b><div style="color:var(--muted);font-size:13px">Дані зберігаються тільки у твоєму профілі</div></div></div>
+   ${isShoe?`<div class="rlab"><span>Довжина стопи</span><span class="num" id="vA">24,5 см</span></div><input class="rng" type="range" id="rA" min="22" max="28" step=".5" value="24.5" aria-label="Довжина стопи">`:
+   isKid?`<div class="rlab"><span>Зріст дитини</span><span class="num" id="vA">110 см</span></div><input class="rng" type="range" id="rA" min="90" max="130" step="1" value="110" aria-label="Зріст дитини">`:
+   `<div class="rlab"><span>Зріст</span><span class="num" id="vA">168 см</span></div><input class="rng" type="range" id="rA" min="150" max="195" value="168" aria-label="Зріст">
+    <div class="rlab"><span>Вага</span><span class="num" id="vB">60 кг</span></div><input class="rng" type="range" id="rB" min="40" max="110" value="60" aria-label="Вага">
+    <div class="lbl">Як любиш носити</div><div class="seg" id="fitp" style="margin:0"><button type="button" data-f="-1" aria-pressed="false">Облягаюче</button><button type="button" data-f="0" aria-pressed="true">В розмір</button><button type="button" data-f="1" aria-pressed="false">Вільно</button></div>`}
+   <div id="res"></div>
+   <button class="btn block" type="button" id="calc" style="margin-top:14px">Підібрати</button></div>`,"small");
+  const rA=$("#rA"),rB=$("#rB");let fp=0;
+  rA.oninput=()=>$("#vA").textContent=(isShoe?r1(rA.value)+" см":rA.value+" см");if(rB)rB.oninput=()=>$("#vB").textContent=rB.value+" кг";
+  const fpEl=$("#fitp");if(fpEl)fpEl.onclick=e=>{const b=e.target.closest("[data-f]");if(!b)return;fp=+b.dataset.f;fpEl.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b))};
+  $("#calc").onclick=()=>{
+    let s,conf;
+    if(isShoe){s=String(Math.max(36,Math.min(43,Math.round(36+(+rA.value-23)/.5))));conf=88}
+    else if(isKid){const opts=[98,104,110,116,122];s=String(opts.reduce((a,b)=>Math.abs(b-rA.value)<Math.abs(a-rA.value)?b:a));conf=85}
+    else{const w=+rB.value,h=+rA.value,bmi=w/((h/100)**2);let idx=w<50?0:w<57?1:w<65?2:w<74?3:w<84?4:5;if(bmi>27&&idx<5)idx++;idx=Math.max(0,Math.min(5,idx+fp));s=["XS","S","M","L","XL","XXL"][idx];conf=72+hash(h+"-"+w)%17}
+    S.my[k]=s;save();
+    $("#res").innerHTML=`<div class="result"><span style="font-size:13px;opacity:.8">Твій розмір</span><br><b>${s}</b> <span style="font-weight:700">· впевненість ${conf}%</span><small>За таблицями продавців і відгуками покупців з такими параметрами. Не підійде — обміняємо безкоштовно.</small></div>`;
+    $("#calc").textContent=forI!=null?"Повернутися до товару":"Готово";$("#calc").onclick=()=>{if(forI!=null)openProduct(forI);else{closeSheet();if(S.view==="me")render()}};
+  };
+}
+function groupSetup(i,size,h){
+  const p=P[i];
+  sheet(`<div class="grab"></div><div class="in" style="padding-top:8px">
+   <h3 class="ph" style="margin-top:4px">Купити разом за ${uah(p.g)}</h3>
+   <p class="lead">Поділись посиланням. Коли приєднається ще 1 людина протягом 24 годин, ви обоє отримаєте групову ціну.</p>
+   <div class="lbl" style="margin-top:0">Якщо не зберемо групу</div>
+   <label class="opt"><input type="radio" name="fb" value="regular" checked><span class="ot"><b>Купити за звичайною ціною</b><small>${uah(p.p)}, відправимо одразу після 24 год</small></span></label>
+   <label class="opt"><input type="radio" name="fb" value="cancel"><span class="ot"><b>Скасувати й повернути гроші</b><small>Автоматично на картку</small></span></label>
+   <button class="btn pink block" type="button" id="mkG" style="margin-top:8px">Відкрити групу</button></div>`,"small");
+  $("#mkG").onclick=()=>{const fb=document.querySelector("input[name=fb]:checked").value;add(i,size,true,false,h,fb);groupCreated(i)};
+}
+function groupCreated(i){
+  const code="G"+(hash(Date.now())%90000+10000),url=`yula.ua/g/${code}`;let left=86400;
+  sheet(`<div class="in" style="padding-top:30px;text-align:center">
+    <div class="duo" style="position:relative;margin:0 auto;right:auto;top:auto"><i>ВИ</i><i>?</i><i>+</i></div>
+    <h3 class="ph" style="margin-top:10px">Групу відкрито</h3>
+    <p class="lead" style="margin:0 auto 8px">Залишилась 1 людина. До кінця <span class="timer" id="gt2">24:00:00</span></p>
+    <div class="link" style="text-align:left"><code>${url}</code><button class="btn sm" type="button" data-copy="${url}" data-msg="Посилання скопійовано">${ic("copy","width:15px;height:15px")}Копіювати</button></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px">${["Telegram","Instagram","Viber"].map(n=>`<button class="btn sm ghost" type="button" data-copy="${url}" data-msg="Посилання скопійовано, встав у ${n}">${n}</button>`).join("")}</div>
+    <p style="font-size:12.5px;color:var(--muted)">Подруга без застосунку оформить замовлення прямо на сайті за посиланням.</p>
+    <button class="btn block" type="button" data-go="cart" style="margin-top:6px">Перейти в кошик</button></div>`);
+  if(motion())document.querySelectorAll(".sheet .duo i").forEach((el,k)=>el.animate([{transform:`translate(${k===0?-50:k===1?50:0}px,${k===2?30:0}px) scale(.4)`,opacity:0},{transform:"none",opacity:1}],{duration:500,delay:k*90,easing:"cubic-bezier(.2,.9,.25,1.15)",fill:"backwards"}));
+  sheet._t=setInterval(()=>{left--;const g=$("#gt2");if(g)g.textContent=hms(left).join(":")},1000);
+}
+let wrot=0;
+function openWheel(){
+  const tw=PRIZES.reduce((a,p)=>a+p.w,0),seg=360/PRIZES.length;
+  const WC=["#FFFFFF","#FF2E7E","#FFE14D","#111111","#FFFFFF","#FF2E7E"],WT=["#111","#fff","#111","#FFE14D","#111","#fff"];
+  const grad=PRIZES.map((_,i)=>`${WC[i]} ${i*seg}deg ${(i+1)*seg}deg`).join(",");
+  sheet(`<div class="in" style="padding-top:26px;text-align:center"><h3 class="ph" style="margin:0">Барабан стилю</h3><p class="lead" style="margin:4px auto 0">Одне безкоштовне обертання на день. Призи справжні, шанси нижче.</p>
+   <div class="wheelwrap"><div class="ptr"></div><div class="wheel" id="wh" style="background:conic-gradient(${grad});transform:rotate(${wrot}deg)">${PRIZES.map((p,i)=>`<span style="transform:rotate(${i*seg+seg/2-90}deg);color:${WT[i]}">${p.t}</span>`).join("")}</div><div class="hub">YULA</div></div>
+   <div id="wres" aria-live="polite">${S.spun&&S.coupon?`<p>Сьогоднішній результат: <b>${S.coupon.d}</b></p>`:""}</div>
+   <button class="btn pink block" type="button" id="spin" ${S.spun?"disabled":""}>${S.spun?"Наступне обертання завтра":"Крутити"}</button>
+   <details class="odds" style="text-align:left"><summary>Шанси та правила</summary><table>${PRIZES.map(p=>`<tr><td>${p.d}</td><td class="num">${Math.round(p.w/tw*100)}%</td></tr>`).join("")}</table><p>Бонуси діють 30 днів і списуються до 30% суми замовлення. Знижка діє до кінця дня. Обертання не потребує покупки чи запрошень.</p></details></div>`);
+  $("#spin").onclick=()=>{
+    if(S.spun)return;S.spun=true;$("#spin").disabled=true;$("#spin").textContent="Крутиться…";
+    let r=Math.random()*tw,i=0;for(;i<PRIZES.length;i++){r-=PRIZES[i].w;if(r<=0)break}i=Math.min(i,PRIZES.length-1);
+    const target=360-(i*seg+seg/2);wrot=wrot+360*6+((target-(wrot%360))+360)%360;$("#wh").style.transform=`rotate(${wrot}deg)`;
+    setTimeout(()=>{const pr=PRIZES[i];if(pr.k==="bonus"){S.bonus+=pr.v;S.coupon={...pr,d:pr.d+" зараховано"}}else S.coupon=pr;save();
+      const w=$("#wres");if(w){w.innerHTML=`<div style="font:900 28px var(--f-d);color:var(--pink-deep);margin:4px 0">${pr.d}</div><p style="margin:0 0 12px;font-weight:600">${pr.k==="bonus"?"Бонуси вже на твоєму рахунку":"Застосуємо в кошику автоматично"}</p>`;confetti(w);$("#spin").outerHTML=`<button class="btn block" type="button" data-go="${S.cart.length?"cart":"home"}">${S.cart.length?"До кошика":"Обрати речі"}</button>`}
+      if(["cart","groups"].includes(S.view))render()},motion()?4500:60);
+  };
+}
+function returnSheet(){
+  const o=S.orders.find(x=>x.no===S.ord);
+  sheet(`<div class="grab"></div><div class="in" style="padding-top:8px"><h3 class="ph" style="margin-top:4px">Повернення або обмін</h3><p class="lead">Оберіть причину. Ми створимо ТТН повернення, і ви віднесете посилку в будь-яке відділення.</p>
+   <form id="rf" novalidate>
+   ${[["size","Не підійшов розмір","Обміняємо на інший безкоштовно"],["look","Не схоже на фото","Додайте фото, доставку оплатить продавець"],["defect","Брак","Додайте фото, доставку оплатить продавець"],["mind","Передумав(-ла)","Доставку назад оплачуєте ви"]].map(([v,b,s],k)=>`<label class="opt"><input type="radio" name="rr" value="${v}" ${k?"":"checked"}><span class="ot"><b>${b}</b><small>${s}</small></span></label>`).join("")}
+   <div id="rExtra"></div>
+   <div class="err" id="rErr" role="alert"></div>
+   <button class="btn pink block" type="submit">Створити повернення</button></form></div>`,"small");
+  const extra=()=>{const v=document.querySelector("input[name=rr]:checked").value,it=P[o.items[0].i],sz=sizesFor(it);
+    $("#rExtra").innerHTML=v==="size"&&sz.length>1?`<label class="f" for="rSize" style="margin-top:6px">Обміняти на розмір<select class="f" id="rSize">${sz.filter(s=>s!==o.items[0].size).map(s=>`<option>${s}</option>`).join("")}</select></label><label class="opt"><input type="checkbox" id="rMoney"><span class="ot"><b>Повернути гроші замість обміну</b></span></label>`:
+    v==="look"||v==="defect"?`<label class="f" for="rPhoto" style="margin-top:6px">Фото товару<input type="file" id="rPhoto" accept="image/*"></label>`:""};
+  $("#rf").addEventListener("change",e=>{if(e.target.name==="rr")extra()});extra();
+  $("#rf").addEventListener("submit",e=>{e.preventDefault();const v=document.querySelector("input[name=rr]:checked").value;
+    if((v==="look"||v==="defect")&&!($("#rPhoto")&&$("#rPhoto").files.length)){$("#rErr").textContent="Додайте хоча б одне фото товару";return}
+    const ttn="2045 "+String(1000+hash(o.no)%9000)+" "+String(1000+hash(o.no+"r")%9000)+" 21";
+    const exch=v==="size"&&$("#rSize")&&!$("#rMoney").checked;
+    o.ret=exch?`Обмін на розмір ${$("#rSize").value}. ТТН ${ttn}: віднесіть у будь-яке відділення протягом 14 днів.`:`Повернення оформлено. ТТН ${ttn}: віднесіть у будь-яке відділення протягом 14 днів. Гроші повернемо на картку після перевірки.`;
+    closeSheet();render();toast(exch?"Обмін оформлено":"Повернення оформлено")});
+}
+function photoSheet(){
+  sheet(`<div class="grab"></div><div class="in" style="padding-top:8px"><h3 class="ph" style="margin-top:4px">Пошук за фото</h3><p class="lead">Завантаж фото або скриншот з Instagram, і ми знайдемо схожі речі.</p>
+   <label class="btn block" for="pf" style="cursor:pointer">${ic("camera")}Обрати фото</label><input type="file" id="pf" accept="image/*" hidden>
+   <div id="pres"></div></div>`,"small");
+  $("#pf").onchange=()=>{const f=$("#pf").files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{const pick=best("all",4);
+    $("#pres").innerHTML=`<img src="${rd.result}" alt="Твоє фото" style="width:100%;max-height:220px;object-fit:cover;border-radius:12px;margin-top:12px"><div class="sh"><h3 style="font-size:14px">Схожі речі</h3><span class="more">демо</span></div><div class="mas">${pick.map(card).join("")}</div>`};rd.readAsDataURL(f)};
+}
+function notifSheet(){
+  sheet(`<div class="grab"></div><div class="in" style="padding-top:8px"><h3 class="ph" style="margin-top:4px">Сповіщення</h3>
+   ${NOTIF.map(([t,s,w])=>`<div class="line"><span class="ic">${ic("bell")}</span><span class="tx"><b>${t}</b><small>${s}</small></span><span style="font-size:12px;color:var(--muted)">${w}</span></div>`).join("")}
+   <p style="font-size:12.5px;color:var(--muted)">Маркетингові сповіщення — не частіше разу на день, тиша з 22:00 до 9:00.</p></div>`,"small");
+}
+function docSheet(t){sheet(`<div class="grab"></div><div class="in" style="padding-top:8px"><h3 class="ph" style="margin-top:4px">${t}</h3><p class="lead">У робочій версії тут буде повний текст: дані оператора платформи (ТОВ, код ЄДРПОУ, адреса для претензій), умови продажу, порядок повернення протягом 14 днів і політика конфіденційності.</p></div>`,"small")}
+
+/* ===== cart ops / effects ===== */
+function add(i,size,group,joined,h,fb){
+  h=h??P[i].h;const ex=S.cart.find(x=>x.i===i&&x.size===size&&x.group===group&&x.h===h);
+  if(ex)ex.q++;else S.cart.push({i,size,group,joined:!!joined,q:1,h,fb:fb||"regular"});
+  count();persistCart();
+}
+function persistCart(){try{localStorage.setItem(LS+"cart",JSON.stringify(S.cart))}catch(e){}}
+try{const c=JSON.parse(localStorage.getItem(LS+"cart")||"[]");if(Array.isArray(c))S.cart=c.filter(x=>P[x.i])}catch(e){}
+function count(){const n=S.cart.reduce((a,x)=>a+x.q,0),c=$("#cnt");c.textContent=n;c.hidden=!n;c.classList.remove("bump");void c.offsetWidth;c.classList.add("bump")}
+function fly(src,p,h){
+  if(!src||!motion())return;const r=src.getBoundingClientRect(),t=$("#tabCart").getBoundingClientRect();
+  const f=document.createElement("div");f.className="fly tile";f.style.setProperty("--h",h??p.h);f.innerHTML=art(p,h);
+  const x0=r.left+r.width/2-33,y0=r.top+r.height/2-33,x1=t.left+t.width/2-33,y1=t.top+8-33;f.style.left=x0+"px";f.style.top=y0+"px";document.body.appendChild(f);
+  const dx=x1-x0,dy=y1-y0;f.animate([{transform:"translate(0,0) scale(1.2)"},{transform:`translate(${dx*.45}px,${dy*.45-90}px) scale(.8)`,offset:.55},{transform:`translate(${dx}px,${dy}px) scale(.2)`,opacity:.5}],{duration:680,easing:"cubic-bezier(.5,0,.6,1)"}).onfinish=()=>f.remove();
+}
+function confetti(el){
+  if(!el||!motion())return;const r=el.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+10;const cols=["#FF2E7E","#FFE14D","#111111","#0B7F55"];
+  for(let k=0;k<26;k++){const c=document.createElement("i");c.className="conf";c.style.background=cols[k%4];c.style.left=cx+"px";c.style.top=cy+"px";document.body.appendChild(c);
+    const a=Math.random()*Math.PI*2,d=60+Math.random()*90;c.animate([{transform:"translate(0,0) rotate(0)",opacity:1},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d-40}px) rotate(${Math.random()*540}deg)`,opacity:0}],{duration:900+Math.random()*400,easing:"cubic-bezier(.2,.8,.3,1)"}).onfinish=()=>c.remove()}
+}
+let lastSub=0;
+function cartRender(){const before=lastSub;render();const t=totals();if(before<1500&&t.sub>=1500)setTimeout(()=>confetti($("#prog")),120);lastSub=t.sub}
+
+/* ===== events ===== */
+document.addEventListener("click",e=>{
+  const T=s=>e.target.closest(s);let b;
+  if(T("[data-close]")||e.target.id==="ov"){closeSheet();return}
+  if(b=T("[data-q]")){e.preventDefault();doSearch(b.dataset.q);return}
+  if(b=T("[data-like]")){e.stopPropagation();const i=+b.dataset.like;S.likes.has(i)?S.likes.delete(i):S.likes.add(i);document.querySelectorAll(`[data-like="${i}"]`).forEach(h=>{h.classList.toggle("on",S.likes.has(i));h.setAttribute("aria-pressed",S.likes.has(i))});if(S.view==="likes")render();return}
+  if(b=T("[data-quick]")){openQuick(+b.dataset.quick,b.closest(".tile"));return}
+  if(b=T("[data-open]")){openProduct(+b.dataset.open);return}
+  if(b=T("[data-stable]")){sizeTable(+b.dataset.stable);return}
+  if(b=T("[data-sizepick]")){sizePicker(b.dataset.sizepick,b.dataset.for!=null?+b.dataset.for:null);return}
+  if(T("[data-wheel]")){openWheel();return}
+  if(T("[data-photo]")){e.preventDefault();photoSheet();return}
+  if(T("[data-notif]")){notifSheet();return}
+  if(b=T("[data-doc]")){e.preventDefault();docSheet(b.dataset.doc);return}
+  if(b=T("[data-copy]")){copy(b.dataset.copy,b.dataset.msg);return}
+  if(b=T("[data-toast]")){toast(b.dataset.toast);return}
+  
+  if(b=T("[data-go]")){closeSheet();if(b.dataset.go==="cart")lastSub=totals().sub;if(b.dataset.go==="likes"&&S.view!=="likes")S.prev=S.view;go(b.dataset.go);return}
+  if(b=T("[data-list]")){const c=b.dataset.list;if(c==="side"){openList({title:b.dataset.title,ids:[...new Set(SIDE[S.side][1].flatMap(s=>s[1]))]});return}openList({title:b.dataset.title||"Каталог",cat:c});return}
+  if(T("[data-back]")){go(S.prev&&!["list","likes"].includes(S.prev)?S.prev:"home");return}
+  if(b=T("[data-fs]")){const k=b.dataset.fs,L=S.list;if(k==="sort")L.sort=L.sort==="cheap"?null:"cheap";if(k==="big")L.big=!L.big;if(k==="mine")L.mine=!L.mine;render();return}
+  if(b=T("[data-nt]")){S.nt=b.dataset.nt;document.querySelectorAll(".nt").forEach(x=>x.setAttribute("aria-selected",x===b));navInd();b.scrollIntoView({inline:"center",block:"nearest",behavior:motion()?"smooth":"auto"});
+    if(S.view!=="home")go("home");else{feedN=0;fillFeed(true);if(io){io.disconnect();$("#more").textContent="Підвантажуємо ще…";io.observe($("#more"))}const f=$("#ftabs");window.scrollTo({top:f.offsetTop-$("#hdr").offsetHeight,behavior:motion()?"smooth":"auto"})}return}
+  if(b=T("[data-ft]")){S.ft=b.dataset.ft;document.querySelectorAll(".ft").forEach(x=>x.setAttribute("aria-selected",x===b));moveInd($("#ftabs"),".ft[aria-selected=true]",$("#find"));feedN=0;fillFeed(true);if(io){io.disconnect();$("#more").textContent="Підвантажуємо ще…";io.observe($("#more"))}return}
+  if(b=T("[data-side]")){S.side=+b.dataset.side;const y=$(".side").scrollTop;render();$(".side").scrollTop=y;return}
+  if(b=T("[data-join]")){const k=+b.dataset.join,g=GROUPS[k],p=P[g.i],sz=sizesFor(p);fly(b.closest(".row").querySelector(".tile"),p);add(g.i,S.my[kind(p)]||sz[Math.min(2,sz.length-1)],true,true);S.joined.add(k);render();toast(`Групу зібрано! ${uah(p.g)} уже в кошику`);return}
+  if(b=T("[data-dec]")){const k=+b.dataset.dec,x=S.cart[k];x.q--;if(!x.q)S.cart.splice(k,1);count();persistCart();cartRender();return}
+  if(b=T("[data-inc]")){S.cart[+b.dataset.inc].q++;count();persistCart();cartRender();return}
+  if(T("[data-bonus]")){S.useBonus=!S.useBonus;render();return}
+  if(T("[data-eco]")){S.eco=!S.eco;applyEco();save();render();return}
+  if(b=T("[data-del]")){keepForm();S.co.del=b.dataset.del;render();return}
+  if(T("[data-orders]")){if(!S.orders.length){toast("Замовлень поки немає");return}S.ord=S.orders[0].no;go("order");return}
+  if(T("[data-adv]")){const o=S.orders.find(x=>x.no===S.ord);o.status=Math.min(5,o.status+1);o.fresh=false;render();if(o.status===4)toast("Посилка в поштоматі. Код на екрані");return}
+  if(T("[data-return]")){returnSheet();return}
+  if(T("[data-delacc]")){sheet(`<div class="grab"></div><div class="in" style="padding-top:8px"><h3 class="ph" style="margin-top:4px">Видалити акаунт?</h3><p class="lead">Ми видалимо профіль, бонуси та історію. Активні замовлення буде доставлено.</p><button class="btn block" type="button" data-close style="margin-bottom:8px">Залишити акаунт</button><button class="btn ghost block" type="button" data-toast="У прототипі акаунт не видаляється">Так, видалити</button></div>`,"small");return}
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet();if((e.key==="Enter"||e.key===" ")&&e.target.matches("[data-open][role=button]")){e.preventDefault();openProduct(+e.target.dataset.open)}});
+document.addEventListener("change",e=>{if(e.target.name==="pay"){keepForm();S.co.pay=e.target.value;render()}if(e.target.id==="agree")S.co.agree=e.target.checked});
+function keepForm(){const g=id=>{const el=$("#"+id);return el?el.value:null};const m={phone:"fPhone",name:"fName",city:"fCity",addr:"fAddr"};for(const k in m){const v=g(m[k]);if(v!=null)S.co[k]=v}const w=g("fWh");if(w!=null){S.co.wh=w;S.co.whFor=S.co.del}const a=$("#agree");if(a)S.co.agree=a.checked}
+document.addEventListener("submit",e=>{
+  if(e.target.id!=="co")return;e.preventDefault();keepForm();const co=S.co,err=t=>{$("#coErr").textContent=t};
+  const ph=(co.phone||"").replace(/\D/g,"");
+  if(!/^(380\d{9}|0\d{9})$/.test(ph)){err("Вкажіть номер у форматі +380 XX XXX XX XX");return}
+  if(!(co.name||"").trim()){err("Вкажіть прізвище та ім'я отримувача");return}
+  if(co.del==="courier"?!(co.addr||"").trim():!((co.city||"").trim()&&(co.wh||"").trim())){err("Вкажіть адресу доставки");return}
+  if(!co.agree){err("Підтвердіть згоду з умовами оферти");return}
+  const t=totals(),no="YL-"+(10000+hash(Date.now())%89999);
+  const online=["gpay","card","parts"].includes(co.pay);
+  if(t.bon)S.bonus-=t.bon;if(online)S.bonus+=50;
+  S.orders.unshift({no,items:S.cart.map(x=>({...x})),total:t.total,status:0,fresh:true,ttn:"2045 "+String(1000+hash(no)%9000)+" "+String(1000+hash(no+"x")%9000)+" 78",code:String(100000+hash(no+"c")%899999),wh:co.del==="courier"?co.addr:co.wh});
+  S.cart=[];S.coupon=null;S.useBonus=false;persistCart();save();count();S.ord=no;go("order");if(online)toast("+50 бонусів за онлайн-оплату");
+});
+
+/* ===== clocks, eco, network ===== */
+function tickClock(){
+  const n=new Date(),m=new Date(n);m.setHours(24,0,0,0);const c=$("#clock");
+  if(c)c.innerHTML=hms(Math.floor((m-n)/1000)).map(x=>`<b>${x}</b>`).join("<span>:</span>");
+  GROUPS.forEach((g,k)=>{g.left=Math.max(0,g.left-1);const el=document.querySelector(`[data-left="${k}"]`);if(el)el.textContent=hms(g.left).join(":")});
+}
+setInterval(tickClock,1000);
+const setHH=()=>document.documentElement.style.setProperty("--hh",$("#hdr").offsetHeight+"px");
+function applyEco(){document.documentElement.classList.toggle("eco",S.eco);$("#ecob").hidden=!S.eco;setHH()}
+function netState(){const on=navigator.onLine!==false;$("#net").hidden=on;if(!on){const t=new Date();$("#netT").textContent=`Немає зв'язку. Показуємо збережене о ${String(t.getHours()).padStart(2,"0")}:${String(t.getMinutes()).padStart(2,"0")}`}setHH()}
+addEventListener("online",netState);addEventListener("offline",netState);
+try{new ResizeObserver(()=>{setHH();navInd();moveInd($("#ftabs"),".ft[aria-selected=true]",$("#find"))}).observe($("#hdr"))}catch(e){}
+
+/* ===== onboarding ===== */
+function onboarding(){
+  if(!S.onb)return;
+  $("#onbHost").innerHTML=`<div class="onb gut" role="dialog" aria-modal="true" aria-label="Ласкаво просимо до YULA"><div class="wrap">
+    <div class="big">YULA<b></b></div>
+    <div class="tag">Модні речі, які вже в Україні</div>
+    <ul><li><i>${ic("truck")}</i>Речі вже в Україні, у поштоматі за 2–3 дні</li><li><i>${ic("ret")}</i>Повернення 14 днів через Нову пошту</li><li><i>${ic("eye")}</i>Справжні фото, розміри в сантиметрах і відгуки</li></ul>
+    <div><div style="font-weight:800;margin-bottom:10px">Для кого шукаємо?</div><div class="who" id="who">${[["women","Жінкам"],["men","Чоловікам"],["kids","Дітям"],["all","Усім"]].map(([k,l])=>`<button type="button" data-who="${k}" aria-pressed="${k==="all"}">${l}</button>`).join("")}</div></div>
+    <div class="gift">${ic("gift","width:28px;height:28px")}<div><b class="num">100 ₴</b><div style="font-size:13px;font-weight:600">на перше замовлення вже у профілі</div></div></div>
+    <div class="juli"><span class="ya">Ю</span>Я Юля. Підберу розмір і підкажу, що пасує саме тобі.</div>
+    <button class="btn block" type="button" id="onbGo">Почати покупки</button>
+  </div></div>`;
+  $("#who").onclick=e=>{const b=e.target.closest("[data-who]");if(!b)return;S.who=b.dataset.who;$("#who").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b))};
+  $("#onbGo").onclick=()=>{S.onb=false;save();const o=$(".onb");if(motion())o.animate([{opacity:1},{opacity:0,transform:"translateY(-20px)"}],{duration:280,easing:"ease-in"}).onfinish=()=>{$("#onbHost").innerHTML=""};else $("#onbHost").innerHTML="";
+    if(S.who!=="all"){S.nt=S.who;document.querySelectorAll(".nt").forEach(x=>x.setAttribute("aria-selected",x.dataset.nt===S.nt));navInd()}render()};
+}
+
+applyEco();netState();setHH();count();
+render();navInd();onboarding();
+document.fonts&&document.fonts.ready.then(()=>{navInd();moveInd($("#ftabs"),".ft[aria-selected=true]",$("#find"));setHH()});
+</script>
+
+</body>
+</html>

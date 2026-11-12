@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>YULA для продавців</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700;900&family=Onest:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: seller cabinet in the YULA system — graphite header, milk ground, white work surfaces, bottom tabs on phone. Light-only like the buyer app. */
+:root{
+  --bg:#F7F4EF; --paper:#FFFFFF; --ink:#111111; --ink2:#2B2926; --muted:#6F6A64; --line:#E6E0D7; --soft:#EFEAE2;
+  --pink:#FF2E7E; --pink-deep:#D3135C; --blush:#FFE9F1; --butter:#FFE14D;
+  --green:#0B7F55; --green-soft:#E1F2E9; --amber:#9A5A00; --amber-soft:#FFF1D6; --red:#C21F3A; --red-soft:#FDE6EA;
+  --f-d:"Unbounded","Arial Black",system-ui,sans-serif; --f-b:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --spring:cubic-bezier(.2,.9,.25,1.15);
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-b);font-size:15px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--ink)}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0;text-align:inherit}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.app{max-width:620px;margin:0 auto;min-height:100vh;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.hdr{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--ink);color:#fff;padding-block:12px;display:flex;align-items:center;gap:10px}
+.mark{font:900 18px var(--f-d);letter-spacing:.14em;display:flex;align-items:center;gap:6px}
+.mark b{width:8px;height:8px;background:var(--pink);clip-path:polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)}
+.hdr small{font-size:12px;font-weight:700;color:rgba(255,255,255,.65);border-left:1px solid rgba(255,255,255,.2);padding-left:10px}
+.hdr .sp{flex:1}
+.who{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700}
+.who i{width:32px;height:32px;border-radius:9px;background:var(--pink);display:grid;place-items:center;font:900 11px var(--f-d);font-style:normal}
+.view{animation:vi .25s ease-out}
+@keyframes vi{from{opacity:.4;transform:translateY(6px)}}
+h1.ph{font:900 21px var(--f-d);letter-spacing:-.01em;margin:18px 0 4px}
+.lead{color:var(--muted);margin:0 0 12px;font-size:14px;max-width:62ch}
+.card{background:var(--paper);border-radius:16px;padding:14px;margin-top:12px}
+.card h3{margin:0 0 10px;font-size:15px;font-weight:800;display:flex;gap:8px;align-items:center}
+.card h3 .r{margin-left:auto;font-size:12.5px;font-weight:700;color:var(--muted)}
+.btn{border-radius:12px;padding:12px 16px;font-weight:800;background:var(--ink);color:#fff;display:inline-flex;gap:6px;align-items:center;justify-content:center;min-height:46px;transition:transform .12s}
+.btn:active{transform:scale(.97)}
+.btn.pink{background:var(--pink)}
+.btn.ghost{background:var(--paper);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.btn.soft{background:var(--soft);color:var(--ink)}
+.btn.sm{padding:7px 12px;font-size:13px;min-height:36px;border-radius:10px}
+.btn.block{width:100%}
+.btn:disabled{background:var(--soft);color:var(--muted);box-shadow:none;cursor:not-allowed}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+@media (min-width:560px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.kpi{background:var(--paper);border-radius:14px;padding:12px}
+.kpi small{display:block;color:var(--muted);font-size:12px;font-weight:600}
+.kpi b{display:block;font:900 20px var(--f-d);margin-top:4px;letter-spacing:-.02em}
+.kpi em{font-style:normal;font-size:11.5px;font-weight:700}
+.up{color:var(--green)}.dn{color:var(--red)}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.pill.ok{background:var(--green-soft);color:var(--green)}
+.pill.warn{background:var(--amber-soft);color:var(--amber)}
+.pill.bad{background:var(--red-soft);color:var(--red)}
+.pill.mod{background:var(--soft);color:var(--ink2)}
+.live{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(11,127,85,.5);animation:live 1.8s infinite}
+@keyframes live{70%{box-shadow:0 0 0 7px rgba(11,127,85,0)}100%{box-shadow:0 0 0 0 rgba(11,127,85,0)}}
+.todo{display:flex;gap:12px;align-items:center;padding-block:11px;border-bottom:1px solid var(--line);width:100%}
+.todo:last-child{border-bottom:0}
+.todo .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none}
+.todo .tx{flex:1;min-width:0;font-size:14px}
+.todo .tx small{display:block;color:var(--muted);font-size:12.5px}
+.src{display:flex;gap:12px;align-items:flex-start;padding-block:12px;border-bottom:1px solid var(--line);width:100%}
+.src:last-child{border-bottom:0}
+.src .lg{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none;font:900 12px var(--f-d)}
+.src .tx{flex:1;min-width:0}
+.src .tx b{font-size:14.5px}
+.src .tx small{display:block;color:var(--muted);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.src .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px;font-size:12px;color:var(--muted)}
+.lg.tg{background:#E3F1FB;color:#1C7FC4}.lg.xml{background:var(--soft);color:var(--ink)}.lg.sheet{background:var(--green-soft);color:var(--green)}.lg.bot{background:var(--blush);color:var(--pink-deep)}
+.spin{animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.log{list-style:none;margin:8px 0 0;padding:0;font-size:12.5px}
+.log li{display:grid;grid-template-columns:44px 1fr;gap:8px;padding-block:6px;border-top:1px dashed var(--line)}
+.log li span:first-child{color:var(--muted)}
+.log li.new{animation:flash 1.2s ease-out}
+@keyframes flash{from{background:var(--butter)}}
+.fchips{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-block:8px 2px}
+.fchips::-webkit-scrollbar{display:none}
+.fch{flex:none;background:var(--paper);border:1.5px solid var(--line);border-radius:999px;padding:7px 12px;font-size:13px;font-weight:700}
+.fch[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.prod{display:flex;gap:12px;padding-block:12px;border-bottom:1px solid var(--line)}
+.prod:last-child{border-bottom:0}
+.th{width:64px;height:80px;border-radius:10px;flex:none;display:grid;place-items:center;background:radial-gradient(120% 85% at 50% 28%,hsl(var(--h) 35% 98%),hsl(var(--h) 22% 88%))}
+.th svg{width:76%;height:76%}
+.prod .tx{flex:1;min-width:0}
+.prod .t{font-weight:700;font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.prod .s{font-size:12.5px;color:var(--muted);margin-top:2px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.stk{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px}
+.stk span{font-size:11.5px;font-weight:800;border-radius:6px;padding:2px 6px;background:var(--green-soft);color:var(--green);transition:background .4s}
+.stk span.z{background:var(--soft);color:var(--muted);text-decoration:line-through}
+.stk span.low{background:var(--amber-soft);color:var(--amber)}
+.stk span.chg{animation:flash 1.4s ease-out}
+.ord{padding-block:12px;border-bottom:1px solid var(--line)}
+.ord:last-child{border-bottom:0}
+.ord .top{display:flex;gap:8px;align-items:center;font-size:13px}
+.ord .top b{font:800 14px var(--f-d)}
+.ord .sla{margin-left:auto;font-weight:800;font-size:12.5px;display:flex;gap:4px;align-items:center}
+.ord .row{display:flex;gap:12px;margin-top:8px}
+.ord .row .th{width:52px;height:64px}
+.ord .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+label.f{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:10px}
+label.f input,label.f textarea,label.f select{display:block;width:100%;margin-top:4px;padding:11px 12px;border:1.5px solid var(--line);border-radius:11px;background:var(--bg);color:var(--ink);font:inherit;font-size:15px}
+label.f textarea{min-height:150px;resize:vertical;font-size:14px;line-height:1.45}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s,background .15s}
+.opt:has(input:checked){border-color:var(--ink);background:var(--bg)}
+.opt input{accent-color:var(--ink);margin-top:4px;flex:none}
+.opt b{font-size:14px}
+.opt small{display:block;color:var(--muted);font-size:12.5px}
+.err{color:var(--red);font-size:13px;font-weight:700;min-height:18px}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--ink2);margin:6px 0 10px}
+.chk input{width:20px;height:20px;accent-color:var(--ink);flex:none;margin:0}
+.steps{display:flex;gap:6px;margin:16px 0 4px}
+.steps i{flex:1;height:4px;border-radius:4px;background:var(--line);overflow:hidden;position:relative}
+.steps i.on::after{content:"";position:absolute;inset:0;background:var(--pink);animation:grow .4s ease-out}
+@keyframes grow{from{transform:scaleX(0);transform-origin:left}}
+.draft{border:1.5px dashed var(--ink);border-radius:16px;padding:14px;margin-top:12px;background:var(--paper);animation:vi .3s ease-out}
+.draft .hd{display:flex;gap:12px}
+.draft .hd .th{width:80px;height:100px}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:7px 14px;font-size:13.5px;margin:12px 0 0}
+.dl dt{color:var(--muted)}
+.dl dd{margin:0;font-weight:600}
+.checks{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.checks li{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;border-radius:10px;padding:9px 11px}
+.checks li.ok{background:var(--green-soft)}
+.checks li.warn{background:var(--amber-soft)}
+.checks li.bad{background:var(--red-soft)}
+.checks li svg.i{margin-top:1px}
+.checks li.ok svg.i{color:var(--green)}.checks li.warn svg.i{color:var(--amber)}.checks li.bad svg.i{color:var(--red)}
+.calc{background:var(--bg);border-radius:12px;padding:12px;margin-top:12px}
+.sum{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-size:14px}
+.sum.t{font-weight:800;border-top:1px dashed var(--line);margin-top:6px;padding-top:8px}
+.rule{display:grid;grid-template-columns:30px 1fr;gap:10px;padding-block:10px;border-bottom:1px solid var(--line)}
+.rule:last-child{border-bottom:0}
+.rule i{width:30px;height:30px;border-radius:9px;background:var(--bg);display:grid;place-items:center;font-style:normal}
+.rule b{font-size:14px}
+.rule small{display:block;color:var(--muted);font-size:12.5px}
+.tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,620px);background:rgba(255,255,255,.97);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding-top:6px;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));padding-left:max(4px,env(safe-area-inset-left,0px));padding-right:max(4px,env(safe-area-inset-right,0px));z-index:25}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:600;color:var(--muted);position:relative;min-height:48px;justify-content:center}
+.tab svg.i{width:23px;height:23px}
+.tab[aria-current="page"]{color:var(--ink);font-weight:800}
+.cnt{position:absolute;top:0;left:calc(50% + 6px);background:var(--pink);color:#fff;font-size:10px;font-weight:800;border-radius:999px;min-width:18px;height:18px;display:grid;place-items:center;padding:0 4px;border:2px solid #fff}
+.ov{position:fixed;inset:0;background:rgba(17,12,8,.5);z-index:40;display:flex;align-items:flex-end;justify-content:center;animation:fd .2s}
+@keyframes fd{from{opacity:0}}
+.sheet{background:var(--paper);width:min(100%,620px);max-height:92vh;overflow-y:auto;border-radius:22px 22px 0 0;padding-top:12px;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));animation:upp .36s var(--spring);position:relative}
+@keyframes upp{from{transform:translateY(40%)}}
+.grab{width:40px;height:4px;border-radius:4px;background:var(--line);margin:0 auto 10px}
+.x{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:var(--bg);display:grid;place-items:center}
+.wiz{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}
+.wiz .in{max-width:620px;margin:0 auto}
+.wiz .hero{background:var(--ink);color:#fff;border-radius:20px;padding:18px;margin-top:12px}
+.wiz .hero h2{margin:0;font:900 24px/1.05 var(--f-d);letter-spacing:-.01em}
+.wiz .hero p{margin:8px 0 0;color:rgba(255,255,255,.75);font-size:14px}
+.wiz .hero ul{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:8px;font-size:14px}
+.wiz .hero li{display:flex;gap:8px;align-items:center}
+.wiz .hero li svg.i{color:var(--butter)}
+.found{display:flex;gap:10px;align-items:center;background:var(--green-soft);color:var(--green);border-radius:12px;padding:10px 12px;font-weight:700;font-size:13.5px;margin-top:8px;animation:vi .3s ease-out}
+.toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 16px;border-radius:13px;font-weight:700;font-size:13.5px;z-index:90;max-width:calc(100% - 32px);text-align:center;animation:tt .3s var(--spring)}
+@keyframes tt{from{transform:translate(-50%,16px);opacity:0}}
+.note{font-size:11.5px;color:var(--muted);text-align:center;padding-block:16px}
+.code{font:600 12.5px ui-monospace,monospace;background:var(--bg);border-radius:8px;padding:2px 6px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+
+<div class="app">
+  <header class="hdr gut"><div class="mark">YULA<b></b></div><small>для продавців</small><span class="sp"></span><div class="who"><i>LS</i><span>Lino Studio</span></div></header>
+  <main id="main"></main>
+  <p class="note gut">Прототип кабінету продавця. Дані, продавці й замовлення умовні.</p>
+</div>
+<nav class="tabs" aria-label="Розділи кабінету">
+  <button class="tab" type="button" data-go="home"><svg class="i" viewBox="0 0 24 24"><path d="M4 13h6V4H4zM14 20h6v-9h-6zM4 20h6v-4H4zM14 7h6V4h-6z"/></svg>Огляд</button>
+  <button class="tab" type="button" data-go="products"><svg class="i" viewBox="0 0 24 24"><path d="M8 4 4 7v3l3-1v11h10V9l3 1V7l-4-3q-4 3-8 0z"/></svg>Товари</button>
+  <button class="tab" type="button" data-go="sources"><svg class="i" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg>Синхронізація</button>
+  <button class="tab" type="button" data-go="orders"><svg class="i" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>Замовлення<span class="cnt num" id="ocnt">2</span></button>
+  <button class="tab" type="button" data-go="me"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.4 4.2-6.5 8-6.5s7 2.1 8 6.5"/></svg>Профіль</button>
+</nav>
+<div id="ovHost"></div><div id="wizHost"></div><div id="toastHost"></div>
+
+<script>
+const IC={
+ chk:'<path d="m5 12 5 5 9-10"/>',warn:'<path d="M12 4 2.5 20h19z"/><path d="M12 10v4M12 17v.5"/>',x:'<path d="M6 6l12 12M18 6 6 18"/>',
+ sync:'<path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/>',plus:'<path d="M12 5v14M5 12h14"/>',
+ clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',ruler:'<rect x="3" y="8" width="18" height="8" rx="1.5"/><path d="M7 8v3M11 8v4M15 8v3M19 8v4"/>',
+ img:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-8 8"/>',copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+ bolt:'<path d="M13 3 5 13h6l-1 8 8-10h-6z"/>',shield:'<path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z"/><path d="m9 12 2 2 4-4"/>',
+ cash:'<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>',info:'<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.5"/>',
+ wand:'<path d="m4 20 11-11M14 4v3M18.5 5.5l-2 2M20 10h-3M15 9l2 2"/>',back:'<path d="M15 5l-7 7 7 7"/>',link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'
+};
+const ic=(n,st="")=>`<svg class="i" viewBox="0 0 24 24" aria-hidden="true"${st?` style="${st}"`:""}>${IC[n]}</svg>`;
+const SH={dress:'<path d="M41 14h18l-1 20 17 52q-25 6-50 0l17-52z"/>',hoodie:'<path d="M31 30 43 21q7 6 14 0l12 9 14 22-9 6-5-6v36H31V52l-5 6-9-6z"/><path d="M40 23q10-17 20 0q-10 11-20 0z"/>',
+ pants:'<path d="M32 14h36l3 72H55l-5-44-5 44H29z"/>',jacket:'<path d="M30 24 42 15h16l12 9 14 22-9 6-5-5v41H30V51l-5 5-9-6z"/>',
+ sneaker:'<path d="M10 64q1-17 16-20l14-8q10 12 23 12l17 4q12 4 10 15z"/><rect x="9" y="65" width="82" height="10" rx="4" fill="#fff"/>',
+ bag:'<path d="M22 40h56a6 6 0 0 1 6 6v34a6 6 0 0 1-6 6H22a6 6 0 0 1-6-6V46a6 6 0 0 1 6-6z"/><path d="M38 41q0-19 12-19t12 19" fill="none" stroke="rgba(0,0,0,.4)" stroke-width="4.5"/>',
+ tee:'<path d="M32 24l12-5q6 5 12 0l12 5 15 13-9 10-6-5v41H32V42l-6 5-9-10z"/>'};
+const th=(s,h,l=55)=>`<div class="th" style="--h:${h}"><svg viewBox="0 0 100 100" aria-hidden="true" fill="hsl(${h} 45% ${l}%)">${SH[s]}</svg></div>`;
+const $=s=>document.querySelector(s);
+const uah=n=>Math.round(n).toLocaleString("uk-UA").replace(/ /g," ")+" ₴";
+const COMM=.12;
+
+/* ---- data ---- */
+const SRC=[
+ {id:"tg",k:"tg",lg:"TG",name:"Telegram-канал",addr:"@lino_drop",freq:10,items:142,last:3,st:"ok",how:"Читаємо нові й відредаговані пости. ❌, «продано», «немає» біля розміру знімають його з продажу.",
+  log:[["12:05","Оновлено залишки 14 товарів"],["11:55","Сукня міді: розмір L — немає (пост відредаговано)"],["11:45","Новий пост → чернетка «Сорочка льон»"]]},
+ {id:"xml",k:"xml",lg:"XML",name:"XML/YML-фід",addr:"lino.com.ua/feed/yula.yml",freq:30,items:96,last:12,st:"ok",how:"Формат як для Prom/Rozetka. Беремо ціну, quantity і available для кожного розміру.",
+  log:[["11:56","Фід прочитано: 96 товарів, 3 змінили ціну"],["11:26","Фід прочитано без змін"]]},
+ {id:"sheet",k:"sheet",lg:"GS",name:"Google Таблиця",addr:"Залишки_листопад",freq:15,items:0,last:190,st:"bad",err:"Немає доступу. Відкрийте таблицю для yula-sync@yula.ua (лише перегляд).",how:"Колонки: Артикул, Розмір, Залишок, Ціна. Зручно, якщо склад у таблиці.",
+  log:[["08:52","Помилка доступу 403"]]},
+ {id:"bot",k:"bot",lg:"BOT",name:"Telegram-бот @yula_seller_bot",addr:"Перешліть пост — отримаєте чернетку",freq:0,items:18,last:40,st:"ok",how:"Пересилаєте пост постачальника боту — він створює чернетку. Залишки змінюєте командою /stock або кнопками під товаром.",
+  log:[["11:20","Чернетка «Худі оверсайз» створена з пересланого поста"]]}
+];
+const PR=[
+ {n:"Сукня міді, льон",s:"dress",h:150,src:"tg",cost:520,price:749,sz:{S:4,M:2,L:0},st:"on"},
+ {n:"Костюм трикотажний, двонитка",s:"hoodie",h:28,src:"xml",cost:860,price:1190,sz:{S:6,M:5,L:3,XL:1},st:"on"},
+ {n:"Худі оверсайз на флісі",s:"hoodie",h:95,src:"bot",cost:640,price:899,sz:{M:0,L:0,XL:0},st:"oos"},
+ {n:"Сорочка льон, оверсайз",s:"tee",h:40,src:"tg",cost:480,price:690,sz:{S:3,M:3,L:2},st:"mod",issues:["Немає таблиці розмірів у см"]},
+ {n:"Джинси mom-fit",s:"pants",h:215,src:"xml",cost:610,price:849,sz:{"26":2,"27":4,"28":5,"29":1},st:"on"},
+ {n:"Пуховик об'ємний",s:"jacket",h:330,src:"sheet",cost:1650,price:2290,sz:{S:2,M:3,L:1},st:"pause"},
+ {n:"Сумка-шопер, еко-шкіра",s:"bag",h:25,src:"tg",cost:410,price:590,sz:{"Один":7},st:"on"},
+ {n:"Кросівки на платформі",s:"sneaker",h:350,src:"xml",cost:850,price:1190,sz:{"37":1,"38":3,"39":4,"40":0},st:"fix",issues:["2 фото з водяним знаком"]}
+];
+const ORD=[
+ {no:"YL-48211",p:0,size:"M",price:749,left:84,st:"new"},
+ {no:"YL-48207",p:1,size:"L",price:1190,left:37,st:"new"},
+ {no:"YL-48190",p:4,size:"28",price:849,left:0,st:"ship",ttn:""},
+ {no:"YL-48102",p:6,size:"Один",price:590,left:0,st:"done",ttn:"2045 1182 7731 20"}
+];
+const ST={on:["ok","Активний"],oos:["bad","Немає в наявності"],mod:["mod","На модерації"],pause:["warn","Пауза: немає синхронізації"],fix:["warn","Потрібні правки"]};
+const S={view:"home",pf:"all",reg:false,draft:null};
+try{if(localStorage.getItem("yulaSellerReg")==="1")S.reg=true}catch(e){}
+
+function toast(t){$("#toastHost").innerHTML=`<div class="toast" role="status">${t}</div>`;clearTimeout(toast.t);toast.t=setTimeout(()=>$("#toastHost").innerHTML="",2400)}
+const ago=m=>m<1?"щойно":m<60?`${m} хв тому`:`${Math.floor(m/60)} год тому`;
+const srcName=k=>({tg:"Telegram-канал",xml:"XML-фід",sheet:"Google Таблиця",bot:"Бот"})[k];
+
+/* ---- views ---- */
+function vHome(){
+  const newO=ORD.filter(o=>o.st==="new").length,fix=PR.filter(p=>p.st==="fix"||p.st==="mod").length,bad=SRC.filter(s=>s.st==="bad").length;
+  return `<section class="view gut"><h1 class="ph">Добрий вечір, Олено</h1><p class="lead">Ось що відбувається з вашим магазином на YULA.</p>
+   <div class="kpis">
+    <div class="kpi"><small>Продажі, 7 днів</small><b class="num">38 420 ₴</b><em class="up">+12% до минулого тижня</em></div>
+    <div class="kpi"><small>Замовлень</small><b class="num">47</b><em class="up">+6</em></div>
+    <div class="kpi"><small>Відправлено вчасно</small><b class="num">98%</b><em class="up">ціль ≥ 95%</em></div>
+    <div class="kpi"><small>Відмови «немає в наявності»</small><b class="num">1,4%</b><em class="up">ціль ≤ 2%</em></div>
+   </div>
+   <div class="card"><h3>Потребує уваги</h3>
+    ${newO?`<button class="todo" type="button" data-go="orders"><span class="ic" style="background:var(--blush);color:var(--pink-deep)">${ic("clock")}</span><span class="tx"><b>${newO} нових замовлення</b><small>Підтвердіть наявність протягом 2 годин</small></span>${ic("back","transform:rotate(180deg)")}</button>`:""}
+    ${bad?`<button class="todo" type="button" data-go="sources"><span class="ic" style="background:var(--red-soft);color:var(--red)">${ic("warn")}</span><span class="tx"><b>Google Таблиця не синхронізується</b><small>Товари з неї поставлено на паузу</small></span>${ic("back","transform:rotate(180deg)")}</button>`:""}
+    ${fix?`<button class="todo" type="button" data-pf="fix"><span class="ic" style="background:var(--amber-soft);color:var(--amber)">${ic("ruler")}</span><span class="tx"><b>${fix} товари потребують правок</b><small>Таблиця розмірів у см, фото без водяних знаків</small></span>${ic("back","transform:rotate(180deg)")}</button>`:""}
+   </div>
+   <div class="card"><h3><span class="live"></span>Автосинхронізація<span class="r">${SRC.filter(s=>s.st==="ok").length} з ${SRC.length} джерел працюють</span></h3>
+    <p style="margin:0;font-size:13.5px;color:var(--muted)">Останнє оновлення залишків ${ago(Math.min(...SRC.map(s=>s.last)))}. Якщо джерело мовчить понад 24 години, його товари стають на паузу, щоб покупці не замовили те, чого немає.</p>
+    <button class="btn soft sm" type="button" data-rules style="margin-top:10px">${ic("info","width:15px;height:15px")}Як працює відстеження наявності</button>
+   </div>
+   <div class="card"><h3>${ic("wand")}Додати товар з Telegram</h3><p style="margin:0 0 10px;font-size:13.5px;color:var(--muted)">Вставте текст поста постачальника, і ми зробимо картку: назву, ціну, розміри, наявність і склад.</p><button class="btn pink block" type="button" data-import>Розпізнати пост</button></div>
+  </section>`;
+}
+function vProducts(){
+  const f=S.pf,list=PR.filter(p=>f==="all"||(f==="fix"?(p.st==="fix"||p.st==="mod"):p.st===f));
+  const c=k=>PR.filter(p=>k==="all"||(k==="fix"?(p.st==="fix"||p.st==="mod"):p.st===k)).length;
+  return `<section class="view gut"><h1 class="ph">Товари</h1>
+   <div class="fchips">${[["all","Усі"],["on","Активні"],["oos","Немає в наявності"],["fix","Потрібні правки"],["pause","На паузі"]].map(([k,l])=>`<button class="fch" type="button" data-pf="${k}" aria-pressed="${f===k}">${l} · ${c(k)}</button>`).join("")}</div>
+   <div class="card" style="padding-block:2px">${list.length?list.map((p,k)=>{const [cl,lb]=ST[p.st];const i=PR.indexOf(p);return`<div class="prod">${th(p.s,p.h)}<div class="tx">
+     <div class="t">${p.n}</div>
+     <div class="s"><span class="pill ${cl}">${lb}</span><span>${srcName(p.src)}</span></div>
+     <div class="s num">Закупка ${uah(p.cost)} · продаж ${uah(p.price)} · ваш заробіток ${uah(p.price*(1-COMM)-p.cost)}</div>
+     <div class="stk" id="stk${i}">${Object.entries(p.sz).map(([s,q])=>`<span class="${q===0?"z":q<=2?"low":""}" data-sz="${s}">${s}${q?` · ${q}`:""}</span>`).join("")}</div>
+     ${p.issues?`<div class="s" style="color:var(--amber);font-weight:700;margin-top:6px">${ic("warn","width:14px;height:14px")}${p.issues.join(", ")}</div>`:""}
+   </div></div>`}).join(""):`<p style="padding:20px 0;text-align:center;color:var(--muted)">Тут поки порожньо</p>`}</div>
+   <button class="btn pink block" type="button" data-import style="margin-top:12px">${ic("plus")}Додати товар</button></section>`;
+}
+function vSources(){
+  return `<section class="view gut"><h1 class="ph">Синхронізація</h1><p class="lead">Звідки ми беремо ваші товари й залишки. Підключіть кілька джерел, якщо працюєте з різними постачальниками.</p>
+   ${SRC.map(s=>`<div class="card" id="src-${s.id}">
+     <div class="src" style="border:0;padding-top:0"><span class="lg ${s.k}">${s.lg}</span><span class="tx"><b>${s.name}</b><small>${s.addr}</small>
+       <span class="meta">${s.st==="ok"?`<span class="pill ok"><span class="live"></span>Працює</span>`:`<span class="pill bad">${ic("warn","width:13px;height:13px")}Помилка</span>`}<span class="num">${s.items} товарів</span>${s.freq?`<span>кожні ${s.freq} хв</span>`:"<span>оновлення вручну й через бот</span>"}<span id="last-${s.id}">оновлено ${ago(s.last)}</span></span></span></div>
+     ${s.err?`<div class="checks"><li class="bad" style="list-style:none">${ic("warn")}<span>${s.err} <button class="btn sm ghost" type="button" data-copy="yula-sync@yula.ua" style="margin-top:6px">${ic("copy","width:14px;height:14px")}Скопіювати адресу</button></span></li></div>`:""}
+     <p style="margin:10px 0 0;font-size:13px;color:var(--ink2)">${s.how}</p>
+     <ul class="log" id="log-${s.id}">${s.log.map(([t,x])=>`<li><span class="num">${t}</span><span>${x}</span></li>`).join("")}</ul>
+     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn sm" type="button" data-sync="${s.id}">${ic("sync","width:15px;height:15px")}Синхронізувати зараз</button>${s.k==="bot"?`<button class="btn sm soft" type="button" data-copy="@yula_seller_bot">Відкрити бота</button>`:""}</div>
+   </div>`).join("")}
+   <button class="btn pink block" type="button" data-addsrc style="margin-top:12px">${ic("plus")}Підключити джерело</button>
+   <button class="btn soft block" type="button" data-rules style="margin-top:8px">Правила відстеження наявності</button></section>`;
+}
+function vOrders(){
+  const fmt=m=>`${Math.floor(m/60)} год ${String(m%60).padStart(2,"0")} хв`;
+  return `<section class="view gut"><h1 class="ph">Замовлення</h1><p class="lead">Нове замовлення треба підтвердити протягом 2 годин. Якщо товару немає, натисніть «Немає» одразу: покупцю запропонуємо схожий товар, а ваш рейтинг постраждає менше, ніж від мовчання.</p>
+   <div class="card" style="padding-block:2px">${ORD.map((o,k)=>{const p=PR[o.p];return`<div class="ord">
+    <div class="top"><b>${o.no}</b>${o.st==="new"?`<span class="sla" style="color:${o.left<60?"var(--red)":"var(--amber)"}">${ic("clock","width:15px;height:15px")}<span class="num">${fmt(o.left)}</span></span>`:o.st==="ship"?`<span class="sla"><span class="pill warn">Чекає ТТН</span></span>`:o.st==="done"?`<span class="sla"><span class="pill ok">Відправлено</span></span>`:`<span class="sla"><span class="pill bad">Скасовано</span></span>`}</div>
+    <div class="row">${th(p.s,p.h)}<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px">${p.n}</div><div style="font-size:12.5px;color:var(--muted)">Розмір ${o.size} · ${uah(o.price)} · вам ${uah(o.price*(1-COMM))}</div>${o.ttn?`<div style="font-size:12.5px;margin-top:2px">ТТН <span class="code num">${o.ttn}</span></div>`:""}</div></div>
+    ${o.st==="new"?`<div class="acts"><button class="btn sm" type="button" data-oyes="${k}">${ic("chk","width:15px;height:15px")}Є в наявності</button><button class="btn sm ghost" type="button" data-ono="${k}">Немає</button></div>`:""}
+    ${o.st==="ship"?`<form class="acts" data-ttn="${k}" novalidate style="grid-template-columns:1fr auto"><label class="f" style="margin:0" for="ttn${k}"><input id="ttn${k}" inputmode="numeric" placeholder="ТТН Нової пошти, 14 цифр" style="margin:0"></label><button class="btn sm" type="submit">Зберегти</button></form><button class="btn sm soft block" type="button" data-autottn="${k}" style="margin-top:8px">Створити ТТН автоматично</button>`:""}
+   </div>`}).join("")}</div></section>`;
+}
+function vMe(){
+  return `<section class="view gut"><h1 class="ph">Профіль продавця</h1>
+   <div class="card"><h3>${ic("shield")}Lino Studio<span class="r"><span class="pill ok">Перевірено YULA</span></span></h3>
+    <dl class="dl"><dt>Продавець</dt><dd>ФОП Коваль О. В.</dd><dt>РНОКПП</dt><dd class="num">•••• •• 4821</dd><dt>Рахунок</dt><dd class="num">UA•• •••• 0274</dd><dt>Місто відправки</dt><dd>Харків</dd><dt>Відправка до</dt><dd>17:00, пн–сб</dd></dl></div>
+   <div class="card"><h3>Рейтинг продавця<span class="r num">4,9</span></h3>
+    ${[["Відправка вчасно","98%","≥ 95%"],["Відмови «немає в наявності»","1,4%","≤ 2%"],["Повернення «не схоже на фото»","0,8%","≤ 3%"],["Середня оцінка товарів","4,8","≥ 4,6"]].map(([a,b,c])=>`<div class="sum"><span>${a}</span><span class="num"><b>${b}</b> <span style="color:var(--muted);font-size:12px">ціль ${c}</span></span></div>`).join("")}
+    <p style="margin:8px 0 0;font-size:12.5px;color:var(--muted)">Нижче 4,3 — втрата бейджа «Перевірено YULA» і нижче місце у видачі.</p></div>
+   <div class="card"><h3>${ic("cash")}Виплати</h3>
+    <div class="sum"><span>До виплати в понеділок</span><span class="num"><b>21 860 ₴</b></span></div>
+    <div class="sum"><span>Комісія YULA</span><span class="num">12% від ціни продажу (приклад)</span></div>
+    <div class="sum"><span>Утримується до отримання</span><span class="num">6 120 ₴</span></div>
+    <p style="margin:8px 0 0;font-size:12.5px;color:var(--muted)">Гроші за замовлення стають доступними, коли покупець забрав посилку.</p></div>
+   <button class="btn soft block" type="button" data-rewiz style="margin-top:12px">Показати реєстрацію ще раз</button></section>`;
+}
+
+/* ---- import from Telegram ---- */
+const SAMPLE=`🔥 КОСТЮМ ДВОНИТКА 🔥
+Колір: молочний, графіт
+Розміри: S ✅ M ✅ L ❌ XL ✅
+Тканина: двонитка, 95% бавовна, 5% еластан
+Дроп ціна: 890 грн
+Роздріб: 1290 грн
+📦 Відправка щодня до 16:00 · @lino_drop`;
+function parsePost(t){
+  const lines=t.split(/\n/).map(x=>x.trim()).filter(Boolean);
+  const clean=s=>s.replace(/[^\p{L}\p{N}\s,.'’%-]/gu,"").replace(/\s+/g," ").trim();
+  let name=clean(lines[0]||"");name=name.charAt(0).toUpperCase()+name.slice(1).toLowerCase();
+  const num=re=>{const m=t.match(re);return m?+m[1].replace(/\s/g,""):null};
+  const cost=num(/(?:дроп|опт|закуп)[^\d\n]*(\d[\d\s]{1,6})/i);
+  const rrp=num(/(?:роздріб|ррц|рр\b|продаж)[^\d\n]*(\d[\d\s]{1,6})/i);
+  const szLine=lines.find(l=>/розмір/i.test(l))||"";
+  const sizes={};szLine.replace(/^[^:]*:/,"").replace(/\b(XXS|XS|S|M|L|XL|XXL|3XL|\d{2})\b\s*(✅|❌|✔️|✖️|\(немає\)|немає|продано)?/gi,(m,s,mark)=>{sizes[s.toUpperCase()]=mark&&/❌|✖|немає|продано/i.test(mark)?0:"є";return m});
+  const mat=(lines.find(l=>/%|тканина|склад/i.test(l))||"").replace(/^[^:]*:\s*/,"");
+  const colors=((lines.find(l=>/колір|кольор/i.test(l))||"").replace(/^[^:]*:\s*/,"")).split(/,\s*/).filter(Boolean);
+  const cat=/костюм|худі|світшот/i.test(t)?"Жінкам → Костюми":/сукн|плать/i.test(t)?"Жінкам → Сукні":/джинс|штан/i.test(t)?"Штани":/кросів|кеди|взуття/i.test(t)?"Взуття":/сумк|рюкзак/i.test(t)?"Сумки":"Визначимо після модерації";
+  const handle=(t.match(/@\w+/)||[""])[0];
+  return {name,cost,rrp,sizes,mat,colors,cat,handle};
+}
+function importSheet(){
+  sheet(`<div class="grab"></div><h1 class="ph" style="margin-top:0">Пост → картка товару</h1><p class="lead">Вставте текст поста з каналу постачальника або перешліть пост боту @yula_seller_bot.</p>
+   <label class="f" for="post">Текст поста<textarea id="post">${SAMPLE}</textarea></label>
+   <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><span style="font-size:13px;color:var(--muted)">${ic("img","width:16px;height:16px;vertical-align:-3px")} Фото з поста: <b>2</b> (демо)</span></div>
+   <button class="btn pink block" type="button" id="parse">${ic("wand")}Розпізнати</button><div id="out"></div>`);
+  $("#parse").onclick=()=>{const d=parsePost($("#post").value);S.draft=d;renderDraft()};
+}
+function renderDraft(){
+  const d=S.draft,sz=Object.entries(d.sizes),base=d.rrp||(d.cost?Math.ceil(d.cost*1.3/10)*10-1:0);
+  const issues=[
+   d.name?["ok",`Назва: «${d.name}»`]:["bad","Не знайшли назву — додайте вручну"],
+   d.cost?["ok",`Ціна закупки: ${uah(d.cost)}`]:["bad","Не знайшли дроп-ціну"],
+   sz.length?["ok",`Розміри й наявність: ${sz.map(([s,q])=>s+(q===0?" — немає":"")).join(", ")}`]:["bad","Не знайшли розміри"],
+   d.mat?["ok","Склад тканини знайдено"]:["warn","Немає складу тканини"],
+   ["warn","Немає таблиці розмірів у см — обов'язково для публікації"],
+   ["warn","Фото: 2 з 4 обов'язкових (перед, зад, тканина, бирка)"],
+   d.handle?["warn",`На фото знайдено напис ${d.handle} — приберемо автоматично, перевірте результат`]:["ok","Водяних знаків не знайдено"],
+   ["ok","Схожий товар уже є у 2 продавців — покажемо одну картку з вибором продавця за ціною й швидкістю"]
+  ];
+  $("#out").innerHTML=`<div class="draft"><div class="hd">${th("hoodie",28,72)}<div style="min-width:0"><span class="pill mod">Чернетка</span><div style="font-weight:800;font-size:16px;margin-top:6px">${d.name||"Без назви"}</div><div style="font-size:13px;color:var(--muted)">${d.cat}</div></div></div>
+   <dl class="dl"><dt>Кольори</dt><dd>${d.colors.join(", ")||"—"}</dd><dt>Склад</dt><dd>${d.mat||"—"}</dd><dt>Джерело залишків</dt><dd>Telegram-канал ${d.handle||""}, кожні 10 хв</dd></dl>
+   <div class="stk" style="margin-top:10px">${sz.map(([s,q])=>`<span class="${q===0?"z":""}">${s}</span>`).join("")}</div>
+   <ul class="checks">${issues.map(([c,t])=>`<li class="${c}">${ic(c==="ok"?"chk":"warn")}<span>${t}</span></li>`).join("")}</ul>
+   <div class="calc"><label class="f" for="pp" style="margin-bottom:6px">Ваша ціна продажу, ₴<input id="pp" type="number" inputmode="numeric" value="${base}"></label><div id="calcOut"></div></div>
+   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px"><button class="btn ghost" type="button" data-toast="Відкрили редактор таблиці розмірів (демо)">${ic("ruler","width:16px;height:16px")}Додати сітку</button><button class="btn pink" type="button" id="toMod">На модерацію</button></div></div>`;
+  const upd=()=>{const p=+$("#pp").value||0,c=d.cost||0,fee=p*COMM,earn=p-fee-c,mk=c?Math.round((p/c-1)*100):0;
+    $("#calcOut").innerHTML=`<div class="sum"><span>Комісія YULA 12% (приклад)</span><span class="num">−${uah(fee)}</span></div><div class="sum"><span>Закупка в постачальника</span><span class="num">−${uah(c)}</span></div><div class="sum t"><span>Ваш заробіток з продажу</span><span class="num" style="color:${earn>0?"var(--green)":"var(--red)"}">${uah(earn)}</span></div><div style="font-size:12.5px;color:${mk<30?"var(--red)":"var(--muted)"};margin-top:4px">Націнка ${mk}%${mk<30?" — менше 30%, не покриє рекламу й повернення":""}</div>`};
+  $("#pp").oninput=upd;upd();
+  $("#toMod").onclick=()=>{PR.unshift({n:d.name||"Новий товар",s:"hoodie",h:28,src:"tg",cost:d.cost||0,price:+$("#pp").value||0,sz:Object.fromEntries(sz.map(([s,q])=>[s,q===0?0:3])),st:"mod",issues:["Немає таблиці розмірів у см","2 фото з 4"]});closeSheet();S.pf="fix";go("products");toast("Чернетку відправлено на модерацію, до 24 годин")};
+  $("#out").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+/* ---- sheets ---- */
+function sheet(h){$("#ovHost").innerHTML=`<div class="ov" id="ov"><div class="sheet" role="dialog" aria-modal="true"><button class="x" type="button" data-close aria-label="Закрити">${ic("x")}</button>${h}</div></div>`}
+function closeSheet(){$("#ovHost").innerHTML=""}
+function rulesSheet(){
+  sheet(`<div class="grab"></div><h1 class="ph" style="margin-top:0">Як ми відстежуємо наявність</h1><p class="lead">Мета одна: покупець не повинен замовити те, чого вже немає. Кожна відмова через відсутність знижує ваш рейтинг.</p>
+   ${[["TG","Telegram-канал","Кожні 10 хв читаємо нові й відредаговані пости. ❌, «продано», «немає» біля розміру — розмір знімається. Видалений пост — товар на паузі."],
+     ["XML","XML/YML-фід","Кожні 15–30 хв. quantity = 0 або available = false — розмір знімається. Ціна оновлюється автоматично, різкі зміни понад 30% чекають підтвердження."],
+     ["GS","Google Таблиця","Кожні 15 хв читаємо колонку «Залишок». Зручно для власного складу."],
+     ["BOT","Бот і кнопки","Команда /stock або кнопки «Закінчилось» під товаром — миттєво."],
+     ["24","Мовчання 24 год","Якщо джерело не оновлювалось 24 години, товари стають на паузу й зникають з видачі до наступної синхронізації."],
+     ["2H","Підтвердження замовлення","Кожне замовлення продавець підтверджує протягом 2 годин. Не підтвердив — скасовуємо й пропонуємо покупцю схожий товар."],
+     ["%","Резерв","Поки замовлення не підтверджене, розмір резервується, щоб його не купили двічі."]].map(([a,b,c])=>`<div class="rule"><i class="num" style="font:900 10px var(--f-d)">${a}</i><span><b>${b}</b><small>${c}</small></span></div>`).join("")}`)
+}
+function addSrcSheet(){
+  sheet(`<div class="grab"></div><h1 class="ph" style="margin-top:0">Підключити джерело</h1>
+   <form id="sf" novalidate>
+   ${[["tg","Telegram-канал","Публічний канал постачальника. Потрібна його згода на використання фото"],["xml","XML/YML-фід","Посилання на фід у форматі Prom/Rozetka"],["sheet","Google Таблиця","Ваш склад у таблиці"],["bot","Telegram-бот","Пересилайте пости вручну"]].map(([v,b,s],k)=>`<label class="opt"><input type="radio" name="sk" value="${v}" ${k?"":"checked"}><span><b>${b}</b><small>${s}</small></span></label>`).join("")}
+   <label class="f" for="saddr" style="margin-top:6px">Адреса<input id="saddr" placeholder="@назва_каналу або https://…" value="@knit_ua_drop"></label>
+   <label class="chk" for="sagree"><input type="checkbox" id="sagree"><span>Я маю право використовувати фото й описи з цього джерела (власник каналу — я або мій постачальник дав згоду)</span></label>
+   <div class="err" id="sErr" role="alert"></div>
+   <button class="btn pink block" type="submit" id="sGo">Перевірити й підключити</button><div id="sRes"></div></form>`);
+  $("#sf").addEventListener("submit",e=>{e.preventDefault();const a=$("#saddr").value.trim();if(!a){$("#sErr").textContent="Вкажіть адресу джерела";return}if(!$("#sagree").checked){$("#sErr").textContent="Підтвердіть право на використання фото й описів";return}$("#sErr").textContent="";
+    const b=$("#sGo");b.disabled=true;b.innerHTML=`${ic("sync","width:16px;height:16px")}Перевіряємо…`;b.querySelector("svg").classList.add("spin");
+    setTimeout(()=>{const k=document.querySelector("input[name=sk]:checked").value;SRC.push({id:"n"+SRC.length,k,lg:{tg:"TG",xml:"XML",sheet:"GS",bot:"BOT"}[k],name:srcName(k),addr:a,freq:k==="xml"?30:k==="bot"?0:10,items:57,last:0,st:"ok",how:"Щойно підключено. Перші товари з'являться як чернетки для перевірки.",log:[[now(),"Підключено: знайдено 57 товарів, 12 без таблиці розмірів"]]});
+      $("#sRes").innerHTML=`<div class="found">${ic("chk")}Знайдено 57 товарів. Створили чернетки, 12 потребують таблиці розмірів.</div><button class="btn block" type="button" data-go="sources" style="margin-top:10px">Готово</button>`;b.hidden=true},1400)});
+}
+const now=()=>{const d=new Date();return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")};
+function doSync(id){
+  const s=SRC.find(x=>x.id===id),btn=document.querySelector(`[data-sync="${id}"]`);if(!s||!btn)return;
+  btn.disabled=true;btn.querySelector("svg").classList.add("spin");
+  setTimeout(()=>{
+    let msg;
+    if(s.st==="bad"){msg="Помилка доступу 403 — таблиця досі закрита";toast("Не вдалося: відкрийте доступ до таблиці")}
+    else{const cand=PR.map((p,i)=>[p,i]).filter(([p])=>p.src===s.k&&Object.values(p.sz).some(q=>q>0));
+      if(cand.length){const [p,i]=cand[Math.floor(Math.random()*cand.length)];const ks=Object.keys(p.sz).filter(z=>p.sz[z]>0);const z=ks[Math.floor(Math.random()*ks.length)];p.sz[z]=Math.max(0,p.sz[z]-1-(Math.random()<.4?9:0));
+        msg=`${p.n}: розмір ${z} — ${p.sz[z]?"залишилось "+p.sz[z]:"немає, знято з продажу"}`;if(Object.values(p.sz).every(q=>q===0))p.st="oos"}
+      else msg="Змін немає";s.last=0;toast("Синхронізовано")}
+    s.log.unshift([now(),msg]);
+    const lg=$("#log-"+id);if(lg){lg.insertAdjacentHTML("afterbegin",`<li class="new"><span class="num">${now()}</span><span>${msg}</span></li>`)}
+    const la=$("#last-"+id);if(la)la.textContent="оновлено "+ago(s.last);
+    btn.disabled=false;btn.querySelector("svg").classList.remove("spin");
+  },1100);
+}
+
+/* ---- registration wizard ---- */
+let W={step:0,type:"drop",src:"tg"};
+function wizard(){
+  const st=W.step,steps=`<div class="steps">${[0,1,2,3].map(k=>`<i class="${k<=st?"on":""}"></i>`).join("")}</div>`;
+  const body=[
+   ()=>`<div class="hero"><h2>Продавайте на YULA</h2><p>Підключіть свій Telegram-канал або фід — ми самі відстежуватимемо наявність.</p><ul><li>${ic("bolt")}Реєстрація за 5 хвилин, перші товари за 15</li><li>${ic("sync")}Залишки оновлюються автоматично</li><li>${ic("cash")}Виплати щотижня на ваш рахунок</li></ul></div>
+     <h1 class="ph">Хто ви?</h1>
+     ${[["maker","Виробник або цех","Шиєте самі, свій склад"],["stock","Постачальник зі своїм складом","Закуповуєте партії й зберігаєте товар"],["drop","Дропшипер","Продаєте з чужого складу, відправляє постачальник"]].map(([v,b,s])=>`<label class="opt"><input type="radio" name="wt" value="${v}" ${W.type===v?"checked":""}><span><b>${b}</b><small>${s}</small></span></label>`).join("")}
+     <div id="dropNote">${W.type==="drop"?`<div class="checks"><li class="warn" style="list-style:none">${ic("info")}<span>Ви відповідаєте перед покупцем за відправку й повернення. Підключіть канал постачальника, щоб ми бачили його залишки. Якщо постачальник уже на YULA, однакові товари стануть однією карткою, і покупець обиратиме продавця за ціною й швидкістю.</span></li></div>`:""}</div>`,
+   ()=>`<h1 class="ph">Дані для виплат</h1><p class="lead">Продавати можна як ФОП або ТОВ. Дані бачитиме покупець у картці товару, як вимагає закон про захист прав споживачів.</p>
+     <form id="wf" novalidate>
+     <label class="f" for="wName">ФОП / ТОВ<input id="wName" value="ФОП Коваль Олена Вікторівна" autocomplete="organization"></label>
+     <label class="f" for="wTax">РНОКПП або ЄДРПОУ<input id="wTax" inputmode="numeric" value="3104814821"></label>
+     <label class="f" for="wIban">IBAN<input id="wIban" value="UA213052990000026007233566001" autocomplete="off"></label>
+     <label class="f" for="wPhone">Телефон для замовлень<input id="wPhone" type="tel" inputmode="tel" value="+380 50 123 45 67"></label>
+     <label class="f" for="wCity">Місто відправки<input id="wCity" value="Харків"></label>
+     <label class="chk" for="wAgree"><input type="checkbox" id="wAgree"><span>Погоджуюсь з договором для продавців і правилами модерації (без копій брендів, тільки українська мова в описах)</span></label>
+     <div class="err" id="wErr" role="alert"></div></form>`,
+   ()=>`<h1 class="ph">Звідки беремо товари</h1><p class="lead">Можна підключити кілька джерел пізніше.</p>
+     ${[["tg","Telegram-канал","Автоматично читаємо пости й позначки ✅ ❌"],["xml","XML/YML-фід","Як для Prom чи Rozetka"],["sheet","Google Таблиця","Ваш склад у таблиці"],["bot","Тільки бот","Пересилатимете пости вручну"]].map(([v,b,s])=>`<label class="opt"><input type="radio" name="ws" value="${v}" ${W.src===v?"checked":""}><span><b>${b}</b><small>${s}</small></span></label>`).join("")}
+     <label class="f" for="wAddr" style="margin-top:6px">Адреса<input id="wAddr" value="@lino_drop"></label>
+     <button class="btn ghost block" type="button" id="wCheck">${ic("link")}Перевірити</button><div id="wRes"></div>`,
+   ()=>`<div style="text-align:center;padding-top:30px"><div style="width:76px;height:76px;border-radius:50%;background:var(--green-soft);color:var(--green);display:grid;place-items:center;margin:0 auto;animation:upp .5s var(--spring)">${ic("chk","width:38px;height:38px;stroke-width:2.5")}</div>
+     <h1 class="ph">Заявку надіслано</h1><p class="lead" style="margin-inline:auto">Перевіримо дані до 24 годин. Тим часом товари з вашого каналу вже імпортуються як чернетки, а залишки синхронізуються.</p></div>
+     <div class="card">${[["Перевірка ФОП і рахунку","до 24 год"],["Імпорт 142 товарів у чернетки","йде зараз"],["Контрольна закупка для бейджа «Перевірено YULA»","після 30 замовлень"]].map(([a,b])=>`<div class="sum"><span>${a}</span><span style="color:var(--muted);font-size:13px">${b}</span></div>`).join("")}</div>`
+  ][st]();
+  $("#wizHost").innerHTML=`<div class="wiz gut" role="dialog" aria-modal="true" aria-label="Реєстрація продавця"><div class="in">
+    <div style="display:flex;align-items:center;gap:10px">${st>0&&st<3?`<button class="btn sm soft" type="button" id="wBack" aria-label="Назад">${ic("back","width:15px;height:15px")}</button>`:""}<div class="mark" style="color:var(--ink)">YULA<b></b></div><span style="font-size:12px;font-weight:700;color:var(--muted)">реєстрація продавця</span></div>
+    ${steps}${body}
+    <button class="btn ${st===3?"":"pink"} block" type="button" id="wNext" style="margin-top:16px">${["Далі","Далі","Надіслати заявку","До кабінету"][st]}</button>
+    ${st===0?`<button class="btn soft block" type="button" id="wSkip" style="margin-top:8px">Пропустити демо-реєстрацію</button>`:""}
+  </div></div>`;
+  $("#wizHost").querySelector(".wiz").scrollTop=0;
+  if(st===0)$("#wizHost").querySelectorAll("input[name=wt]").forEach(r=>r.onchange=()=>{W.type=r.value;wizard()});
+  if(st===2){$("#wizHost").querySelectorAll("input[name=ws]").forEach(r=>r.onchange=()=>{W.src=r.value;$("#wAddr").value={tg:"@lino_drop",xml:"https://lino.com.ua/feed/yula.yml",sheet:"https://docs.google.com/…",bot:"@yula_seller_bot"}[r.value]});
+    $("#wCheck").onclick=()=>{const b=$("#wCheck");b.disabled=true;b.innerHTML=`${ic("sync","width:16px;height:16px")}Перевіряємо…`;b.querySelector("svg").classList.add("spin");setTimeout(()=>{$("#wRes").innerHTML=`<div class="found">${ic("chk")}Знайдено 142 товари, 118 з розмірами й цінами. Залишки оновлюватимемо кожні 10 хв.</div>`;b.hidden=true;W.checked=true},1300)}}
+  if($("#wBack"))$("#wBack").onclick=()=>{W.step--;wizard()};
+  if($("#wSkip"))$("#wSkip").onclick=finishWiz;
+  $("#wNext").onclick=()=>{
+    if(st===1){const need=["wName","wTax","wIban","wPhone"].find(id=>!$("#"+id).value.trim());if(need){$("#wErr").textContent="Заповніть усі поля";return}
+      if(!/^UA\d{27}$/.test($("#wIban").value.replace(/\s/g,""))){$("#wErr").textContent="IBAN має починатися з UA і містити 29 символів";return}
+      if(!$("#wAgree").checked){$("#wErr").textContent="Підтвердіть згоду з договором";return}}
+    if(st===2&&!W.checked){$("#wCheck").click();return}
+    if(st===3){finishWiz();return}
+    W.step++;wizard();
+  };
+}
+function finishWiz(){S.reg=true;try{localStorage.setItem("yulaSellerReg","1")}catch(e){}const w=$(".wiz");if(w&&!matchMedia("(prefers-reduced-motion: reduce)").matches)w.animate([{opacity:1},{opacity:0,transform:"translateY(-16px)"}],{duration:250}).onfinish=()=>$("#wizHost").innerHTML="";else $("#wizHost").innerHTML="";go("home")}
+
+/* ---- nav & events ---- */
+function render(){$("#main").innerHTML={home:vHome,products:vProducts,sources:vSources,orders:vOrders,me:vMe}[S.view]();document.querySelectorAll(".tab").forEach(t=>t.dataset.go===S.view?t.setAttribute("aria-current","page"):t.removeAttribute("aria-current"));const n=ORD.filter(o=>o.st==="new").length,c=$("#ocnt");c.textContent=n;c.hidden=!n}
+function go(v){S.view=v;render();scrollTo({top:0})}
+document.addEventListener("click",e=>{
+  const T=s=>e.target.closest(s);let b;
+  if(T("[data-close]")||e.target.id==="ov"){closeSheet();return}
+  if(b=T("[data-go]")){closeSheet();go(b.dataset.go);return}
+  if(b=T("[data-pf]")){S.pf=b.dataset.pf;go("products");return}
+  if(T("[data-import]")){importSheet();return}
+  if(T("[data-rules]")){rulesSheet();return}
+  if(T("[data-addsrc]")){addSrcSheet();return}
+  if(b=T("[data-sync]")){doSync(b.dataset.sync);return}
+  if(b=T("[data-copy]")){const t=b.dataset.copy;try{navigator.clipboard.writeText(t).then(()=>toast("Скопійовано: "+t),()=>toast(t))}catch(x){toast(t)}return}
+  if(b=T("[data-toast]")){toast(b.dataset.toast);return}
+  if(b=T("[data-oyes]")){const o=ORD[+b.dataset.oyes];o.st="ship";const p=PR[o.p];if(p.sz[o.size]>0)p.sz[o.size]--;render();toast("Підтверджено. Відправте до 17:00");return}
+  if(b=T("[data-ono]")){const o=ORD[+b.dataset.ono];o.st="cancel";const p=PR[o.p];p.sz[o.size]=0;render();toast(`Розмір ${o.size} знято з продажу. Покупцю запропонуємо схожий товар`);return}
+  if(b=T("[data-autottn]")){const o=ORD[+b.dataset.autottn];o.ttn="2045 "+(1000+Math.floor(Math.random()*9000))+" "+(1000+Math.floor(Math.random()*9000))+" 31";o.st="done";render();toast("ТТН створено через API Нової пошти");return}
+  if(T("[data-rewiz]")){W={step:0,type:"drop",src:"tg"};wizard();return}
+});
+document.addEventListener("submit",e=>{const f=e.target.closest("[data-ttn]");if(!f)return;e.preventDefault();const k=+f.dataset.ttn,v=f.querySelector("input").value.replace(/\D/g,"");if(v.length!==14){toast("ТТН має містити 14 цифр");return}ORD[k].ttn=v.replace(/(\d{4})(\d{4})(\d{4})(\d{2})/,"$1 $2 $3 $4");ORD[k].st="done";render();toast("ТТН збережено, покупець отримав SMS")});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet()});
+/* SLA countdown, minutes */
+setInterval(()=>{ORD.forEach(o=>{if(o.st==="new"&&o.left>0)o.left--});if(S.view==="orders")render()},60000);
+render();if(!S.reg)wizard();
+</script>
+
+</body>
+</html>

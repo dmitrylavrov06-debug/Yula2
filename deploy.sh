@@ -38,6 +38,22 @@ server {
   index index.html;
   location ~ /\.git { deny all; }
   location /fonts/ { add_header Cache-Control "public, max-age=31536000, immutable"; }
+  # Проксі для фідів постачальників: адмінка завантажує їх зі свого домену, без блокування CORS.
+  # Дозволені тільки ці два джерела, тому це не відкритий проксі.
+  location /feed-proxy/mydrop/ {
+    proxy_pass https://backend.mydrop.com.ua/vendor/api/export/;
+    proxy_set_header Host backend.mydrop.com.ua;
+    proxy_ssl_server_name on;
+    proxy_read_timeout 180s;
+    add_header Cache-Control "no-store";
+  }
+  location /feed-proxy/prom/ {
+    proxy_pass https://my.prom.ua/;
+    proxy_set_header Host my.prom.ua;
+    proxy_ssl_server_name on;
+    proxy_read_timeout 180s;
+    add_header Cache-Control "no-store";
+  }
   location / { try_files \$uri \$uri/ =404; }
 }
 NGINX

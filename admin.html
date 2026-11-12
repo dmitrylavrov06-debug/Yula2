@@ -303,18 +303,18 @@ function vHome(){
     ${newO?`<button class="todo" type="button" data-go="orders"><span class="ic" style="background:var(--green-soft);color:var(--green)">${ic("box")}</span><span class="tx"><b>${newO} нових замовлень</b><small>Передайте постачальнику</small></span></button>`:""}
     ${avgM<80?`<button class="todo" type="button" data-go="rules"><span class="ic" style="background:var(--red-soft);color:var(--red)">${ic("cash")}</span><span class="tx"><b>Малий заробіток з речі</b><small>${uah(avgM)} у середньому. Підніміть націнку або мінімальну суму</small></span></button>`:""}
    </div>
-   <div class="card"><h3>${ic("up")}Додати постачальника</h3><p style="margin:0 0 10px;font-size:13.5px;color:var(--muted)">Завантажте XML/YML-вивантаження з MyDrop, Prom чи Horoshop. Ми розберемо товари, розміри й залишки і почистимо назви.</p><button class="btn pink block" type="button" data-addsup>Завантажити фід</button></div>
+   <div class="card"><h3>${ic("up")}Додати постачальника</h3><p style="margin:0 0 10px;font-size:13.5px;color:var(--muted)">Встав посилання на фід MyDrop чи Prom або завантаж файл. Розберемо товари, розміри й залишки і почистимо назви.</p><button class="btn pink block" type="button" data-addsup>Додати за посиланням</button></div>
   </section>`;
 }
 function vSup(){
   const d=dupMap();
   return `<section class="view gut"><h1 class="ph">Постачальники</h1><p class="lead">Канали, з якими ви працюєте. Оновлюйте фід, щоб підтягнути нові товари й залишки.</p>
    ${ST.sup.map((s,k)=>{const its=ST.items.filter(i=>i.sl===k),live=its.filter(i=>status(i,d)==="live").length,rev=its.filter(i=>status(i,d)==="review").length,stock=its.reduce((a,i)=>a+tot(i),0);return`<div class="card">
-    <div class="sup"><span class="lg">${s.lg}</span><span class="tx"><b>${s.n}</b><small>${s.src} · ${s.file||"—"}</small><small>${s.contact?"Менеджер "+s.contact+" · ":""}оновлено ${ago(s.last)}</small></span><span class="pill ok"><span class="live"></span>Працює</span></div>
+    <div class="sup"><span class="lg">${s.lg}</span><span class="tx"><b>${s.n}</b><small>${s.src}${s.url?" · автооновлення":s.file?" · "+s.file:""}</small>${s.err?`<small style="color:var(--red)">${s.err}</small>`:""}<small>${s.contact?"Менеджер "+s.contact+" · ":""}оновлено ${ago(s.last)}</small></span>${s.err?`<span class="pill bad">Помилка</span>`:`<span class="pill ok"><span class="live"></span>Працює</span>`}</div>
     <div class="stats"><div><b class="num">${its.length}</b><small>моделей</small></div><div><b class="num">${live}</b><small>на сайті</small></div><div><b class="num">${rev}</b><small>перевірити</small></div><div><b class="num">${stock}</b><small>шт на складі</small></div></div>
     <div class="sum" style="margin-top:10px;font-size:13px"><span style="color:var(--muted)">Оплата</span><span>${s.pay||"—"}</span></div>
     <div class="sum" style="font-size:13px"><span style="color:var(--muted)">Повернення</span><span>${s.ret||"—"}</span></div>
-    <div class="acts"><label class="btn sm" style="cursor:pointer">${ic("sync","width:15px;height:15px")}Оновити з файлу<input type="file" accept=".xml,.yml,text/xml" data-refresh="${k}" hidden></label><button class="btn sm soft" type="button" data-supitems="${k}">Товари</button>${k>0?`<button class="btn sm ghost" type="button" data-delsup="${k}">${ic("trash","width:15px;height:15px")}Видалити</button>`:""}</div>
+    <div class="acts">${s.url?`<button class="btn sm" type="button" data-syncurl="${k}">${ic("sync","width:15px;height:15px")}<span>Оновити з посилання</span></button>`:""}<button class="btn sm soft" type="button" data-editsup="${k}">${ic("link","width:15px;height:15px")}${s.url?"Змінити посилання":"Додати посилання"}</button><label class="btn sm soft" style="cursor:pointer">${ic("up","width:15px;height:15px")}Файл<input type="file" accept=".xml,.yml,text/xml" data-refresh="${k}" hidden></label><button class="btn sm soft" type="button" data-supitems="${k}">Товари</button>${k>0?`<button class="btn sm ghost" type="button" data-delsup="${k}">${ic("trash","width:15px;height:15px")}Видалити</button>`:""}</div>
    </div>`}).join("")}
    <button class="btn pink block" type="button" data-addsup style="margin-top:12px">${ic("plus")}Додати постачальника</button></section>`;
 }
@@ -373,16 +373,51 @@ function vOrders(){
 /* ===== import sheet ===== */
 function sheet(h){$("#ovHost").innerHTML=`<div class="ov" id="ov"><div class="sheet" role="dialog" aria-modal="true"><button class="x" type="button" data-close aria-label="Закрити">${ic("x")}</button>${h}</div></div>`}
 function closeSheet(){$("#ovHost").innerHTML=""}
+const PROXY=[["https://backend.mydrop.com.ua/vendor/api/export/","/feed-proxy/mydrop/"],["https://my.prom.ua/","/feed-proxy/prom/"]];
+function proxify(u){for(const [from,to] of PROXY)if(u.startsWith(from))return to+u.slice(from.length);return null}
+async function fetchFeed(u){
+  if(!/^https:\/\//.test(u))throw new Error("Посилання має починатися з https://");
+  const p=proxify(u),tries=[];if(p&&/^https?:$/.test(location.protocol))tries.push(p);tries.push(u);let last=null;
+  for(const t of tries){try{const r=await fetch(t,{cache:"no-store"});if(!r.ok)throw new Error("сервер постачальника відповів "+r.status);const tx=await r.text();if(!/<offer[\s>]/.test(tx))throw new Error("за посиланням немає товарів");return tx}catch(e){last=e}}
+  if(!p)throw new Error("Цей сайт не віддає фід браузеру. Зараз підтримуються посилання MyDrop і Prom, або завантаж файл.");
+  throw new Error("Не вдалося завантажити фід ("+(last&&last.message||"немає зв’язку")+"). На вашому сервері це працює через проксі YULA, у превью Claude — ні.");
+}
+function mergeImport(text,k,meta){
+  const {groups,offers,supplierTag}=parseFeedXML(text);
+  const isNew=k==null,sl=isNew?ST.sup.length:k,items=normalizeOffers(groups,sl);let added=0,updated=0,gone=0;
+  if(!isNew){const s=ST.sup[k],old=new Map(ST.items.filter(i=>i.sl===sl).map(i=>[i.n+"|"+i.code,i])),keep=ST.items.filter(i=>i.sl!==sl),next=[];
+    for(const it of items){const key=it.n+"|"+it.code,o=old.get(key);if(o){it.gid=o.gid;it.added=o.added;updated++;old.delete(key)}else added++;next.push(it)}
+    for(const o of old.values()){o.sz=Object.fromEntries(Object.keys(o.sz).map(z=>[z,0]));next.push(o);gone++}
+    ST.items=keep.concat(next);s.offers=offers;s.last=now();Object.assign(s,meta||{})}
+  else{ST.sup.push(Object.assign({lg:(meta.n||"").replace(/[^\p{L}\p{N}]/gu,"").slice(0,2).toUpperCase()||"??",offers,last:now()},meta,{contact:meta.contact||(supplierTag?"@"+supplierTag:"")}));ST.items=ST.items.concat(items);added=items.length}
+  ST.dirty=true;save();updBadges();
+  return {sl,offers,groups:groups.size,added,updated,gone,isNew};
+}
+function reportHtml(r){
+  const d=dupMap(),mine=ST.items.filter(i=>i.sl===r.sl),stat={live:0,review:0,hidden:0};for(const it of mine)stat[status(it,d)]++;
+  const noColor=mine.filter(i=>!i.colorOk).length,few=mine.filter(i=>i.pics<2).length,dups=mine.filter(i=>d[i.gid]).length,nostock=mine.filter(i=>!tot(i)).length;
+  return `<ul class="report"><li><span>Позицій у фіді</span><b>${r.offers}</b></li><li><span>Моделей після групування</span><b>${r.groups}</b></li>${r.isNew?"":`<li><span>Нових / оновлено / зникло з фіду</span><b>${r.added} / ${r.updated} / ${r.gone}</b></li>`}
+    <li><span>Одразу на сайт</span><b>${stat.live}</b></li><li class="${stat.review?"w":""}"><span>На перевірку</span><b>${stat.review}</b></li><li><span>Приховано: немає в наявності або дубль</span><b>${stat.hidden}</b></li>
+    ${noColor?`<li class="w"><span>Колір не розпізнано</span><b>${noColor}</b></li>`:""}${few?`<li class="w"><span>Менше 2 фото</span><b>${few}</b></li>`:""}${dups?`<li><span>Дублі з іншими постачальниками</span><b>${dups}</b></li>`:""}${nostock?`<li><span>Без залишків</span><b>${nostock}</b></li>`:""}</ul>`;
+}
+async function syncSup(k,silent){
+  const s=ST.sup[k];if(!s||!s.url)return;
+  const btn=document.querySelector(`[data-syncurl="${k}"]`);if(btn){btn.disabled=true;btn.lastChild.textContent="Оновлюємо…"}
+  try{const r=mergeImport(await fetchFeed(s.url),k,{});if(!silent||r.added||r.gone)toast(`${s.n}: нових ${r.added}, оновлено ${r.updated}, зникло ${r.gone}`);render()}
+  catch(e){s.err=e.message;save();if(!silent)toast(e.message);render()}
+}
 function addSupSheet(refresh){
   const s=refresh!=null?ST.sup[refresh]:null;
   sheet(`<div class="grab"></div><h1 class="ph" style="margin-top:0">${s?"Оновити "+s.n:"Новий постачальник"}</h1>
-   <p class="lead">Попросіть у каналу посилання на вивантаження або файл XML/YML. Більшість дроп-каналів дають його через MyDrop, Prom або Horoshop.</p>
+   <p class="lead">Встав посилання на вивантаження (MyDrop, Prom) або завантаж файл XML/YML. За посиланням товари й залишки оновлюватимуться самі.</p>
    <form id="sf" novalidate>
-   ${s?"":`<label class="f" for="sName">Назва постачальника<input id="sName" placeholder="Наприклад, Knit UA" autocomplete="off"></label>
-   <label class="f" for="sContact">Контакт менеджера<input id="sContact" placeholder="@manager у Telegram" autocomplete="off"></label>
+   ${s?"":`<label class="f" for="sName">Назва постачальника<input id="sName" placeholder="Наприклад, Knit UA" autocomplete="off"></label>`}
+   <label class="f" for="sUrl">Посилання на фід<input id="sUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://backend.mydrop.com.ua/vendor/api/export/…" value="${s&&s.url?s.url.replace(/"/g,"&quot;"):""}"></label>
+   <div style="text-align:center;color:var(--muted);font-size:12.5px;margin:-2px 0 8px">або файл</div>
+   <label class="drop" id="drop" for="sFile">${ic("up","width:26px;height:26px")}<b id="dropT">Обери файл фіду</b><small>.xml або .yml · або перетягни сюди</small><input type="file" id="sFile" accept=".xml,.yml,text/xml" hidden></label>
+   ${s?"":`<label class="f" for="sContact" style="margin-top:12px">Контакт менеджера<input id="sContact" placeholder="@manager у Telegram" autocomplete="off"></label>
    <label class="f" for="sPay">Як рахуєтесь<select id="sPay"><option>Оплата при отриманні на постачальника, він переводить різницю</option><option>Передплата постачальнику</option><option>Обидва варіанти</option></select></label>
    <label class="f" for="sRet">Повернення<input id="sRet" placeholder="Наприклад, 14 днів, обмін безкоштовно" autocomplete="off"></label>`}
-   <label class="drop" id="drop" for="sFile">${ic("up","width:26px;height:26px")}<b id="dropT">Обери файл фіду</b><small>.xml або .yml · або перетягніть сюди</small><input type="file" id="sFile" accept=".xml,.yml,text/xml" hidden></label>
    <div class="err" id="sErr" role="alert"></div><div id="sRes"></div>
    <button class="btn pink block" type="submit" id="sGo">Імпортувати</button></form>`);
   const drop=$("#drop"),fi=$("#sFile");let file=null;
@@ -392,28 +427,18 @@ function addSupSheet(refresh){
   ["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over")}));
   drop.addEventListener("drop",e=>{if(e.dataTransfer.files[0])setF(e.dataTransfer.files[0])});
   $("#sf").addEventListener("submit",async e=>{e.preventDefault();$("#sErr").textContent="";
-    const name=s?s.n:$("#sName").value.trim();if(!name){$("#sErr").textContent="Як називається постачальник?";return}
-    if(!file){$("#sErr").textContent="Обери файл фіду";return}
-    const btn=$("#sGo");btn.disabled=true;btn.textContent="Розбираємо…";
+    const name=s?s.n:$("#sName").value.trim(),url=$("#sUrl").value.trim();
+    if(!name){$("#sErr").textContent="Як називається постачальник?";return}
+    if(!file&&!url){$("#sErr").textContent="Встав посилання або обери файл";return}
+    const btn=$("#sGo");btn.disabled=true;btn.textContent=file?"Розбираємо файл…":"Завантажуємо фід…";
     try{
-      const text=await file.text();const {groups,offers,supplierTag}=parseFeedXML(text);
-      const sl=s?refresh:ST.sup.length;const items=normalizeOffers(groups,sl);
-      let added=0,updated=0,gone=0;
-      if(s){const old=new Map(ST.items.filter(i=>i.sl===sl).map(i=>[i.n+"|"+i.code,i]));const keep=ST.items.filter(i=>i.sl!==sl);const next=[];
-        for(const it of items){const o=old.get(it.n+"|"+it.code);if(o){it.gid=o.gid;it.added=o.added;updated++;old.delete(it.n+"|"+it.code)}else added++;next.push(it)}
-        for(const o of old.values()){o.sz=Object.fromEntries(Object.keys(o.sz).map(k=>[k,0]));next.push(o);gone++}
-        ST.items=keep.concat(next);s.offers=offers;s.last=now();s.file=file.name}
-      else{ST.sup.push({n:name,lg:name.replace(/[^\p{L}\p{N}]/gu,"").slice(0,2).toUpperCase()||"??",src:"XML-фід",file:file.name,offers,last:now(),contact:$("#sContact").value.trim()||(supplierTag?"@"+supplierTag:""),pay:$("#sPay").value,ret:$("#sRet").value.trim()||"Уточнити умови повернення"});ST.items=ST.items.concat(items);added=items.length}
-      ST.dirty=true;save();updBadges();
-      const d=dupMap(),mine=ST.items.filter(i=>i.sl===sl);
-      const stat={live:0,review:0,hidden:0};for(const it of mine)stat[status(it,d)]++;
-      const noColor=mine.filter(i=>!i.colorOk).length,few=mine.filter(i=>i.pics<2).length,dups=mine.filter(i=>d[i.gid]).length,nostock=mine.filter(i=>!tot(i)).length;
-      $("#sRes").innerHTML=`<ul class="report"><li><span>Позицій у фіді</span><b>${offers}</b></li><li><span>Моделей після групування</span><b>${groups.size}</b></li>${s?`<li><span>Нових / оновлено / зникло з фіду</span><b>${added} / ${updated} / ${gone}</b></li>`:""}
-        <li><span>Одразу на сайт</span><b>${stat.live}</b></li><li class="${stat.review?"w":""}"><span>На перевірку</span><b>${stat.review}</b></li><li><span>Приховано (немає в наявності або дубль)</span><b>${stat.hidden}</b></li>
-        ${noColor?`<li class="w"><span>Колір не розпізнано</span><b>${noColor}</b></li>`:""}${few?`<li class="w"><span>Менше 2 фото</span><b>${few}</b></li>`:""}${dups?`<li><span>Дублі з іншими постачальниками</span><b>${dups}</b></li>`:""}${nostock?`<li><span>Без залишків</span><b>${nostock}</b></li>`:""}</ul>`;
-      btn.outerHTML=`<div class="acts"><button class="btn" type="button" data-supitems="${sl}" style="flex:1">Переглянути товари</button><button class="btn pink" type="button" data-publish style="flex:1">${ic("send","width:16px;height:16px")}Опублікувати</button></div>`;
+      const text=file?await file.text():await fetchFeed(url);
+      const meta=s?(file?{file:file.name}:{url,src:"Фід за посиланням",file:"",err:""}):{n:name,src:file?"XML-файл":"Фід за посиланням",file:file?file.name:"",url:file?"":url,contact:$("#sContact").value.trim(),pay:$("#sPay").value,ret:$("#sRet").value.trim()||"Уточнити умови повернення"};
+      const r=mergeImport(text,s?refresh:null,meta);
+      $("#sRes").innerHTML=reportHtml(r);
+      btn.outerHTML=`<div class="acts"><button class="btn" type="button" data-supitems="${r.sl}" style="flex:1">Переглянути товари</button><button class="btn pink" type="button" data-publish style="flex:1">${ic("send","width:16px;height:16px")}Опублікувати</button></div>`;
       render();
-    }catch(err){$("#sErr").textContent=err.message||"Не вдалося прочитати файл";btn.disabled=false;btn.textContent="Імпортувати"}
+    }catch(err){$("#sErr").textContent=err.message||"Не вдалося прочитати фід";btn.disabled=false;btn.textContent="Імпортувати"}
   });
 }
 
@@ -456,6 +481,8 @@ document.addEventListener("click",e=>{
   if(T("[data-unpub]")){try{localStorage.removeItem(PUB)}catch(x){}ST.dirty=true;save();closeSheet();render();toast("Сайт знову показує вбудований каталог");return}
   if(T("[data-addsup]")){addSupSheet();return}
   if(b=T("[data-filter]")){S.f=b.dataset.filter;S.lim=40;if(S.view!=="items")S.view="items";render();return}
+  if(b=T("[data-syncurl]")){syncSup(+b.dataset.syncurl,false);return}
+  if(b=T("[data-editsup]")){addSupSheet(+b.dataset.editsup);return}
   if(b=T("[data-supitems]")){closeSheet();S.sup=b.dataset.supitems;S.f="all";go("items");return}
   if(b=T("[data-delsup]")){const k=+b.dataset.delsup;const n=ST.sup[k].n;ST.items=ST.items.filter(i=>i.sl!==k).map(i=>i.sl>k?{...i,sl:i.sl-1}:i);ST.sup.splice(k,1);ST.dirty=true;save();render();toast(`Постачальника ${n} видалено`);return}
   if(b=T("[data-toggle]")){const id=b.dataset.toggle,it=ST.items.find(i=>i.gid===id);const on=b.getAttribute("aria-checked")!=="true";if(on&&!tot(it)){toast("Немає в наявності — не можна показати");return}ST.hide[id]=!on;ST.dirty=true;save();b.setAttribute("aria-checked",on);updBadges();return}
@@ -468,6 +495,7 @@ document.addEventListener("change",e=>{const r=e.target.closest("[data-refresh]"
 document.addEventListener("submit",e=>{const f=e.target.closest("[data-ttn]");if(!f)return;e.preventDefault();const k=+f.dataset.ttn,v=f.querySelector("input").value.replace(/\D/g,"");if(v.length!==14){toast("ТТН має містити 14 цифр");return}const o=ST.orders[k];o.ttn=v.replace(/(\d{4})(\d{4})(\d{4})(\d{2})/,"$1 $2 $3 $4");o.st=2;save();render();toast("ТТН збережено, покупець отримає SMS")});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet()});
 render();
+ST.sup.forEach((sp,k)=>{if(sp.url&&now()-sp.last>30*60e3)syncSup(k,true)});
 </script>
 
 </body>

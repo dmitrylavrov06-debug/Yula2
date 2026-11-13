@@ -263,10 +263,10 @@ function parseFeedXML(text){
 const LS="yula_admin_v1",PUB="yula_pub";
 let ST=load();
 function load(){
-  try{const s=JSON.parse(localStorage.getItem(LS)||"null");if(s&&s.sup)return s}catch(e){}
+  try{const s=JSON.parse(localStorage.getItem(LS)||"null");if(s&&s.sup){if(s.rules.ship==null){s.rules.ship=80;s.dirty=true}delete s.rules.grp;return s}}catch(e){}
   const items=BASE.items.map(x=>({gid:"0:"+x.code+":"+hash(x.raw),n:x.n,raw:x.raw,s:x.s,sub:x.sub,c:x.c,h:x.h,sat:x.sat,l:x.l,pat:x.pat,cost:x.cost,sz:x.sz,pics:x.pics,ph:(x.ph||[]).map(f=>MYDROP+f),mat:x.mat,code:x.code,sl:0,colorOk:!(x.sat===30&&x.l===55),added:now()-3600e3}));
   return {sup:[{n:"MODAMIXX",lg:"MM",src:"MyDrop XML",file:"product_export.xml",offers:808,last:now()-3600e3,contact:"@MODAMIXX_ADMIN",pay:"Оплата при отриманні на постачальника або передплата",ret:"Уточнити умови повернення"}],
-    items,hide:{},rules:{pct:30,min:0,cat:{}},published:null,dirty:true,
+    items,hide:{},rules:{pct:30,min:0,ship:80,cat:{}},published:null,dirty:true,
     orders:[{no:"YL-10231",gid:items[0].gid,size:Object.keys(items[0].sz)[0],buyer:"Коваленко Марія",phone:"+380 67 123 45 67",np:"Київ, поштомат № 5521",pay:"Оплачено онлайн",st:0,ttn:""},
             {no:"YL-10229",gid:items[40].gid,size:Object.keys(items[40].sz)[1]||Object.keys(items[40].sz)[0],buyer:"Мельник Андрій",phone:"+380 50 222 33 44",np:"Львів, відділення №7",pay:"Передплата 200 ₴, решта при отриманні",st:1,ttn:""}]};
 }
@@ -276,7 +276,7 @@ function toast(t){$("#toastHost").innerHTML=`<div class="toast" role="status">${
 
 /* ===== pricing & checks ===== */
 const r9=x=>Math.ceil(x/10)*10-1;
-function priceOf(it){const R=ST.rules,pct=R.cat[it.sub]!=null&&R.cat[it.sub]!==""?+R.cat[it.sub]:R.pct;const p=r9(Math.max(it.cost*(1+pct/100),it.cost+(+R.min||0)));return{p,pct}}
+function priceOf(it){const R=ST.rules,pct=R.cat[it.sub]!=null&&R.cat[it.sub]!==""?+R.cat[it.sub]:R.pct;const ship=+R.ship||0,p=r9(Math.max(it.cost*(1+pct/100),it.cost+(+R.min||0))+ship);return{p,pct,ship,earn:p-it.cost-ship}}
 const tot=it=>Object.values(it.sz).reduce((a,b)=>a+b,0);
 function dupMap(){const m={},best={};for(const it of ST.items){const k=it.n.toLowerCase().replace(/\s+/g," ");(m[k]=m[k]||[]).push(it)}
   for(const k in m){if(m[k].length<2)continue;const arr=m[k].filter(i=>tot(i)>0).sort((a,b)=>a.cost-b.cost);const w=arr[0]||m[k][0];for(const i of m[k])if(i!==w)best[i.gid]=w}return best}
@@ -287,7 +287,7 @@ function counts(){const d=dupMap(),c={all:0,live:0,review:0,hidden:0};for(const 
 /* ===== views ===== */
 function vHome(){
   const c=counts(),live=ST.items.filter(i=>status(i,dupMap())==="live");
-  const avgM=live.length?live.reduce((a,i)=>a+(priceOf(i).p-i.cost),0)/live.length:0;
+  const avgM=live.length?live.reduce((a,i)=>a+(priceOf(i).earn),0)/live.length:0;
   const avgP=live.length?live.reduce((a,i)=>a+priceOf(i).p,0)/live.length:0;
   const newO=ST.orders.filter(o=>o.st===0).length;
   return `<section class="view gut"><h1 class="ph">Огляд</h1><p class="lead">Ваш магазин збирає товари з каналів постачальників. Тут видно, що на сайті, що чекає перевірки і скільки ви заробляєте з речі.</p>
@@ -295,7 +295,7 @@ function vHome(){
     <div class="kpi"><small>На сайті</small><b class="num">${c.live}</b><em>з ${c.all} імпортованих</em></div>
     <div class="kpi"><small>Постачальників</small><b class="num">${ST.sup.length}</b><em>${ST.sup.reduce((a,s)=>a+s.offers,0)} позицій у фідах</em></div>
     <div class="kpi"><small>Середня ціна</small><b class="num">${uah(avgP)}</b><em>для покупця</em></div>
-    <div class="kpi"><small>Заробіток з речі</small><b class="num" style="color:${avgM<80?"var(--red)":"var(--green)"}">${uah(avgM)}</b><em>до реклами й повернень</em></div>
+    <div class="kpi"><small>Заробіток з речі</small><b class="num" style="color:${avgM<80?"var(--red)":"var(--green)"}">${uah(avgM)}</b><em>після доставки, до реклами</em></div>
    </div>
    <div class="card"><h3>Що зробити</h3>
     ${ST.dirty?`<button class="todo" type="button" data-publish><span class="ic" style="background:var(--blush);color:var(--pink-deep)">${ic("send")}</span><span class="tx"><b>Є неопубліковані зміни</b><small>${ST.published?"Остання публікація "+ago(ST.published):"Сайт ще показує вбудований каталог"}</small></span></button>`:""}
@@ -332,7 +332,7 @@ function vItems(){
    <div class="card" style="padding-block:2px">${shown.length?shown.map(({it,st})=>{const pr=priceOf(it),is=issues(it,d);return`<div class="prod">${thumb(it)}<div class="tx">
      <div class="t">${it.n}</div><div class="raw" title="${it.raw.replace(/"/g,"&quot;")}">У фіді: ${it.raw}</div>
      <div class="s"><span class="pill ${st==="live"?"ok":st==="review"?"warn":"mut"}">${st==="live"?"На сайті":st==="review"?"Перевірити":"Приховано"}</span><span>${it.sub}</span><span>${ST.sup[it.sl].n}</span><span>${it.code}</span></div>
-     <div class="money num">Дроп ${uah(it.cost)} → <b>${uah(pr.p)}</b> · +${uah(pr.p-it.cost)} (${Math.round((pr.p/it.cost-1)*100)}%)</div>
+     <div class="money num">Дроп ${uah(it.cost)} → <b>${uah(pr.p)}</b> · доставка ${uah(pr.ship)} · вам +${uah(pr.earn)}</div>
      <div class="stk">${Object.entries(it.sz).map(([s,q])=>`<span class="${q===0?"z":q<=2?"low":""}">${s}${q?` · ${q}`:""}</span>`).join("")}</div>
      ${is.length?`<div class="iss">${ic("warn","width:14px;height:14px")}${is.map(x=>x[1]).join(" · ")}</div>`:""}
    </div><button class="tg" type="button" role="switch" aria-checked="${st==="live"}" data-toggle="${it.gid}" aria-label="Показувати на сайті"></button></div>`}).join("")+(list.length>S.lim?`<button class="more" type="button" data-more>Показати ще ${Math.min(40,list.length-S.lim)} з ${list.length-S.lim}</button>`:""):`<p style="text-align:center;color:var(--muted);padding:20px 0">Нічого не знайдено</p>`}</div></section>`;
@@ -340,11 +340,13 @@ function vItems(){
 function vRules(){
   const R=ST.rules,cats={};for(const it of ST.items)cats[it.sub]=(cats[it.sub]||0)+1;
   const d=dupMap(),live=ST.items.filter(i=>status(i,d)==="live");
-  const ex=[150,250,400,700].map(c=>[c,priceOf({cost:c,sub:"__"}).p]);
-  const avgM=live.length?live.reduce((a,i)=>a+(priceOf(i).p-i.cost),0)/live.length:0;
-  return `<section class="view gut"><h1 class="ph">Націнки</h1><p class="lead">Ціна для покупця рахується з дроп-ціни постачальника й округлюється до …9 ₴. Нові правила одразу застосовуються до всіх товарів.</p>
+  const ex=[150,250,400,700].map(c=>[c,priceOf({cost:c,sub:"__"})]);
+  const avgM=live.length?live.reduce((a,i)=>a+(priceOf(i).earn),0)/live.length:0;
+  return `<section class="view gut"><h1 class="ph">Націнки</h1><p class="lead">Доставка для покупця безкоштовна, тому її вартість закладена в ціну кожної речі. Ціна = дроп + націнка + доставка, округлено до …9 ₴. Нові правила одразу застосовуються до всіх товарів.</p>
    <div class="card">
     <div class="rrow"><span>Загальна націнка</span><b class="num" id="vPct">${R.pct}%</b></div><input class="rng" type="range" id="rPct" min="10" max="120" step="5" value="${R.pct}" aria-label="Загальна націнка">
+    <div class="rrow"><span>Доставка в ціні речі</span><b class="num" id="vShip">${R.ship} ₴</b></div><input class="rng" type="range" id="rShip" min="0" max="200" step="5" value="${R.ship}" aria-label="Доставка в ціні речі">
+    <p style="margin:2px 0 0;font-size:12.5px;color:var(--muted)">Скільки коштує посилка Новою поштою. Заклади реальний тариф твого постачальника.</p>
     <div class="rrow"><span>Мінімальний заробіток з речі</span><b class="num" id="vMin">${R.min} ₴</b></div><input class="rng" type="range" id="rMin" min="0" max="250" step="10" value="${R.min}" aria-label="Мінімальний заробіток">
     <div class="ex" id="ex">${exHtml(ex)}</div>
     <p style="margin:10px 0 0;font-size:13px;color:${avgM<80?"var(--red)":"var(--muted)"}" id="avgM">Середній заробіток з речі на сайті: <b class="num">${uah(avgM)}</b>${avgM<80?" — цього замало, щоб окупити рекламу в Instagram":""}</p>
@@ -354,14 +356,14 @@ function vRules(){
     ${Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([c,n])=>`<tr><td>${c}</td><td class="num">${n}</td><td><input type="number" inputmode="numeric" min="0" max="300" data-cat="${c}" value="${R.cat[c]??""}" placeholder="${R.pct}" aria-label="Націнка для ${c}"></td></tr>`).join("")}
     </tbody></table></div></section>`;
 }
-function exHtml(ex){return `<div style="font-size:12.5px;color:var(--muted);font-weight:700;margin-bottom:4px">Приклади</div>${ex.map(([c,p])=>`<div class="sum num"><span>Дроп ${uah(c)}</span><span><b>${uah(p)}</b> <span style="color:var(--muted)">· +${uah(p-c)}</span></span></div>`).join("")}`}
+function exHtml(ex){return `<div style="font-size:12.5px;color:var(--muted);font-weight:700;margin-bottom:4px">Приклади</div>${ex.map(([c,r])=>`<div class="sum num"><span style="white-space:nowrap">Дроп ${uah(c)}</span><span style="text-align:right"><b>${uah(r.p)}</b><br><span style="color:var(--muted);font-size:12.5px">доставка ${uah(r.ship)} · вам +${uah(r.earn)}</span></span></div>`).join("")}`}
 const OST=["Нове","Передано постачальнику","Є ТТН","Отримано"];
 function orderMsg(o){const it=ST.items.find(i=>i.gid===o.gid);if(!it)return"";return `Замовлення ${o.no}\nТовар: ${it.raw}\nАртикул: ${it.code}, розмір ${o.size}\nОтримувач: ${o.buyer}\nТелефон: ${o.phone}\nНова пошта: ${o.np}\nОплата: ${o.pay}\nВідправник: YULA`}
 function vOrders(){
   return `<section class="view gut"><h1 class="ph">Замовлення</h1><p class="lead">Покупець платить вам, а замовлення ви передаєте постачальнику. Скопіюйте готовий текст для менеджера каналу, а потім внесіть ТТН.</p>
    <div class="card" style="padding-block:2px">${ST.orders.map((o,k)=>{const it=ST.items.find(i=>i.gid===o.gid);if(!it)return"";const s=ST.sup[it.sl],pr=priceOf(it);return`<div class="ord">
     <div class="top"><b>${o.no}</b><span style="color:var(--muted)">${s.n}${s.contact?" · "+s.contact:""}</span><span class="pill ${o.st===0?"warn":o.st===3?"ok":"mut"}">${OST[o.st]}</span></div>
-    <div class="prod" style="border:0;padding-bottom:0">${thumb(it)}<div class="tx"><div class="t">${it.n}</div><div class="s">Розмір ${o.size} · ${o.pay}</div><div class="money num">Покупець: <b>${uah(pr.p)}</b> · постачальнику ${uah(it.cost)} · вам +${uah(pr.p-it.cost)}</div></div></div>
+    <div class="prod" style="border:0;padding-bottom:0">${thumb(it)}<div class="tx"><div class="t">${it.n}</div><div class="s">Розмір ${o.size} · ${o.pay}</div><div class="money num">Покупець: <b>${uah(pr.p)}</b> · постачальнику ${uah(it.cost)} · доставка ${uah(pr.ship)} · вам +${uah(pr.earn)}</div></div></div>
     <div class="steps">${OST.map((_,j)=>`<i class="${j<=o.st?"on":""}"></i>`).join("")}</div>
     ${o.st===0?`<div class="msg">${orderMsg(o)}</div><div class="acts"><button class="btn sm" type="button" data-copyorder="${k}">${ic("copy","width:15px;height:15px")}Скопіювати для постачальника</button><button class="btn sm soft" type="button" data-ost="${k}">Позначити переданим</button></div>`:""}
     ${o.st===1?`<form class="acts" data-ttn="${k}" novalidate><input id="ttn${k}" inputmode="numeric" placeholder="ТТН від постачальника, 14 цифр" aria-label="ТТН" style="flex:1;min-width:0;padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);font:inherit"><button class="btn sm" type="submit">Зберегти</button></form>`:""}
@@ -463,12 +465,12 @@ function bindView(){
   const q=$("#q");if(q){q.oninput=()=>{S.q=q.value;S.lim=40;const pos=q.selectionStart;render();const n=$("#q");n.focus();n.setSelectionRange(pos,pos)}}
   const ss=$("#supSel");if(ss)ss.onchange=()=>{S.sup=ss.value;render()};
   if(S.view==="rules"){
-    const upd=()=>{const R=ST.rules;R.pct=+$("#rPct").value;R.min=+$("#rMin").value;$("#vPct").textContent=R.pct+"%";$("#vMin").textContent=R.min+" ₴";
-      $("#ex").innerHTML=exHtml([150,250,400,700].map(c=>[c,priceOf({cost:c,sub:"__"}).p]));
-      const d=dupMap(),live=ST.items.filter(i=>status(i,d)==="live"),m=live.length?live.reduce((a,i)=>a+(priceOf(i).p-i.cost),0)/live.length:0;
+    const upd=()=>{const R=ST.rules;R.pct=+$("#rPct").value;R.min=+$("#rMin").value;R.ship=+$("#rShip").value;$("#vShip").textContent=R.ship+" ₴";$("#vPct").textContent=R.pct+"%";$("#vMin").textContent=R.min+" ₴";
+      $("#ex").innerHTML=exHtml([150,250,400,700].map(c=>[c,priceOf({cost:c,sub:"__"})]));
+      const d=dupMap(),live=ST.items.filter(i=>status(i,d)==="live"),m=live.length?live.reduce((a,i)=>a+(priceOf(i).earn),0)/live.length:0;
       $("#avgM").style.color=m<80?"var(--red)":"var(--muted)";$("#avgM").innerHTML=`Середній заробіток з речі на сайті: <b class="num">${uah(m)}</b>${m<80?" — цього замало, щоб окупити рекламу в Instagram":""}`;
       document.querySelectorAll("[data-cat]").forEach(i=>i.placeholder=R.pct);ST.dirty=true;updBadges()};
-    ["rPct","rMin"].forEach(id=>{$("#"+id).oninput=upd;$("#"+id).onchange=save});
+    ["rPct","rMin","rShip"].forEach(id=>{$("#"+id).oninput=upd;$("#"+id).onchange=save});
     document.querySelectorAll("[data-cat]").forEach(inp=>inp.onchange=()=>{const v=inp.value.trim();if(v==="")delete ST.rules.cat[inp.dataset.cat];else ST.rules.cat[inp.dataset.cat]=Math.max(0,+v);ST.dirty=true;save();updBadges();toast(`Націнка для «${inp.dataset.cat}»: ${v===""?"загальна":v+"%"}`)});
   }
 }

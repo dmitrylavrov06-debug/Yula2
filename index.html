@@ -227,6 +227,10 @@ svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .lvs b{display:block;font-size:13px}
 .lvs small{display:block;color:var(--muted);font-size:11px;line-height:1.25;margin-top:2px}
 .club p{margin:10px 0 0;font-size:12.5px;color:var(--muted)}
+.cdots{display:flex;gap:5px;align-items:center;margin-top:7px}
+.cdots i{width:12px;height:12px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.cdots i.on{outline:1.5px solid var(--ink);outline-offset:1.5px}
+.cdots small{font-size:11px;color:var(--muted);font-weight:700;margin-left:2px}
 .ya{width:34px;height:34px;border-radius:50%;background:var(--pink);color:var(--ink);display:grid;place-items:center;font:900 12px var(--f-d);flex:none}
 .hello{display:flex;gap:10px;align-items:center;background:var(--ink);color:#fff;border-radius:14px;padding:12px;margin-top:10px}
 .hello b{display:block;font-size:14px}
@@ -672,8 +676,13 @@ const P=CAT.items.map((x,i)=>({...x,i,p:x.o&&(!x.pe||x.pe>Date.now())?x.p:(x.o||
   season:/фліс|плюш|зим|термо|жилет/i.test(x.raw)?"Осінь–зима":/демі/i.test(x.raw)?"Демісезон":/шорт|майка|футболк|топ/i.test(x.raw)?"Літо":"Всесезон",
   country:"Уточнюємо у виробника"}));
 const BYBASE={};
-P.forEach(p=>{p.base=p.n.replace(/,\s*[^,]+$/,"");p.col=(p.n.match(/,\s*([^,]+)$/)||[,""])[1];p.tot=Object.values(p.sz).reduce((a,b)=>a+b,0);(BYBASE[p.base]=BYBASE[p.base]||[]).push(p.i)});
-P.forEach(p=>{p.sib=BYBASE[p.base].filter(j=>P[j].tot>0||j===p.i).slice(0,8)});
+/* a model is the name without its colours: "Футболка + шорти хакі, чорний" and "Футболка + шорти білий, чорний" are one model */
+const COLW=["світлий","світла","темний","темна","сірі","сіра","чорні","чорна","білі","біла","темно-синій","темно-сірий","світло-сірий","чорний","білий","сірий","графіт","графит","хакі","беж","бежевий","шоколад","меланж","мокко","блакитний","зелений","димчастий","синій","жовтий","електрик","червоний","бордо","кемел","малина","джинс","персик","м’ята","м'ята","олива","оливка","рожевий","бірюза","бузок","лаванда","молочний","пудра","фіолетовий","помаранчевий","оранж","коричневий","крем","айворі","мармур","леопард","смужка"];
+const COLRE=new RegExp("(^|[^\\p{L}’'-])("+COLW.join("|")+")(?=$|[^\\p{L}’'-])","giu");
+function splitCol(n){const cols=[];const rest=n.replace(COLRE,(m,a,w)=>{cols.push(w.toLowerCase()==="графит"?"графіт":w.toLowerCase());return a});
+  const base=rest.replace(/\s*\+\s*(?=[,+]|$)/g,"").replace(/\s+,/g,",").replace(/,\s*,+/g,",").replace(/[\s,+]+$/,"").replace(/\s{2,}/g," ").trim();return{base:base||n,cols}}
+P.forEach(p=>{const sc=splitCol(p.n);p.base=sc.base;p.cols=sc.cols;p.col=sc.cols.join(" / ");p.tot=Object.values(p.sz).reduce((a,b)=>a+b,0);const k=p.sub+"|"+p.base.toLowerCase().replace(/[^\p{L}\p{N}]+/gu," ").split(" ").filter(Boolean).sort().join(" ");p.mkey=k;(BYBASE[k]=BYBASE[k]||[]).push(p.i)});
+P.forEach(p=>{p.sib=BYBASE[p.mkey].filter(j=>P[j].tot>0||j===p.i).slice(0,8)});
 /* products are saved by key, not by position: the catalog changes after every publish */
 const KEY=p=>p.code+"|"+p.n,BYKEY={};P.forEach(p=>BYKEY[KEY(p)]=p.i);
 const snap=p=>({n:p.n,base:p.base,code:p.code,sub:p.sub,s:p.s,h:p.h,sat:p.sat,l:p.l,pat:p.pat,sl:p.sl,sz:{},ph:(p.ph||[]).slice(0,1)});
@@ -693,7 +702,7 @@ function match(p,cat){if(!cat||cat==="all")return true;if(cat==="women")return p
 const best=(cat,n=1)=>P.filter(p=>match(p,cat)&&p.tot>0).sort((a,b)=>b.tot-a.tot).slice(0,n);
 const WHO=[["women","Жінкам"],["men","Чоловікам"],["kids","Дітям"]].filter(([k])=>k!=="kids"||P.some(p=>p.c==="kids"&&p.tot>0));
 const WHON={all:"Усе",women:"Жінкам",men:"Чоловікам",kids:"Дітям"};
-const subsFor=who=>{const c={};P.forEach(p=>{if(p.tot>0&&match(p,who))c[p.sub]=(c[p.sub]||0)+1});return Object.keys(c).filter(x=>x!=="Інше").sort((a,b)=>c[b]-c[a]||a.localeCompare(b,"uk")).concat(c["Інше"]?["Інше"]:[])};
+const subsFor=who=>{const c=countBy(P.filter(p=>p.tot>0&&match(p,who)),p=>p.sub);return Object.keys(c).filter(x=>x!=="Інше").sort((a,b)=>c[b]-c[a]||a.localeCompare(b,"uk")).concat(c["Інше"]?["Інше"]:[])};
 const bestW=(cat,who,n=1)=>P.filter(p=>match(p,cat)&&match(p,who)&&p.tot>0).sort((a,b)=>b.tot-a.tot).slice(0,n);
 const circ=()=>[...subsFor(S.who).slice(0,9).map(x=>[x.replace(" та зіпки",""),"sub:"+x,bestW("sub:"+x,S.who)[0]?.i]),["Великі розміри","big",bestW("big",S.who)[0]?.i],["До 300 ₴","cheap",bestW("cheap",S.who)[0]?.i]].filter(x=>x[2]!=null);
 const GROUPS=[["Верх",["Худі та зіпки","Світшоти","Светри й кофти","Лонгсліви","Футболки","Поло","Сорочки","Майки","Топи"]],["Низ",["Штани","Джинси","Легінси","Шорти","Спідниці"]],["Костюми й комплекти",["Костюми","Комплекти","Комбінезони","Сукні"]],["Верхній одяг",["Куртки","Пальта","Жилети"]],["Білизна й дім",["Термобілизна","Дім і сон","Білизна","Купальники","Шкарпетки"]],["Взуття",["Кросівки й кеди","Черевики","Тапочки й сандалі"]],["Аксесуари",["Сумки","Рюкзаки","Шапки й аксесуари"]],["Інше",["Інше"]]];
@@ -823,10 +832,14 @@ function card(p,k=0){
      <button class="add" type="button" data-quick="${p.i}" aria-label="Швидко додати в кошик">${ic("cartp")}</button>
    </div>
    <div class="pmeta" data-open="${p.i}">
-     <div class="pn">${p.n}</div>
-     <div class="ps">${p.o?`<s class="was num">${uah(p.o)}</s>`:""}${p.r?`<span class="star">${STAR}${r1(p.r)}</span><span>(${p.rv})</span>`:'<span class="newb">Новинка</span>'}<span>${Object.keys(p.sz).filter(s=>p.sz[s]>0).length} розм.</span>${p.sib.length>1?`<span>${p.sib.length} кольори</span>`:""}</div>
+     <div class="pn">${p.sib.length>1?p.base:p.n}</div>
+     <div class="ps">${p.o?`<s class="was num">${uah(p.o)}</s>`:""}${p.r?`<span class="star">${STAR}${r1(p.r)}</span><span>(${p.rv})</span>`:'<span class="newb">Новинка</span>'}<span>${Object.keys(p.sz).filter(s=>p.sz[s]>0).length} розм.</span></div>${p.sib.length>1?`<div class="cdots" aria-label="${p.sib.length} кольорів">${p.sib.slice(0,6).map(j=>{const q=P[j];return`<i style="background:hsl(${q.h} ${q.sat}% ${q.l}%)"${j===p.i?' class="on"':""}></i>`}).join("")}${p.sib.length>6?`<small>+${p.sib.length-6}</small>`:""}</div>`:""}
    </div></div>`;
 }
+/* keep one variant per model, in list order; the one with the most stock stands for the model */
+function models(l){const pos=new Map(),out=[];for(const p of l){const k=p.mkey,j=pos.get(k);if(j==null){pos.set(k,out.length);out.push(p)}else if(p.tot>out[j].tot)out[j]=p}return out}
+
+function countBy(l,key){const c={};for(const p of l)(c[key(p)]=c[key(p)]||new Set()).add(p.mkey);for(const k in c)c[k]=c[k].size;return c}
 function feedList(k,cat,who){
   who=who??S.who;let l=P.filter(p=>match(p,cat||"all")&&p.tot>0&&match(p,who));
   if(k==="cheap")l=[...l].sort((a,b)=>a.p-b.p);
@@ -835,7 +848,7 @@ function feedList(k,cat,who){
   return l;
 }
 function vHome(){
-  const low=P.filter(p=>p.tot>0&&p.tot<=6&&match(p,S.who)).sort((a,b)=>a.tot-b.tot).slice(0,8);
+  const low=models(P.filter(p=>p.tot>0&&p.tot<=6&&match(p,S.who)).sort((a,b)=>a.tot-b.tot)).slice(0,8);
   const minF=Math.min(...P.filter(p=>p.tot>0).map(p=>p.p));
   return `<section class="view">
    <div class="trust gut"><span>${ic("truck")}Доставка безкоштовна</span>${CFG.parcel?`<span>${ic("box")}Друга річ −${CFG.parcel} ₴</span>`:""}<span>${ic("locker")}У поштоматі за 2–3 дні</span><span>${ic("ret")}Повернення 14 днів</span><span>${ic("eye")}Огляд на пошті</span><span>${ic("shield")}Безпечна оплата</span></div>
@@ -891,7 +904,7 @@ function vHome(){
   </section>`;
 }
 function vCats(){
-  const cnt={};P.forEach(p=>{if(p.tot>0&&match(p,S.who))cnt[p.sub]=(cnt[p.sub]||0)+1});
+  const cnt=countBy(P.filter(p=>p.tot>0&&match(p,S.who)),p=>p.sub);
   const total=Object.values(cnt).reduce((a,b)=>a+b,0);
   return `<section class="view gut"><h2 class="ph">Каталог <span style="color:var(--muted);font:600 14px var(--f-b)">${total} моделей</span></h2>
    <div class="seg" role="group" aria-label="Для кого" style="grid-template-columns:repeat(${WHO.length+1},1fr);margin-top:10px">${[["all","Усім"],...WHO].map(([k,l])=>`<button type="button" data-whoset="${k}" aria-pressed="${S.who===k}">${l}</button>`).join("")}</div>
@@ -918,17 +931,17 @@ function listItems(L,f,who){
   if(L.mine&&S.my.wear)it=it.filter(p=>{const z=recSize(p);return z&&p.sz[z]>0});
   if(f.sz&&f.sz.length)it=it.filter(p=>f.sz.some(z=>hasSize(p,z)));
   if(f.pr!=null)it=it.filter(p=>p.p>PRB[f.pr][1]&&p.p<=PRB[f.pr][2]);
-  if(f.col&&f.col.length)it=it.filter(p=>f.col.includes(p.col));
+  if(f.col&&f.col.length)it=it.filter(p=>p.cols.some(c=>f.col.includes(c)));
   if(f.sort==="cheap")it=[...it].sort((a,b)=>a.p-b.p);else if(f.sort==="dear")it=[...it].sort((a,b)=>b.p-a.p);else if(f.sort==="new")it=[...it].reverse();
-  return it}
+  return models(it)}
 const nFilt=f=>(f.sz?f.sz.length:0)+(f.pr!=null?1:0)+(f.col?f.col.length:0)+(f.sort==="dear"||f.sort==="new"?1:0);
 function vList(){
   const L=S.list;L.f=L.f||{};
   if(L.qs&&L.who&&L.who!=="all"&&!listBase(L).length&&listBase(L,"all").length){L.who="all";L.note=(L.note?L.note+". ":"")+"У цьому розділі такого немає, показуємо з усіх"}
-  const base=listBase(L),items=listItems(L),nf=nFilt(L.f),sc={};base.forEach(p=>sc[p.sub]=(sc[p.sub]||0)+1);
+  const base=listBase(L),items=listItems(L),nf=nFilt(L.f),sc=countBy(base,p=>p.sub);
   const subs=Object.keys(sc).sort((a,b)=>sc[b]-sc[a]),narrowed=nf||L.sub||L.big||L.mine;
   return `<section class="view gut">
-    <div class="lhead"><button class="back" type="button" data-back aria-label="Назад">${ic("back")}</button><h2>${L.title}</h2><span style="color:var(--muted);font-size:12.5px">${items.length} шт.</span></div>
+    <div class="lhead"><button class="back" type="button" data-back aria-label="Назад">${ic("back")}</button><h2>${L.title}</h2><span style="color:var(--muted);font-size:12.5px">${items.length} ${items.length%10===1&&items.length%100!==11?"модель":[2,3,4].includes(items.length%10)&&![12,13,14].includes(items.length%100)?"моделі":"моделей"}</span></div>
     ${L.note?`<div class="qnote">${L.note}</div>`:""}
     ${subs.length>1?`<div class="fchips" style="padding-bottom:0"><button class="fch" type="button" data-lsub="" aria-pressed="${!L.sub}">Усе</button>${subs.slice(0,12).map(c=>`<button class="fch" type="button" data-lsub="${c}" aria-pressed="${L.sub===c}">${c.replace(" та зіпки","")}<span style="opacity:.55;font-weight:600">${sc[c]}</span></button>`).join("")}</div>`:""}
     <div class="fchips">
@@ -945,7 +958,7 @@ function filterSheet(){
   const L=S.list,D={who:L.who||"all",sz:[...(L.f.sz||[])],pr:L.f.pr??null,col:[...(L.f.col||[])],sort:L.f.sort||null};
   const paint=()=>{const bs=listBase(L,D.who).filter(p=>!L.sub||p.sub===L.sub);
     const szs=[...new Set(bs.flatMap(p=>Object.keys(p.sz).filter(k=>p.sz[k]>0)))].sort(szCmp);
-    const cc={};bs.forEach(p=>{if(p.col)(cc[p.col]=cc[p.col]||{n:0,p}).n++});const cols=Object.keys(cc).sort((a,b)=>cc[b].n-cc[a].n).slice(0,14);
+    const cc={};bs.forEach(p=>p.cols.forEach(c=>{if(!cc[c]||p.cols.length===1&&cc[c].p.cols.length>1)cc[c]={n:(cc[c]?cc[c].n:0),p};cc[c].n++}));const cols=Object.keys(cc).sort((a,b)=>cc[b].n-cc[a].n).slice(0,14);
     D.sz=D.sz.filter(z=>szs.includes(z));D.col=D.col.filter(c=>cols.includes(c));
     const n=listItems(L,D,D.who).length;
     $("#fbody").innerHTML=`
@@ -1151,7 +1164,7 @@ function render(){
     try{io=new IntersectionObserver(e=>{if(e[0].isIntersecting)fillFeed()},{rootMargin:"300px"});io.observe($("#more"))}catch(e){}}
 }
 function fillFeed(reset){
-  const base=feedList(S.ft,S.nt),feed=$("#feed");if(!feed)return;if(feedN>=base.length&&!reset){io&&io.disconnect();$("#more").textContent="Це поки все. Заглядай ще — додаємо нове";return}
+  const base=models(feedList(S.ft,S.nt)),feed=$("#feed");if(!feed)return;if(feedN>=base.length&&!reset){io&&io.disconnect();$("#more").textContent="Це поки все. Заглядай ще — додаємо нове";return}
   if(!base.length){feed.innerHTML='<div class="empty" style="column-span:all">Тут поки порожньо</div>';$("#more").textContent="";return}
   const chunk=base.slice(feedN,feedN+10);feedN+=10;
   const html=chunk.map((p,k)=>card(p,k)).join("");

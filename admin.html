@@ -330,6 +330,7 @@ function load(){
   if(s&&s.sup){
     if(s.rules.ship==null){s.rules.ship=90;s.dirty=true}delete s.rules.grp;
     if(s.rules.parcel==null){s.rules.parcel=Math.min(50,s.rules.ship);s.rules.bonusCap=10;s.rules.cashback=2;s.dirty=true}s.shop=s.shop||{};s.eco=s.eco||{cpa:0,ref:10};
+    if(!Array.isArray(s.rules.tiers)){s.rules.tiers=[20,25,30];s.rules.xfloor=30;s.dirty=true}
     if(!s.promos){s.promos=[];if(s.rules.pct===30&&!Object.keys(s.rules.cat||{}).length){s.rules.pct=55;s.promos=[launchPromo()]}s.dirty=true}
     s.catRules=s.catRules||[];CUSTOM=s.catRules;
     for(const it of s.items)if(!it.subm){const [sh,sub]=kindOf(it.raw);it.s=sh;it.sub=sub}
@@ -342,7 +343,7 @@ function load(){
     return s}
   const items=BASE.items.map(x=>{const [sh,sub]=kindOf(x.raw);return{gid:"0:"+x.code+":"+hash(x.raw),n:x.n,raw:x.raw,s:sh,sub,c:"uni",cat:x.cat||"",h:x.h,sat:x.sat,l:x.l,pat:x.pat,cost:x.cost,sz:x.sz,pics:x.pics,ph:(x.ph||[]).map(f=>MYDROP+f),mat:x.mat,code:x.code,sl:0,colorOk:!(x.sat===30&&x.l===55),added:now()-3600e3}});
   return {sup:[{n:"MODAMIXX",lg:"MM",g:"men",src:"MyDrop XML",file:"product_export.xml",offers:808,last:now()-3600e3,contact:"@MODAMIXX_ADMIN",pay:"Оплата при отриманні на постачальника або передплата",ret:"Уточнити умови повернення"}],
-    items,hide:{},rules:{pct:55,min:0,ship:90,parcel:50,gift3:50,bonusCap:10,cashback:2,cat:{}},shop:{},eco:{cpa:0,ref:10},promos:[launchPromo()],catRules:[],published:null,dirty:true,orders:null};
+    items,hide:{},rules:{pct:55,min:0,ship:90,tiers:[20,25,30],xfloor:30,gift3:50,bonusCap:10,cashback:2,cat:{}},shop:{},eco:{cpa:0,ref:10},promos:[launchPromo()],catRules:[],published:null,dirty:true,orders:null};
 }
 function seedOrders(){
   const live=ST.items.filter(i=>tot(i)>0),pick=k=>live[k%live.length],sz=(it,k=0)=>Object.keys(it.sz).filter(s=>it.sz[s]>0)[k]||Object.keys(it.sz)[0];
@@ -469,9 +470,10 @@ function vItems(){
 }
 function ecoCard(){
   const dd=dupMap(),lv=ST.items.filter(i=>status(i,dd)==="live"),avgM=lv.length?lv.reduce((a,i)=>a+priceOf(i).earn,0)/lv.length:0;
-  const R=ST.rules,E=ST.eco,ship=+R.ship||0,par=Math.min(+R.parcel||0,ship),ref=Math.min(90,Math.max(0,+E.ref||0))/100,cpa=+E.cpa||0;
-  /* every next item in the same parcel carries its own delivery share in the price, but delivery is paid once */
-  const earn=n=>n*avgM+(n-1)*(ship-par)-(n>=3?Math.round(ship*.5):0),net=n=>Math.round((1-ref)*earn(n)-cpa),be=Math.max(0,Math.round((1-ref)*earn(1)));
+  const R=ST.rules,E=ST.eco,ship=+R.ship||0,ref=Math.min(90,Math.max(0,+E.ref||0))/100,cpa=+E.cpa||0;
+  /* every next item in the same parcel carries its own delivery share in the price, but delivery is paid once; it gets the tier discount */
+  const avgD=k=>lv.length?lv.reduce((a,i)=>a+xDisc(i,k),0)/lv.length:0;
+  const earn=n=>{let e=n*avgM+(n-1)*ship-(n>=3?Math.round(ship*.5):0);for(let k=1;k<n;k++)e-=avgD(k);return Math.round(e)},net=n=>Math.round((1-ref)*earn(n)-cpa),be=Math.max(0,Math.round((1-ref)*earn(1)));
   return `<div class="card" id="ecoCard"><h3>Економіка замовлення<span class="r">до податків</span></h3>
     <p style="margin:0;font-size:13.5px;color:var(--ink2)">Реклама коштує однаково, хоч одна річ у замовленні, хоч три. Доставку ви теж платите один раз. Тому прибуток з’являється, коли в посилці більше однієї речі.</p>
     <div class="eco2"><label>Реклама на одне замовлення, ₴<input type="number" inputmode="numeric" min="0" id="eCpa" value="${cpa||""}" placeholder="напр. 120"></label><label>Невикуп, %<input type="number" inputmode="numeric" min="0" max="90" id="eRef" value="${Math.round(ref*100)}"></label></div>
@@ -500,7 +502,8 @@ function vRules(){
     <div class="rrow"><span>Доставка в ціні речі</span><b class="num" id="vShip">${R.ship} ₴</b></div><input class="rng" type="range" id="rShip" min="0" max="200" step="5" value="${R.ship}" aria-label="Доставка в ціні речі">
     <p style="margin:2px 0 0;font-size:12.5px;color:var(--muted)">Скільки коштує посилка Новою поштою. З 13 квітня 2026 це 90 ₴ за посилку до 2 кг по Україні. Заклади тариф, за яким реально відправляє твій постачальник.</p>
     <div class="rrow"><span>Мінімальний заробіток з речі</span><b class="num" id="vMin">${R.min} ₴</b></div><input class="rng" type="range" id="rMin" min="0" max="250" step="10" value="${R.min}" aria-label="Мінімальний заробіток">
-    <div class="rrow"><span>Знижка за кожну наступну річ у посилці</span><b class="num" id="vPar">${R.parcel} ₴</b></div><input class="rng" type="range" id="rPar" min="0" max="100" step="10" value="${R.parcel}" aria-label="Знижка за наступну річ у посилці">
+    ${[["rT0","Друга річ у посилці"],["rT1","Третя річ"],["rT2","Четверта й далі"]].map(([id,l],k)=>`<div class="rrow"><span>${l}</span><b class="num" id="v${id}">−${R.tiers[k]}%</b></div><input class="rng" type="range" id="${id}" min="0" max="60" step="5" value="${R.tiers[k]}" aria-label="Знижка: ${l}">`).join("")}
+    <div class="rrow"><span>Залишати собі з кожної такої речі щонайменше</span><b class="num" id="vXf">${R.xfloor} ₴</b></div><input class="rng" type="range" id="rXf" min="0" max="150" step="10" value="${R.xfloor}" aria-label="Мінімальний заробіток з додаткової речі">
     <p style="margin:2px 0 0;font-size:12.5px;color:var(--muted)" id="parNote">${parNote()}</p>
     <div class="rrow"><span>Бонуси за три речі в посилці</span><b class="num" id="vG3">${R.gift3} ₴</b></div><input class="rng" type="range" id="rG3" min="0" max="150" step="10" value="${R.gift3}" aria-label="Бонуси за три речі в посилці">
     <p style="margin:2px 0 0;font-size:12.5px;color:var(--muted)">Нараховуються, коли покупець забрав посилку, і діють 30 днів. Це причина і взяти третю річ, і повернутись.</p>
@@ -516,7 +519,13 @@ function vRules(){
     ${Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([c,n])=>`<tr><td>${c}</td><td class="num">${n}</td><td><input type="number" inputmode="numeric" min="0" max="300" data-cat="${c}" value="${R.cat[c]??""}" placeholder="${R.pct}" aria-label="Націнка для ${c}"></td></tr>`).join("")}
     </tbody></table></div></section>`;
 }
-function parNote(){const R=ST.rules,ship=+R.ship||0,par=Math.min(+R.parcel||0,ship);return par?`Друга й наступні речі їдуть у тій самій посилці, і за доставку ви за них не платите. З кожної такої речі вам лишається на ${uah(ship-par)} більше, ніж з першої.`:"Вимкнено. Покупець не має причини додавати другу річ, а саме вона робить замовлення прибутковим."}
+const tierOf=k=>{const T=ST.rules.tiers||[];return k<1?0:(+T[Math.min(k,T.length)-1]||0)};
+const mxOf=it=>{const pr=priceOf(it);return Math.max(0,Math.floor((pr.p-it.cost-(+ST.rules.xfloor||0))/10)*10)};
+const xDisc=(it,k)=>{const p=priceOf(it).p;return Math.min(Math.round(p*tierOf(k)/100),mxOf(it))};
+function parNote(){const T=ST.rules.tiers||[];if(!T[0])return"Вимкнено. Покупець не має причини додавати другу річ, а саме вона робить замовлення прибутковим.";
+  const dd=dupMap(),lv=ST.items.filter(i=>status(i,dd)==="live");if(!lv.length)return"";
+  const cap=T.map((t,k)=>lv.filter(i=>priceOf(i).p*t/100>mxOf(i)).length),hr=lv.map(i=>Math.floor(mxOf(i)/priceOf(i).p*100)).sort((a,b)=>a-b),med=hr[Math.floor(hr.length/2)];
+  return `Друга й наступні речі їдуть у тій самій посилці, за доставку ви за них не платите, тому на них можна дати знижку. Без збитку з кожної такої речі можна віддати в середньому ${med}% ціни (ви лишаєте собі щонайменше ${uah(+ST.rules.xfloor||0)}). ${cap.map((c,k)=>c?`На ${["другу","третю","четверту"][k]} річ −${T[k]}% не дасть ${c} з ${lv.length} товарів: для них сайт покаже меншу знижку.`:"").join(" ")}`}
 function exHtml(ex){return `<div style="font-size:12.5px;color:var(--muted);font-weight:700;margin-bottom:4px">Приклади</div>${ex.map(([c,r])=>`<div class="sum num"><span style="white-space:nowrap">Дроп ${uah(c)}</span><span style="text-align:right">${r.o?`<s style="color:var(--muted)">${uah(r.o)}</s> `:""}<b>${uah(r.p)}</b><br><span style="color:var(--muted);font-size:12.5px">доставка ${uah(r.ship)} · вам +${uah(r.earn)}</span></span></div>`).join("")}`}
 const OST={wait:["warn","Чекає підтвердження покупця"],new:["warn","Нове"],sent:["mut","Передано постачальнику"],ttn:["mut","Їде, є ТТН"],got:["ok","Отримано"],refused:["bad","Не забрав"],cancel:["mut","Скасовано"]};
 const OSTEP=["new","sent","ttn","got"];
@@ -533,9 +542,9 @@ function custs(){const m=new Map();
     c.n++;if(o.st!=="refused")c.sum+=(o.goods??o.total);c.last=Math.max(c.last,o.at||0);if(o.promoOk)c.ok=true;if(o.st==="got")c.got++;if(o.st==="refused")c.ref++;m.set(k,c)}
   return [...m.values()].sort((a,b)=>b.last-a.last)}
 const BSEG={all:["Усі",c=>true],rep:["Купували 2+ рази",c=>c.n>=2],sleep:["Мовчать 30+ днів",c=>now()-c.last>30*864e5],ok:["Зі згодою",c=>c.ok]};
-function tpls(){const site=/^https?:/.test(location.origin)?location.origin+"/":"",pr=(ST.promos||[]).find(p=>p.on&&p.end>now()),par=+ST.rules.parcel||0;
+function tpls(){const site=/^https?:/.test(location.origin)?location.origin+"/":"",pr=(ST.promos||[]).find(p=>p.on&&p.end>now()),T=ST.rules.tiers||[],par=+T[0]||0;
   return [["Після отримання посилки",`Привіт! Це YULA. Посилка вже в тебе. Як сіло? Залиш відгук у замовленні, нарахуємо 30 ₴ бонусами. ${site}`],
-   ["Мовчать 30+ днів",`Привіт! Це YULA. Давно не бачились.${par?` Друга річ у посилці в нас дешевша на ${par} ₴, доставка 0 ₴.`:" Доставка 0 ₴."} Глянь, що нового: ${site}`],
+   ["Мовчать 30+ днів",`Привіт! Це YULA. Давно не бачились.${par?` Друга річ у посилці −${T[0]}%, третя −${T[1]}%, доставка 0 ₴.`:" Доставка 0 ₴."} Глянь, що нового: ${site}`],
    pr?[`Акція «${pr.name}»`,`Привіт! Це YULA. ${pr.name}: до −${pr.pct}% до ${dmy(pr.end)}. Доставка 0 ₴. ${site}`]:null].filter(Boolean)}
 const ovTabs=()=>`<div class="fchips" style="padding-top:0"><button class="fch" type="button" data-ov="orders" aria-pressed="${S.ov!=="buyers"}">Замовлення · ${ST.orders.length}</button><button class="fch" type="button" data-ov="buyers" aria-pressed="${S.ov==="buyers"}">Покупці · ${custs().length}</button></div>`;
 function vBuyers(){
@@ -686,8 +695,8 @@ function addSupSheet(refresh){
 function publish(){
   const d=dupMap(),live=ST.items.filter(i=>status(i,d)==="live");
   if(!live.length){toast("Немає товарів для публікації");return}
-  const items=live.map(it=>{const pr=priceOf(it);return{n:it.n,raw:it.raw,s:it.s,sub:it.sub,c:it.c,h:it.h,sat:it.sat,l:it.l,pat:it.pat,p:pr.p,o:pr.o,pe:pr.o?pr.promo.end:null,pn:pr.o?pr.promo.name:null,sz:it.sz,pics:it.pics,ph:it.ph,mat:it.mat,code:it.code,sl:it.sl}});
-  const R=ST.rules,pub={at:now(),cfg:{parcel:Math.min(+R.parcel||0,+R.ship||0),parcelMax:4,gift3:+R.gift3||0,bonusCap:+R.bonusCap||0,cashback:+R.cashback||0,shop:ST.shop||{}},items};
+  const items=live.map(it=>{const pr=priceOf(it);return{n:it.n,raw:it.raw,s:it.s,sub:it.sub,c:it.c,h:it.h,sat:it.sat,l:it.l,pat:it.pat,mx:mxOf(it),p:pr.p,o:pr.o,pe:pr.o?pr.promo.end:null,pn:pr.o?pr.promo.name:null,sz:it.sz,pics:it.pics,ph:it.ph,mat:it.mat,code:it.code,sl:it.sl}});
+  const R=ST.rules,pub={at:now(),cfg:{tiers:(R.tiers||[]).map(Number),parcelMax:4,gift3:+R.gift3||0,bonusCap:+R.bonusCap||0,cashback:+R.cashback||0,shop:ST.shop||{}},items};
   try{localStorage.setItem(PUB,JSON.stringify(pub));ST.published=now();ST.dirty=false;save();updBadges();
     sheet(`<div class="grab"></div><div style="text-align:center;padding-top:16px"><div style="width:70px;height:70px;border-radius:50%;background:var(--green-soft);color:var(--green);display:grid;place-items:center;margin:0 auto">${ic("chk","width:34px;height:34px;stroke-width:2.6")}</div>
      <h1 class="ph">Опубліковано ${items.length} товарів</h1><p class="lead" style="margin-inline:auto">Сайт на цьому ж адресі вже показує новий каталог у вашому браузері. У робочій версії публікація оновлюватиме сайт для всіх.</p>
@@ -710,12 +719,12 @@ function bindView(){
   const pp=$("#pPct");if(pp)pp.oninput=()=>{$("#vPp").textContent=pp.value+"%"};
   ["eCpa","eRef"].forEach(id=>{const el=$("#"+id);if(el)el.onchange=()=>{ST.eco={cpa:Math.max(0,+$("#eCpa").value||0),ref:Math.min(90,Math.max(0,+$("#eRef").value||0))};save();$("#ecoCard").outerHTML=ecoCard();bindView()}});
   if(S.view==="rules"){
-    const upd=()=>{const R=ST.rules;R.pct=+$("#rPct").value;R.min=+$("#rMin").value;R.ship=+$("#rShip").value;R.parcel=Math.min(+$("#rPar").value,R.ship);R.bonusCap=+$("#rCap").value;R.cashback=+$("#rCb").value;R.gift3=+$("#rG3").value;$("#vG3").textContent=R.gift3+" ₴";$("#vPar").textContent=R.parcel+" ₴";$("#vCap").textContent="до "+R.bonusCap+"%";$("#vCb").textContent=R.cashback+"%";$("#parNote").textContent=parNote();$("#vShip").textContent=R.ship+" ₴";$("#vPct").textContent=R.pct+"%";$("#vMin").textContent=R.min+" ₴";
+    const upd=()=>{const R=ST.rules;R.pct=+$("#rPct").value;R.min=+$("#rMin").value;R.ship=+$("#rShip").value;R.tiers=[0,1,2].map(k=>+$("#rT"+k).value);R.xfloor=+$("#rXf").value;[0,1,2].forEach(k=>$("#vrT"+k).textContent="−"+R.tiers[k]+"%");$("#vXf").textContent=R.xfloor+" ₴";R.bonusCap=+$("#rCap").value;R.cashback=+$("#rCb").value;R.gift3=+$("#rG3").value;$("#vG3").textContent=R.gift3+" ₴";$("#vCap").textContent="до "+R.bonusCap+"%";$("#vCb").textContent=R.cashback+"%";$("#parNote").textContent=parNote();$("#vShip").textContent=R.ship+" ₴";$("#vPct").textContent=R.pct+"%";$("#vMin").textContent=R.min+" ₴";
       $("#ex").innerHTML=exHtml([150,250,400,700].map(c=>[c,priceOf({cost:c,sub:"__"})]));
       const d=dupMap(),live=ST.items.filter(i=>status(i,d)==="live"),m=live.length?live.reduce((a,i)=>a+(priceOf(i).earn),0)/live.length:0;
       $("#avgM").style.color=m<80?"var(--red)":"var(--muted)";$("#avgM").innerHTML=`Середній заробіток з речі на сайті: <b class="num">${uah(m)}</b>${m<80?" — цього замало, щоб окупити рекламу в Instagram":""}`;
       document.querySelectorAll("[data-cat]").forEach(i=>i.placeholder=R.pct);ST.dirty=true;updBadges()};
-    ["rPct","rMin","rShip","rPar","rG3","rCap","rCb"].forEach(id=>{$("#"+id).oninput=upd;$("#"+id).onchange=save});
+    ["rPct","rMin","rShip","rT0","rT1","rT2","rXf","rG3","rCap","rCb"].forEach(id=>{$("#"+id).oninput=upd;$("#"+id).onchange=save});
     document.querySelectorAll("[data-cat]").forEach(inp=>inp.onchange=()=>{const v=inp.value.trim();if(v==="")delete ST.rules.cat[inp.dataset.cat];else ST.rules.cat[inp.dataset.cat]=Math.max(0,+v);ST.dirty=true;save();updBadges();toast(`Націнка для «${inp.dataset.cat}»: ${v===""?"загальна":v+"%"}`)});
   }
 }

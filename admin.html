@@ -160,6 +160,11 @@ label.f input,label.f select{display:block;width:100%;margin-top:4px;padding:11p
 .report li.w{background:var(--amber-soft)}
 .fold summary{cursor:pointer;display:flex;gap:8px;align-items:center;font-size:15px;list-style:none}
 .fold summary::-webkit-details-marker{display:none}
+.bulk{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;font-size:13px;color:var(--ink2)}
+.hintbar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--amber-soft);color:var(--ink);border-radius:12px;padding:10px 12px;margin-top:10px;font-size:13px}
+.tpl{padding-block:10px;border-top:1px solid var(--line)}
+.tpl:first-of-type{border-top:0;padding-top:0}
+.tpl p{margin:4px 0 8px;font-size:13.5px;color:var(--ink2);overflow-wrap:anywhere}
 .eco2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 6px}
 .eco2 label{display:grid;gap:4px;font-size:12.5px;font-weight:700;color:var(--muted);align-content:start}
 .eco2 input{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:11px;background:var(--bg);color:var(--ink);font:inherit;font-size:16px}
@@ -265,7 +270,14 @@ function kindOf(n){const l=n.toLowerCase();
  for(const r of CUSTOM)if(r.w&&l.includes(r.w))return[CSHAPE[r.cat]||"tee",r.cat];
  for(const [re,cat,sh] of TAX)if(re.test(l))return[sh||CSHAPE[cat],cat];
  return["tee","Інше"]}
-function genderOf(n,sizes){const l=n.toLowerCase();if(sizes.some(s=>/зріст|рост/i.test(s))||/дитяч|детск|підлітк/.test(l))return"kids";if(/жін|жіноч|жен|майка|топ\+/.test(l))return"women";if(/чоловіч|мужск/.test(l))return"men";return"uni"}
+const GEN=[["uni","Унісекс"],["women","Жінкам"],["men","Чоловікам"],["kids","Дітям"]];
+function genderOf(n,sizes){const l=" "+n.toLowerCase()+" ",nums=sizes.map(x=>String(x)).filter(x=>/^\D*\d+\D*$/.test(x)).map(x=>+x.match(/\d+/)[0]);
+  if(sizes.some(x=>/зріст|рост/i.test(x))||/дитяч|детск|підлітк|подрост|малюк|малыш|дівчинк|девочк|хлопчик|мальчик|шкільн|школьн|kids|baby|junior/.test(l)||(nums.length&&nums.length===sizes.length&&Math.max(...nums)>=86&&Math.min(...nums)>=56))return"kids";
+  if(/жін|женск|женщ|дівоч|девуш|lady|wom[ae]n/.test(l))return"women";
+  if(/чолов|мужск|мужч|[^\p{L}]m[ae]n[^\p{L}]/u.test(l))return"men";
+  if(/сукн|плать|спідниц|юбк|блуз|бюст|бралет|легінс|лосин|купальник|топ\+|[^\p{L}]топ[^\p{L}]|майка/u.test(l))return"women";
+  if(/боксер/.test(l))return"men";
+  return"uni"}
 function matOf(n){const l=n.toLowerCase();for(const [k,v] of [["coolmax","CoolMax (поліестер), швидко сохне"],["кулір","Кулірна гладь, бавовна"],["плюш","Плюш"],["рибан","Фліс з рибаною"],["рібан","Фліс з рибаною"],["фліс","Фліс, тепла начісна тканина"],["флис","Фліс, тепла начісна тканина"],["2х нитка","Двонитка"],["двонитка","Двонитка"],["варенк","Варена бавовна"],["варені","Варена бавовна"],["термобілизн","Термотканина"],["петля","Двонитка, петля"]])if(l.includes(k))return v;return null}
 function normSize(s){s=(s||"Один").trim();const m=s.match(/(?:зріст|рост)\s*(\d+)/i);if(m)return m[1];const u=s.toUpperCase();return{"XXXL":"3XL","XXXXL":"4XL","2XL":"XXL"}[u]||u}
 const ORDER=["XS","XS-S","S","M","M-L","L","XL","XL-XXL","XXL","3XL","4XL"];
@@ -316,17 +328,19 @@ function load(){
     if(!s.promos){s.promos=[];if(s.rules.pct===30&&!Object.keys(s.rules.cat||{}).length){s.rules.pct=55;s.promos=[launchPromo()]}s.dirty=true}
     s.catRules=s.catRules||[];CUSTOM=s.catRules;
     for(const it of s.items)if(!it.subm){const [sh,sub]=kindOf(it.raw);it.s=sh;it.sub=sub}
+    for(const it of s.items)if(!it.cm)it.c=genderOf(it.raw,Object.keys(it.sz));
+    if(s.rules.gift3==null){s.rules.gift3=50;s.dirty=true}
     if(!s.orders||!s.orders.length||!s.orders[0].items)s.orders=null;
     return s}
-  const items=BASE.items.map(x=>{const [sh,sub]=kindOf(x.raw);return{gid:"0:"+x.code+":"+hash(x.raw),n:x.n,raw:x.raw,s:sh,sub,c:x.c,h:x.h,sat:x.sat,l:x.l,pat:x.pat,cost:x.cost,sz:x.sz,pics:x.pics,ph:(x.ph||[]).map(f=>MYDROP+f),mat:x.mat,code:x.code,sl:0,colorOk:!(x.sat===30&&x.l===55),added:now()-3600e3}});
+  const items=BASE.items.map(x=>{const [sh,sub]=kindOf(x.raw);return{gid:"0:"+x.code+":"+hash(x.raw),n:x.n,raw:x.raw,s:sh,sub,c:genderOf(x.raw,Object.keys(x.sz)),h:x.h,sat:x.sat,l:x.l,pat:x.pat,cost:x.cost,sz:x.sz,pics:x.pics,ph:(x.ph||[]).map(f=>MYDROP+f),mat:x.mat,code:x.code,sl:0,colorOk:!(x.sat===30&&x.l===55),added:now()-3600e3}});
   return {sup:[{n:"MODAMIXX",lg:"MM",src:"MyDrop XML",file:"product_export.xml",offers:808,last:now()-3600e3,contact:"@MODAMIXX_ADMIN",pay:"Оплата при отриманні на постачальника або передплата",ret:"Уточнити умови повернення"}],
-    items,hide:{},rules:{pct:55,min:0,ship:90,parcel:50,bonusCap:10,cashback:2,cat:{}},shop:{},eco:{cpa:0,ref:10},promos:[launchPromo()],catRules:[],published:null,dirty:true,orders:null};
+    items,hide:{},rules:{pct:55,min:0,ship:90,parcel:50,gift3:50,bonusCap:10,cashback:2,cat:{}},shop:{},eco:{cpa:0,ref:10},promos:[launchPromo()],catRules:[],published:null,dirty:true,orders:null};
 }
 function seedOrders(){
   const live=ST.items.filter(i=>tot(i)>0),pick=k=>live[k%live.length],sz=(it,k=0)=>Object.keys(it.sz).filter(s=>it.sz[s]>0)[k]||Object.keys(it.sz)[0];
   const oi=(it,size,q=1)=>({n:it.n,raw:it.raw,code:it.code,size,q,price:priceOf(it).p,cost:it.cost,sl:it.sl,h:it.h,sat:it.sat,l:it.l,s:it.s,ph:(it.ph||[]).slice(0,1)});
   const mk=(no,ago,items,payKind,st,buyer,np,hist,flags=[])=>{const goods=items.reduce((a,i)=>a+i.price*i.q,0),prepaid=payKind==="online"?goods:payKind==="pre200"?200:0;
-    return{no,at:now()-ago*60e3,items,goods,total:goods,payKind,prepaid,payLabel:payKind==="online"?"Оплачено онлайн":payKind==="pre200"?`Передплата 200 ₴, решта ${goods-200} ₴ при отриманні`:`Оплата при отриманні, ${goods} ₴`,buyer,np,hist,flags,st,ttn:st==="refused"?"2045 1182 7731 20":st==="got"?"2045 "+(1000+no.length*37+ago%8000)+" 5521 08":""}};
+    return{no,at:now()-ago*60e3,items,goods,total:goods,payKind,prepaid,payLabel:payKind==="online"?"Оплачено онлайн":payKind==="pre200"?`Передплата 200 ₴, решта ${goods-200} ₴ при отриманні`:`Оплата при отриманні, ${goods} ₴`,buyer,np,hist,flags,st,promoOk:st!=="refused"&&payKind!=="pre200",ttn:st==="refused"?"2045 1182 7731 20":st==="got"?"2045 "+(1000+no.length*37+ago%8000)+" 5521 08":""}};
   const a=pick(0),b=pick(41),c=pick(90),d=pick(120),e=pick(60),g=pick(150);
   return [
    mk("YL-10234",12,[oi(b,sz(b,0))],"cod","wait",{name:"Шевченко Ігор",phone:"+380 93 555 01 02"},"Одеса, відділення № 14",{got:1,refused:0},["Ще є неотримане замовлення з оплатою на пошті"]),
@@ -343,10 +357,16 @@ function buyers(){try{return JSON.parse(localStorage.getItem(BK)||"{}")||{}}catc
 function setBuyer(ph,fn){try{const b=buyers(),k=normPh(ph);b[k]=b[k]||{got:0,refused:0};fn(b[k]);localStorage.setItem(BK,JSON.stringify(b))}catch(e){}}
 function pullOrders(){let inb=[];try{inb=JSON.parse(localStorage.getItem("yula_orders_in")||"[]")}catch(e){}let ch=false;
   for(const o of Array.isArray(inb)?inb:[]){if(!o||!o.no||!Array.isArray(o.items)||!o.buyer)continue;const ex=ST.orders.find(x=>x.no===o.no);
-    if(!ex){o.items.forEach(i=>{const it=ST.items.find(x=>x.code===i.code&&x.raw===i.raw)||ST.items.find(x=>x.code===i.code);if(it){i.cost=it.cost;i.sl=it.sl}else i.cost=+i.cost||0});ST.orders.unshift(o);ch=true}else if(ex.st==="wait"&&(o.st==="new"||o.st==="cancel")){ex.st=o.st;ch=true}}
+    const enrich=()=>o.items.forEach(i=>{const it=ST.items.find(x=>x.code===i.code&&x.raw===i.raw)||ST.items.find(x=>x.code===i.code);if(it){i.cost=it.cost;i.sl=it.sl}else i.cost=+i.cost||0});
+    if(!ex){enrich();o.flags=Array.isArray(o.flags)?o.flags:[];ST.orders.unshift(o);ch=true;continue}
+    if(ex.st==="wait"&&(o.st==="new"||o.st==="cancel")){ex.st=o.st;ch=true}
+    if(o.upd&&o.upd>(ex.upd||0)){ex.upd=o.upd;ex.flags=ex.flags||[];const F="Покупець додав річ після оформлення";
+      if(ex.st==="wait"||ex.st==="new"){enrich();Object.assign(ex,{items:o.items,goods:o.goods,total:o.total,prepaid:o.prepaid,payLabel:o.payLabel,par:o.par});if(!ex.flags.includes(F))ex.flags.push(F)}
+      else if(!ex.flags.some(f=>f.startsWith(F)))ex.flags.push(F+", але замовлення вже передано. Зв’яжіться з ним");
+      ch=true}}
   if(ch)save();return ch}
 function save(){try{localStorage.setItem(LS,JSON.stringify(ST))}catch(e){toast("Не вдалося зберегти: браузер заблокував сховище")}}
-const S={view:"home",f:"all",sup:"all",cat:"all",q:"",lim:40,rulesOpen:false};
+const S={view:"home",f:"all",sup:"all",cat:"all",g:"all",q:"",lim:40,rulesOpen:false,ov:"orders",bseg:"all"};
 function recat(){let n=0;for(const it of ST.items)if(!it.subm){const [sh,sub]=kindOf(it.raw);if(sub!==it.sub)n++;it.s=sh;it.sub=sub}return n}
 function toast(t){$("#toastHost").innerHTML=`<div class="toast" role="status">${t}</div>`;clearTimeout(toast.t);toast.t=setTimeout(()=>$("#toastHost").innerHTML="",2600)}
 
@@ -390,7 +410,7 @@ function vHome(){
    </div>
    ${ecoCard()}
    <div class="card"><h3>Дані магазину<span class="r">бачить покупець</span></h3>
-    <p style="margin:0;font-size:13.5px;color:var(--ink2)">${sh.legal?esc(sh.legal):"Продавця не вказано"}${sh.phone?" · "+esc(sh.phone):""}${sh.tg?" · Telegram "+esc(sh.tg):""}${sh.ig?" · Instagram "+esc(sh.ig):""}${sh.hours?" · "+esc(sh.hours):""}</p>
+    <p style="margin:0;font-size:13.5px;color:var(--ink2)">${sh.legal?esc(sh.legal):"Продавця не вказано"}${sh.phone?" · "+esc(sh.phone):""}${sh.tg?" · Telegram "+esc(sh.tg):""}${sh.ig?" · Instagram "+esc(sh.ig):""}${sh.hours?" · "+esc(sh.hours):""}${sh.ch?" · канал "+esc(sh.ch):""}</p>
     <button class="btn soft block" type="button" data-shopset style="margin-top:10px">Змінити</button></div>
    <div class="card"><h3>${ic("up")}Додати постачальника</h3><p style="margin:0 0 10px;font-size:13.5px;color:var(--muted)">Встав посилання на фід MyDrop чи Prom або завантаж файл. Розберемо товари, розміри й залишки і почистимо назви.</p><button class="btn pink block" type="button" data-addsup>Додати за посиланням</button></div>
   </section>`;
@@ -407,13 +427,16 @@ function vSup(){
    </div>`}).join("")}
    <button class="btn pink block" type="button" data-addsup style="margin-top:12px">${ic("plus")}Додати постачальника</button></section>`;
 }
-function vItems(){
-  const d=dupMap();let list=ST.items.map(it=>({it,st:status(it,d)}));
+function itemsList(d){let list=ST.items.map(it=>({it,st:status(it,d)}));
   if(S.sup!=="all")list=list.filter(x=>x.it.sl===+S.sup);
   if(S.cat!=="all")list=list.filter(x=>x.it.sub===S.cat);
-  const cc={};for(const it of ST.items)cc[it.sub]=(cc[it.sub]||0)+1;
+  if(S.g!=="all")list=list.filter(x=>x.it.c===S.g);
   if(S.f!=="all")list=list.filter(x=>x.st===S.f);
   if(S.q){const q=S.q.toLowerCase();list=list.filter(x=>(x.it.n+" "+x.it.raw+" "+x.it.code).toLowerCase().includes(q))}
+  return list}
+function vItems(){
+  const d=dupMap(),list=itemsList(d),gc={};for(const it of ST.items)gc[it.c]=(gc[it.c]||0)+1;
+  const cc={};for(const it of ST.items)cc[it.sub]=(cc[it.sub]||0)+1;
   const c=counts(),shown=list.slice(0,S.lim);
   return `<section class="view gut"><h1 class="ph">Товари</h1>
    <div class="search">${ic("search")}<input id="q" type="search" placeholder="Назва, артикул" value="${S.q.replace(/"/g,"&quot;")}" aria-label="Пошук товарів"></div>
@@ -423,11 +446,12 @@ function vItems(){
     <form id="rf" class="rform" novalidate><input id="rW" placeholder="слово, напр. бриджі" aria-label="Слово в назві" autocomplete="off"><select id="rC" aria-label="Категорія">${CATS.map(c=>`<option>${c}</option>`).join("")}</select><button class="btn sm" type="submit">Додати</button></form>
    </details>
    <div class="fchips">${[["all","Усі"],["live","На сайті"],["review","Перевірити"],["hidden","Приховані"]].map(([k,l])=>`<button class="fch" type="button" data-filter="${k}" aria-pressed="${S.f===k}">${l} · ${c[k]}</button>`).join("")}
-   ${ST.sup.length>1?`<select class="fch" id="supSel" aria-label="Постачальник"><option value="all">Усі постачальники</option>${ST.sup.map((s,k)=>`<option value="${k}" ${S.sup==String(k)?"selected":""}>${s.n}</option>`).join("")}</select>`:""}<select class="fch" id="catSel" aria-label="Категорія"><option value="all">Усі категорії</option>${CATS.filter(c=>cc[c]).map(c=>`<option value="${c}" ${S.cat===c?"selected":""}>${c} · ${cc[c]}</option>`).join("")}</select></div>
+   ${ST.sup.length>1?`<select class="fch" id="supSel" aria-label="Постачальник"><option value="all">Усі постачальники</option>${ST.sup.map((s,k)=>`<option value="${k}" ${S.sup==String(k)?"selected":""}>${s.n}</option>`).join("")}</select>`:""}<select class="fch" id="catSel" aria-label="Категорія"><option value="all">Усі категорії</option>${CATS.filter(c=>cc[c]).map(c=>`<option value="${c}" ${S.cat===c?"selected":""}>${c} · ${cc[c]}</option>`).join("")}</select><select class="fch" id="gSel" aria-label="Для кого"><option value="all">Для всіх</option>${GEN.map(([k,l])=>`<option value="${k}" ${S.g===k?"selected":""}>${l} · ${gc[k]||0}</option>`).join("")}</select></div>
+   ${list.length?`<div class="bulk"><span>Усім показаним (${list.length}) поставити:</span><select class="fch" id="gBulk" aria-label="Для кого, для всіх показаних"><option value="">для кого…</option>${GEN.map(([k,l])=>`<option value="${k}">${l}</option>`).join("")}</select></div>`:""}
    ${S.f==="review"&&list.length?`<div class="acts"><button class="btn sm" type="button" data-approveall>${ic("chk","width:15px;height:15px")}Показувати всі ${list.length} на сайті</button></div>`:""}
    <div class="card" style="padding-block:2px">${shown.length?shown.map(({it,st})=>{const pr=priceOf(it),is=issues(it,d);return`<div class="prod">${thumb(it)}<div class="tx">
      <div class="t">${it.n}</div><div class="raw" title="${it.raw.replace(/"/g,"&quot;")}">У фіді: ${it.raw}</div>
-     <div class="s"><span class="pill ${st==="live"?"ok":st==="review"?"warn":"mut"}">${st==="live"?"На сайті":st==="review"?"Перевірити":"Приховано"}</span><select class="csel" data-setcat="${it.gid}" aria-label="Категорія товару">${CATS.map(c=>`<option ${c===it.sub?"selected":""}>${c}</option>`).join("")}</select><span>${ST.sup[it.sl].n}</span><span>${it.code}</span></div>
+     <div class="s"><span class="pill ${st==="live"?"ok":st==="review"?"warn":"mut"}">${st==="live"?"На сайті":st==="review"?"Перевірити":"Приховано"}</span><select class="csel" data-setcat="${it.gid}" aria-label="Категорія товару">${CATS.map(c=>`<option ${c===it.sub?"selected":""}>${c}</option>`).join("")}</select><select class="csel" data-setg="${it.gid}" aria-label="Для кого товар">${GEN.map(([k,l])=>`<option value="${k}" ${k===it.c?"selected":""}>${l}</option>`).join("")}</select><span>${ST.sup[it.sl].n}</span><span>${it.code}</span></div>
      <div class="money num">Дроп ${uah(it.cost)} → ${pr.o?`<s style="color:var(--muted)">${uah(pr.o)}</s> `:""}<b>${uah(pr.p)}</b>${pr.o?` <span class="pill warn">−${Math.round((1-pr.p/pr.o)*100)}%</span>`:""} · доставка ${uah(pr.ship)} · вам +${uah(pr.earn)}</div>
      <div class="stk">${Object.entries(it.sz).map(([s,q])=>`<span class="${q===0?"z":q<=2?"low":""}">${s}${q?` · ${q}`:""}</span>`).join("")}</div>
      ${is.length?`<div class="iss">${ic("warn","width:14px;height:14px")}${is.map(x=>x[1]).join(" · ")}</div>`:""}
@@ -445,13 +469,15 @@ function ecoCard(){
     <p style="margin:10px 0 0;font-size:12.5px;color:var(--muted)">Замовлення з однієї речі виходить у нуль, якщо реклама коштує до <b class="num">${uah(be)}</b> за замовлення. ${cpa?"":"Введіть свою ціну замовлення з рекламного кабінету Meta. "}Розрахунок вважає, що доставку невикуплених посилок покриває передплата 200 ₴.</p></div>`}
 function shopSheet(){const sh=ST.shop||{};
   sheet(`<div class="grab"></div><h1 class="ph" style="margin-top:6px">Дані магазину</h1><p class="lead">Ці дані покупець бачить на сторінці товару, в довідці й у кнопці «Написати нам». Продавця й контакти закон вимагає показувати на сайті.</p>
-   <form id="sf" novalidate>
+   <form id="shf" novalidate>
     <label class="f" for="sLegal">Продавець<input id="sLegal" value="${esc(sh.legal||"")}" placeholder="ФОП Прізвище Ім’я По батькові, РНОКПП 1234567890" autocomplete="off"></label>
     <label class="f" for="sPhone">Телефон<input id="sPhone" type="tel" value="${esc(sh.phone||"")}" placeholder="+380 67 123 45 67" autocomplete="off"></label>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
      <label class="f" for="sTg">Telegram<input id="sTg" value="${esc(sh.tg||"")}" placeholder="@yula_help" autocomplete="off"></label>
      <label class="f" for="sIg">Instagram<input id="sIg" value="${esc(sh.ig||"")}" placeholder="@yula.shop" autocomplete="off"></label></div>
     <label class="f" for="sHours">Коли відповідаєте<input id="sHours" value="${esc(sh.hours||"")}" placeholder="Щодня 9:00–21:00" autocomplete="off"></label>
+    <label class="f" for="sCh">Telegram-канал з новинками<input id="sCh" value="${esc(sh.ch||"")}" placeholder="@yula_news" autocomplete="off"></label>
+    <p style="margin:-4px 0 12px;font-size:12.5px;color:var(--muted)">Посилання на канал покупець бачить у замовленні й профілі. Це найдешевший спосіб повертати покупців: підписка безкоштовна, пост бачать усі.</p>
     <button class="btn pink block" type="submit">Зберегти</button></form>`)}
 function vRules(){
   const R=ST.rules,cats={};for(const it of ST.items)cats[it.sub]=(cats[it.sub]||0)+1;
@@ -466,6 +492,8 @@ function vRules(){
     <div class="rrow"><span>Мінімальний заробіток з речі</span><b class="num" id="vMin">${R.min} ₴</b></div><input class="rng" type="range" id="rMin" min="0" max="250" step="10" value="${R.min}" aria-label="Мінімальний заробіток">
     <div class="rrow"><span>Знижка за кожну наступну річ у посилці</span><b class="num" id="vPar">${R.parcel} ₴</b></div><input class="rng" type="range" id="rPar" min="0" max="100" step="10" value="${R.parcel}" aria-label="Знижка за наступну річ у посилці">
     <p style="margin:2px 0 0;font-size:12.5px;color:var(--muted)" id="parNote">${parNote()}</p>
+    <div class="rrow"><span>Бонуси за три речі в посилці</span><b class="num" id="vG3">${R.gift3} ₴</b></div><input class="rng" type="range" id="rG3" min="0" max="150" step="10" value="${R.gift3}" aria-label="Бонуси за три речі в посилці">
+    <p style="margin:2px 0 0;font-size:12.5px;color:var(--muted)">Нараховуються, коли покупець забрав посилку, і діють 30 днів. Це причина і взяти третю річ, і повернутись.</p>
     <div class="rrow"><span>Бонусами можна оплатити</span><b class="num" id="vCap">до ${R.bonusCap}%</b></div><input class="rng" type="range" id="rCap" min="0" max="30" step="5" value="${R.bonusCap}" aria-label="Яку частину замовлення можна оплатити бонусами">
     <div class="rrow"><span>Бонуси за онлайн-оплату</span><b class="num" id="vCb">${R.cashback}%</b></div><input class="rng" type="range" id="rCb" min="0" max="5" step="1" value="${R.cashback}" aria-label="Бонуси за онлайн-оплату">
     <p style="margin:2px 0 0;font-size:12.5px;color:var(--muted)">Бонуси з барабана, за відгук і за онлайн-оплату покупець витрачає тільки в цих межах, тому вони не з’їдають заробіток.</p>
@@ -489,10 +517,40 @@ function oCalc(o){const by={};o.items.forEach(i=>by[i.sl]=(by[i.sl]||0)+i.q);con
 function oHist(o){return buyers()[normPh(o.buyer.phone)]||o.hist||{got:0,refused:0}}
 function orderMsg(o){const by={};o.items.forEach(i=>(by[i.sl]=by[i.sl]||[]).push(i));
   return Object.entries(by).map(([sl,its])=>`Замовлення ${o.no}${ST.sup[sl]?" · "+ST.sup[sl].n:""}\n`+its.map(i=>`Товар: ${i.raw}\nАртикул: ${i.code}, розмір ${i.size}, ${i.q} шт.`).join("\n")+`\nОтримувач: ${o.buyer.name}\nТелефон: ${o.buyer.phone}\nНова пошта: ${o.np}\nОплата: ${o.payLabel}\nВідправник: YULA`).join("\n\n")}
+const DEMO=["YL-10234","YL-10231","YL-10229","YL-10212","YL-10198","YL-10187"];
+function custs(){const m=new Map();
+  for(const o of ST.orders){if(o.st==="cancel")continue;const k=normPh(o.buyer.phone),c=m.get(k)||{k,name:o.buyer.name,phone:o.buyer.phone,n:0,sum:0,last:0,ok:false,got:0,ref:0};
+    c.n++;if(o.st!=="refused")c.sum+=(o.goods??o.total);c.last=Math.max(c.last,o.at||0);if(o.promoOk)c.ok=true;if(o.st==="got")c.got++;if(o.st==="refused")c.ref++;m.set(k,c)}
+  return [...m.values()].sort((a,b)=>b.last-a.last)}
+const BSEG={all:["Усі",c=>true],rep:["Купували 2+ рази",c=>c.n>=2],sleep:["Мовчать 30+ днів",c=>now()-c.last>30*864e5],ok:["Зі згодою",c=>c.ok]};
+function tpls(){const site=/^https?:/.test(location.origin)?location.origin+"/":"",pr=(ST.promos||[]).find(p=>p.on&&p.end>now()),par=+ST.rules.parcel||0;
+  return [["Після отримання посилки",`Привіт! Це Юля з YULA. Посилка вже в тебе. Як сіло? Залиш відгук у замовленні, нарахуємо 30 ₴ бонусами. ${site}`],
+   ["Мовчать 30+ днів",`Привіт! Це Юля з YULA. Давно не бачились.${par?` Друга річ у посилці в нас дешевша на ${par} ₴, доставка 0 ₴.`:" Доставка 0 ₴."} Глянь, що нового: ${site}`],
+   pr?[`Акція «${pr.name}»`,`Привіт! Це Юля з YULA. ${pr.name}: до −${pr.pct}% до ${dmy(pr.end)}. Доставка 0 ₴. ${site}`]:null].filter(Boolean)}
+const ovTabs=()=>`<div class="fchips" style="padding-top:0"><button class="fch" type="button" data-ov="orders" aria-pressed="${S.ov!=="buyers"}">Замовлення · ${ST.orders.length}</button><button class="fch" type="button" data-ov="buyers" aria-pressed="${S.ov==="buyers"}">Покупці · ${custs().length}</button></div>`;
+function vBuyers(){
+  const all=custs(),list=all.filter(BSEG[S.bseg][1]),ok=list.filter(c=>c.ok),rep=all.filter(BSEG.rep[1]).length,T=tpls();
+  return `<section class="view gut"><h1 class="ph">Замовлення</h1>${ovTabs()}
+   <p class="lead" style="margin-top:8px">Повторне замовлення не коштує реклами. Тут видно, хто вже купував і кому можна написати.</p>
+   <div class="kpis">
+    <div class="kpi"><small>Покупців</small><b class="num">${all.length}</b><em>за номером телефону</em></div>
+    <div class="kpi"><small>Повернулись</small><b class="num">${all.length?Math.round(rep/all.length*100):0}%</b><em>${rep} купували 2+ рази</em></div>
+    <div class="kpi"><small>Зі згодою на розсилку</small><b class="num">${all.filter(c=>c.ok).length}</b><em>їм можна писати про акції</em></div>
+    <div class="kpi"><small>Мовчать 30+ днів</small><b class="num">${all.filter(BSEG.sleep[1]).length}</b><em>час нагадати про себе</em></div>
+   </div>
+   <div class="fchips">${Object.entries(BSEG).map(([k,[l,f]])=>`<button class="fch" type="button" data-bseg="${k}" aria-pressed="${S.bseg===k}">${l} · ${all.filter(f).length}</button>`).join("")}</div>
+   <div class="card" style="padding-block:2px">${list.length?list.map(c=>`<div class="ord"><div class="top"><b>${esc(c.name)}</b><span class="num">${esc(c.phone)}</span><span class="pill ${c.ok?"ok":"mut"}">${c.ok?"Згода є":"Без згоди"}</span></div>
+     <div class="money num" style="margin-top:4px;color:var(--ink2)">${c.n} ${c.n===1?"замовлення":"замовлень"} · ${uah(c.sum)} · останнє ${ago(c.last)}${c.ref?` · <span style="color:var(--red)">не забрав ${c.ref}</span>`:""}</div></div>`).join(""):`<p style="text-align:center;color:var(--muted);padding:20px 0">Тут поки нікого</p>`}</div>
+   <div class="acts"><button class="btn sm" type="button" data-copyph ${ok.length?"":"disabled"}>${ic("copy","width:15px;height:15px")}Скопіювати номери зі згодою · ${ok.length}</button></div>
+   <div class="card"><h3>Готові повідомлення<span class="r">Viber, SMS, Telegram</span></h3>
+    ${T.map(([t,x],k)=>`<div class="tpl"><b>${esc(t)}</b><p>${esc(x)}</p><button class="btn sm soft" type="button" data-copytpl="${k}">${ic("copy","width:15px;height:15px")}Скопіювати</button></div>`).join("")}
+    <p style="margin:10px 0 0;font-size:12.5px;color:var(--muted)">Про акції пишіть тільки тим, хто поставив галочку згоди під час замовлення. Іншим можна писати лише щодо їхнього замовлення. У кожному повідомленні залишайте спосіб відписатись.</p></div>
+  </section>`}
 function vOrders(){
+  if(S.ov==="buyers")return vBuyers();
   const O=ST.orders,done=O.filter(o=>o.st==="got").length,ref=O.filter(o=>o.st==="refused"),lost=ref.reduce((a,o)=>a+oCalc(o).risk,0);
   const rate=done+ref.length?Math.round(ref.length/(done+ref.length)*100):0;
-  return `<section class="view gut"><h1 class="ph">Замовлення</h1><p class="lead">Покупець платить вам, а замовлення ви передаєте постачальнику. Замовлення з оплатою на пошті не йдуть постачальнику, доки покупець їх не підтвердить.</p>
+  return `<section class="view gut"><h1 class="ph">Замовлення</h1>${ovTabs()}${O.some(o=>DEMO.includes(o.no))?`<div class="hintbar"><span>Частина замовлень тут — приклади для знайомства з адмінкою.</span><button class="btn sm ghost" type="button" data-rmdemo>Прибрати приклади</button></div>`:""}<p class="lead" style="margin-top:8px">Покупець платить вам, а замовлення ви передаєте постачальнику. Замовлення з оплатою на пошті не йдуть постачальнику, доки покупець їх не підтвердить.</p>
    <div class="kpis">
     <div class="kpi"><small>Нові</small><b class="num">${O.filter(o=>o.st==="new").length}</b><em>передати постачальнику</em></div>
     <div class="kpi"><small>Чекають підтвердження</small><b class="num">${O.filter(o=>o.st==="wait").length}</b><em>ще не відправляємо</em></div>
@@ -555,7 +613,7 @@ function mergeImport(text,k,meta){
   const {groups,offers,supplierTag}=parseFeedXML(text);
   const isNew=k==null,sl=isNew?ST.sup.length:k,items=normalizeOffers(groups,sl);let added=0,updated=0,gone=0;
   if(!isNew){const s=ST.sup[k],old=new Map(ST.items.filter(i=>i.sl===sl).map(i=>[i.n+"|"+i.code,i])),keep=ST.items.filter(i=>i.sl!==sl),next=[];
-    for(const it of items){const key=it.n+"|"+it.code,o=old.get(key);if(o){it.gid=o.gid;it.added=o.added;if(o.subm){it.sub=o.sub;it.s=o.s;it.subm=true}updated++;old.delete(key)}else added++;next.push(it)}
+    for(const it of items){const key=it.n+"|"+it.code,o=old.get(key);if(o){it.gid=o.gid;it.added=o.added;if(o.subm){it.sub=o.sub;it.s=o.s;it.subm=true}if(o.cm){it.c=o.c;it.cm=true}updated++;old.delete(key)}else added++;next.push(it)}
     for(const o of old.values()){o.sz=Object.fromEntries(Object.keys(o.sz).map(z=>[z,0]));next.push(o);gone++}
     ST.items=keep.concat(next);s.offers=offers;s.last=now();Object.assign(s,meta||{})}
   else{ST.sup.push(Object.assign({lg:(meta.n||"").replace(/[^\p{L}\p{N}]/gu,"").slice(0,2).toUpperCase()||"??",offers,last:now()},meta,{contact:meta.contact||(supplierTag?"@"+supplierTag:"")}));ST.items=ST.items.concat(items);added=items.length}
@@ -616,7 +674,7 @@ function publish(){
   const d=dupMap(),live=ST.items.filter(i=>status(i,d)==="live");
   if(!live.length){toast("Немає товарів для публікації");return}
   const items=live.map(it=>{const pr=priceOf(it);return{n:it.n,raw:it.raw,s:it.s,sub:it.sub,c:it.c,h:it.h,sat:it.sat,l:it.l,pat:it.pat,p:pr.p,o:pr.o,pe:pr.o?pr.promo.end:null,pn:pr.o?pr.promo.name:null,sz:it.sz,pics:it.pics,ph:it.ph,mat:it.mat,code:it.code,sl:it.sl}});
-  const R=ST.rules,pub={at:now(),cfg:{parcel:Math.min(+R.parcel||0,+R.ship||0),parcelMax:4,bonusCap:+R.bonusCap||0,cashback:+R.cashback||0,shop:ST.shop||{}},items};
+  const R=ST.rules,pub={at:now(),cfg:{parcel:Math.min(+R.parcel||0,+R.ship||0),parcelMax:4,gift3:+R.gift3||0,bonusCap:+R.bonusCap||0,cashback:+R.cashback||0,shop:ST.shop||{}},items};
   try{localStorage.setItem(PUB,JSON.stringify(pub));ST.published=now();ST.dirty=false;save();updBadges();
     sheet(`<div class="grab"></div><div style="text-align:center;padding-top:16px"><div style="width:70px;height:70px;border-radius:50%;background:var(--green-soft);color:var(--green);display:grid;place-items:center;margin:0 auto">${ic("chk","width:34px;height:34px;stroke-width:2.6")}</div>
      <h1 class="ph">Опубліковано ${items.length} товарів</h1><p class="lead" style="margin-inline:auto">Сайт на цьому ж адресі вже показує новий каталог у вашому браузері. У робочій версії публікація оновлюватиме сайт для всіх.</p>
@@ -633,16 +691,18 @@ function bindView(){
   const q=$("#q");if(q){q.oninput=()=>{S.q=q.value;S.lim=40;const pos=q.selectionStart;render();const n=$("#q");n.focus();n.setSelectionRange(pos,pos)}}
   const ss=$("#supSel");if(ss)ss.onchange=()=>{S.sup=ss.value;render()};
   const cs=$("#catSel");if(cs)cs.onchange=()=>{S.cat=cs.value;S.lim=40;render()};
+  const gs=$("#gSel");if(gs)gs.onchange=()=>{S.g=gs.value;S.lim=40;render()};
+  const gb=$("#gBulk");if(gb)gb.onchange=()=>{const v=gb.value;if(!v)return;const l=itemsList(dupMap());l.forEach(x=>{x.it.c=v;x.it.cm=true});ST.dirty=true;save();render();toast(`${GEN.find(g=>g[0]===v)[1]}: ${l.length} товарів. Натисніть «Опублікувати»`)};
   const cr=$("#crules");if(cr)cr.ontoggle=()=>{S.rulesOpen=cr.open};
   const pp=$("#pPct");if(pp)pp.oninput=()=>{$("#vPp").textContent=pp.value+"%"};
   ["eCpa","eRef"].forEach(id=>{const el=$("#"+id);if(el)el.onchange=()=>{ST.eco={cpa:Math.max(0,+$("#eCpa").value||0),ref:Math.min(90,Math.max(0,+$("#eRef").value||0))};save();$("#ecoCard").outerHTML=ecoCard();bindView()}});
   if(S.view==="rules"){
-    const upd=()=>{const R=ST.rules;R.pct=+$("#rPct").value;R.min=+$("#rMin").value;R.ship=+$("#rShip").value;R.parcel=Math.min(+$("#rPar").value,R.ship);R.bonusCap=+$("#rCap").value;R.cashback=+$("#rCb").value;$("#vPar").textContent=R.parcel+" ₴";$("#vCap").textContent="до "+R.bonusCap+"%";$("#vCb").textContent=R.cashback+"%";$("#parNote").textContent=parNote();$("#vShip").textContent=R.ship+" ₴";$("#vPct").textContent=R.pct+"%";$("#vMin").textContent=R.min+" ₴";
+    const upd=()=>{const R=ST.rules;R.pct=+$("#rPct").value;R.min=+$("#rMin").value;R.ship=+$("#rShip").value;R.parcel=Math.min(+$("#rPar").value,R.ship);R.bonusCap=+$("#rCap").value;R.cashback=+$("#rCb").value;R.gift3=+$("#rG3").value;$("#vG3").textContent=R.gift3+" ₴";$("#vPar").textContent=R.parcel+" ₴";$("#vCap").textContent="до "+R.bonusCap+"%";$("#vCb").textContent=R.cashback+"%";$("#parNote").textContent=parNote();$("#vShip").textContent=R.ship+" ₴";$("#vPct").textContent=R.pct+"%";$("#vMin").textContent=R.min+" ₴";
       $("#ex").innerHTML=exHtml([150,250,400,700].map(c=>[c,priceOf({cost:c,sub:"__"})]));
       const d=dupMap(),live=ST.items.filter(i=>status(i,d)==="live"),m=live.length?live.reduce((a,i)=>a+(priceOf(i).earn),0)/live.length:0;
       $("#avgM").style.color=m<80?"var(--red)":"var(--muted)";$("#avgM").innerHTML=`Середній заробіток з речі на сайті: <b class="num">${uah(m)}</b>${m<80?" — цього замало, щоб окупити рекламу в Instagram":""}`;
       document.querySelectorAll("[data-cat]").forEach(i=>i.placeholder=R.pct);ST.dirty=true;updBadges()};
-    ["rPct","rMin","rShip","rPar","rCap","rCb"].forEach(id=>{$("#"+id).oninput=upd;$("#"+id).onchange=save});
+    ["rPct","rMin","rShip","rPar","rG3","rCap","rCb"].forEach(id=>{$("#"+id).oninput=upd;$("#"+id).onchange=save});
     document.querySelectorAll("[data-cat]").forEach(inp=>inp.onchange=()=>{const v=inp.value.trim();if(v==="")delete ST.rules.cat[inp.dataset.cat];else ST.rules.cat[inp.dataset.cat]=Math.max(0,+v);ST.dirty=true;save();updBadges();toast(`Націнка для «${inp.dataset.cat}»: ${v===""?"загальна":v+"%"}`)});
   }
 }
@@ -662,6 +722,10 @@ document.addEventListener("click",e=>{
   if(b=T("[data-toggle]")){const id=b.dataset.toggle,it=ST.items.find(i=>i.gid===id);const on=b.getAttribute("aria-checked")!=="true";if(on&&!tot(it)){toast("Немає в наявності — не можна показати");return}ST.hide[id]=!on;ST.dirty=true;save();b.setAttribute("aria-checked",on);updBadges();return}
   if(T("[data-approveall]")){const d=dupMap();ST.items.filter(i=>status(i,d)==="review"&&(S.sup==="all"||i.sl===+S.sup)).forEach(i=>ST.hide[i.gid]=false);ST.dirty=true;save();render();toast("Товари з перевірки показуються на сайті");return}
   if(T("[data-more]")){S.lim+=40;render();return}
+  if(b=T("[data-ov]")){S.ov=b.dataset.ov;render();return}
+  if(b=T("[data-bseg]")){S.bseg=b.dataset.bseg;render();return}
+  if(T("[data-rmdemo]")){ST.orders=ST.orders.filter(o=>!DEMO.includes(o.no));save();render();toast("Приклади прибрано. Лишились тільки справжні замовлення");return}
+  if(T("[data-copyph]")||(b=T("[data-copytpl]"))){const t=b?tpls()[+b.dataset.copytpl][1]:custs().filter(BSEG[S.bseg][1]).filter(c=>c.ok).map(c=>c.phone).join("\n");try{navigator.clipboard.writeText(t).then(()=>toast("Скопійовано"),()=>toast("Виділіть текст і скопіюйте вручну"))}catch(x){toast("Виділіть текст і скопіюйте вручну")}return}
   if(b=T("[data-copyorder]")){const t=orderMsg(ST.orders[+b.dataset.copyorder]);try{navigator.clipboard.writeText(t).then(()=>toast("Скопійовано — надішліть менеджеру в Telegram"),()=>toast("Виділіть текст і скопіюйте вручну"))}catch(x){toast("Виділіть текст і скопіюйте вручну")}return}
   if(b=T("[data-oact]")){const [k,act]=b.dataset.oact.split(":"),o=ST.orders[+k];o.st=act;
     if(act==="got")setBuyer(o.buyer.phone,x=>x.got++);
@@ -671,11 +735,12 @@ document.addEventListener("click",e=>{
   if(b=T("[data-tgpromo]")){const pr=ST.promos[+b.dataset.tgpromo];pr.on=!pr.on;ST.dirty=true;save();render();return}
   if(b=T("[data-delpromo]")){ST.promos.splice(+b.dataset.delpromo,1);ST.dirty=true;save();render();toast("Акцію видалено, ціни повернулись до звичайних");return}
 });
-document.addEventListener("change",e=>{const cs=e.target.closest("[data-setcat]");if(cs){const it=ST.items.find(i=>i.gid===cs.dataset.setcat);it.sub=cs.value;it.s=CSHAPE[cs.value]||"tee";it.subm=true;ST.dirty=true;save();render();toast(`Категорія: ${cs.value}`);return}
+document.addEventListener("change",e=>{const gg=e.target.closest("[data-setg]");if(gg){const it=ST.items.find(i=>i.gid===gg.dataset.setg);it.c=gg.value;it.cm=true;ST.dirty=true;save();updBadges();toast(`Для кого: ${GEN.find(g=>g[0]===gg.value)[1]}`);return}
+  const cs=e.target.closest("[data-setcat]");if(cs){const it=ST.items.find(i=>i.gid===cs.dataset.setcat);it.sub=cs.value;it.s=CSHAPE[cs.value]||"tee";it.subm=true;ST.dirty=true;save();render();toast(`Категорія: ${cs.value}`);return}
   const r=e.target.closest("[data-refresh]");if(r&&r.files[0]){const k=+r.dataset.refresh;addSupSheet(k);const dt=new DataTransfer();dt.items.add(r.files[0]);const fi=$("#sFile");fi.files=dt.files;fi.dispatchEvent(new Event("change"));}});
 document.addEventListener("submit",e=>{const f=e.target.closest("[data-ttn]");if(!f)return;e.preventDefault();const k=+f.dataset.ttn,v=f.querySelector("input").value.replace(/\D/g,"");if(v.length!==14){toast("ТТН має містити 14 цифр");return}const o=ST.orders[k];o.ttn=v.replace(/(\d{4})(\d{4})(\d{4})(\d{2})/,"$1 $2 $3 $4");o.st="ttn";save();render();toast("ТТН збережено, покупець отримає SMS")});
 document.addEventListener("submit",e=>{
-  if(e.target.id==="sf"){e.preventDefault();const g=id=>$("#"+id).value.trim().slice(0,160);ST.shop={legal:g("sLegal"),phone:g("sPhone"),tg:g("sTg").replace(/^https?:\/\/t\.me\//,"@"),ig:g("sIg").replace(/^https?:\/\/(www\.)?instagram\.com\//,"@").replace(/\/$/,""),hours:g("sHours")};ST.dirty=true;save();closeSheet();render();toast("Збережено. Натисніть «Опублікувати», щоб покупці побачили");return}
+  if(e.target.id==="shf"){e.preventDefault();const g=id=>$("#"+id).value.trim().slice(0,160);ST.shop={legal:g("sLegal"),phone:g("sPhone"),tg:g("sTg").replace(/^https?:\/\/t\.me\//,"@"),ig:g("sIg").replace(/^https?:\/\/(www\.)?instagram\.com\//,"@").replace(/\/$/,""),hours:g("sHours"),ch:g("sCh").replace(/^https?:\/\/t\.me\//,"@")};ST.dirty=true;save();closeSheet();render();toast("Збережено. Натисніть «Опублікувати», щоб покупці побачили");return}
   if(e.target.id==="rf"){e.preventDefault();const w=$("#rW").value.trim().toLowerCase(),cat=$("#rC").value;if(w.length<2){toast("Введи слово з назви товару, хоча б 2 літери");return}
     ST.catRules=ST.catRules.filter(r=>r.w!==w);ST.catRules.push({w,cat});CUSTOM=ST.catRules;const n=recat();ST.dirty=true;S.rulesOpen=true;save();render();toast(n?`«${w}» → ${cat}: перенесено ${n} товарів`:`Правило додано. Товарів зі словом «${w}» поки немає`)}
   if(e.target.id==="pf"){e.preventDefault();const name=$("#pName").value.trim(),pct=+$("#pPct").value,cat=$("#pCat").value,days=+$("#pDays").value,floor=Math.max(0,+$("#pFloor").value||0);if(!name){toast("Дай акції назву, її побачить покупець");return}

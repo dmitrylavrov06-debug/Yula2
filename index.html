@@ -758,7 +758,7 @@ const nextOff=sl=>{const n=parcels()[sl]||0;return CFG.parcel&&n>=1&&n<=CFG.parc
 const LV=[["Знайомство",0,0],["Свої",1,1],["Рідня",3,3]];
 function level(){const g=(S.co.verified&&buyer(S.co.verified).got)||0;let k=0;LV.forEach((l,i)=>{if(g>=l[1])k=i});return{k,got:g,name:LV[k][0],add:LV[k][2],next:LV[k+1]||null}}
 const cashb=x=>CFG.cashback?Math.max(1,Math.round(x*(CFG.cashback+level().add)/100)):0;
-const chanCard=()=>CFG.shop.ch?`<a class="tgc" href="https://t.me/${encodeURIComponent(CFG.shop.ch.replace(/^@/,""))}" target="_blank" rel="noopener"><span class="ya">Ю</span><span><b>Канал YULA в Telegram</b><small>Новинки й знижки з’являються там раніше</small></span>${ic("chev")}</a>`:"";
+const chanCard=()=>CFG.shop.ch?`<a class="tgc" href="https://t.me/${encodeURIComponent(CFG.shop.ch.replace(/^@/,""))}" target="_blank" rel="noopener"><span class="ya">Y</span><span><b>Канал YULA в Telegram</b><small>Новинки й знижки з’являються там раніше</small></span>${ic("chev")}</a>`:"";
 function clubCard(){const lv=level(),b=CFG.cashback||0,cod=["","до 1 000 ₴ на пошті","до 2 000 ₴ на пошті"],d=lv.next?lv.next[1]-lv.got:0;
   return `<div class="card club"><h4>Клуб YULA<span class="lvn">${lv.name}</span></h4>
    <div class="lvs">${LV.map((l,k)=>`<div class="${k<=lv.k?"on":""}"><i>${k<lv.k?ic("check"):k+1}</i><b>${l[0]}</b><small>${[b?`кешбек ${b+l[2]}%`:"",cod[k]].filter(Boolean).join(", ")||"перше замовлення"}</small></div>`).join("")}</div>
@@ -839,7 +839,7 @@ function vHome(){
   const minF=Math.min(...P.filter(p=>p.tot>0).map(p=>p.p));
   return `<section class="view">
    <div class="trust gut"><span>${ic("truck")}Доставка безкоштовна</span>${CFG.parcel?`<span>${ic("box")}Друга річ −${CFG.parcel} ₴</span>`:""}<span>${ic("locker")}У поштоматі за 2–3 дні</span><span>${ic("ret")}Повернення 14 днів</span><span>${ic("eye")}Огляд на пошті</span><span>${ic("shield")}Безпечна оплата</span></div>
-   ${S.onb?`<div class="gut"><div class="hello"><span class="ya">Ю</span><div><b>Привіт, я Юля</b><small>${S.bonus>0?`На старт у тебе ${uah(S.bonus)} бонусів: ними можна оплатити до ${CFG.bonusCap}% замовлення.`:"Підкажу з розміром і зберу посилку вигідніше."}</small></div><button class="xx" type="button" data-hello aria-label="Закрити">${ic("x")}</button></div></div>`:""}
+   ${S.onb?`<div class="gut"><div class="hello"><span class="ya">Y</span><div><b>Привіт, це YULA</b><small>${S.bonus>0?`На старт у тебе ${uah(S.bonus)} бонусів: ними можна оплатити до ${CFG.bonusCap}% замовлення.`:"Підкажу з розміром і зберу посилку вигідніше."}</small></div><button class="xx" type="button" data-hello aria-label="Закрити">${ic("x")}</button></div></div>`:""}
    ${homeStrips()}
    <div class="hero" id="hero"><div class="track" id="track">
      ${PROMO?`<button class="slide s1 on" type="button" data-list="sale" data-title="${esc(PROMO.name)}">
@@ -1009,7 +1009,7 @@ function bumpCard(){
   if(!CFG.parcel||S.co.bump||!S.cart.length)return"";
   const m=mates(S.cart.map(x=>P[x.i]),8).find(p=>nextOff(p.sl)&&p.p<=700);if(!m)return"";
   const o=nextOff(m.sl),rec=recSize(m),av=sizesFor(m).filter(z=>stock(m,z)>0);
-  return `<div class="card"><div class="jl" style="margin-top:0"><span class="ya">Ю</span><div style="flex:1;min-width:0"><b>Докинути в цю посилку?</b><small>Доставка та сама, тому на ${o} ₴ дешевше</small></div><button class="xx" type="button" data-bumpx aria-label="Не треба">${ic("x")}</button></div>
+  return `<div class="card"><div class="jl" style="margin-top:0"><span class="ya">Y</span><div style="flex:1;min-width:0"><b>Докинути в цю посилку?</b><small>Доставка та сама, тому на ${o} ₴ дешевше</small></div><button class="xx" type="button" data-bumpx aria-label="Не треба">${ic("x")}</button></div>
     <div class="row" style="border:0;padding-bottom:0">${tile(m)}<div class="info"><div class="t">${m.n}</div><div class="pr num" style="margin-top:2px">${uah(m.p-o)} <s class="was">${uah(m.p)}</s></div>
     <div class="bumpa"><select class="f" id="bumpSz" aria-label="Розмір">${av.map(z=>`<option${z===rec?" selected":""}>${z}</option>`).join("")}</select><button class="btn sm" type="button" data-bump="${m.i}">Додати</button></div></div></div></div>`}
 function vCheckout(){
@@ -1074,7 +1074,7 @@ function addonSheet(i){
   sheet(`<div class="grab"></div><div class="in" style="padding-top:8px">
     <div class="row" style="border:0;padding-top:4px">${tile(p)}<div class="info"><div class="t">${p.n}</div><div class="pr num" style="margin-top:4px">${uah(price)}${off?` <s class="was">${uah(p.p)}</s>`:""}</div><div class="s">У замовлення ${o.no}, без нової доставки</div></div></div>
     <div class="lbl" style="margin-top:4px">Розмір</div>
-    <div class="sizes" id="asz">${sizesFor(p).map(z=>{const st=stock(p,z);return`<button class="size ${st?"":"oos"}" type="button" data-s="${z}" aria-pressed="${z===pick}">${z}${z===rec?'<span class="rec">Юля радить</span>':""}</button>`}).join("")}</div>
+    <div class="sizes" id="asz">${sizesFor(p).map(z=>{const st=stock(p,z);return`<button class="size ${st?"":"oos"}" type="button" data-s="${z}" aria-pressed="${z===pick}">${z}${z===rec?'<span class="rec">YULA радить</span>':""}</button>`}).join("")}</div>
     <p style="margin:12px 0 0;font-size:12.5px;color:var(--muted)">${online?"Доплату спишемо з тієї ж картки.":"Сума до сплати на пошті зросте на вартість цієї речі."}</p>
     <button class="btn pink block" type="button" id="addonGo" style="margin-top:12px" ${pick?"":"disabled"}>Додати до замовлення · +${uah(price)}</button></div>`,"small");
   $("#asz").addEventListener("click",e=>{const b=e.target.closest(".size");if(!b||b.classList.contains("oos"))return;pick=b.dataset.s;$("#asz").querySelectorAll(".size").forEach(x=>x.setAttribute("aria-pressed",x===b));$("#addonGo").disabled=false});
@@ -1115,11 +1115,11 @@ function vMe(){
   const ph=S.co.verified?"+"+String(S.co.verified).replace(/^(\d{3})(\d{2})(\d{3})(\d{2})(\d{2})$/,"$1 $2 $3 $4 $5"):"";
   const stx=o=>o.status===7?"скасовано":o.status===6?"не забрали":o.conf===false?"чекає твого підтвердження":STATUSES[o.status][0].toLowerCase();
   return `<section class="view gut">
-   <div class="prof"><div class="ava">Ю</div><div style="min-width:0"><b style="font-size:16px">${S.co.name?esc(S.co.name.trim().split(/\s+/).slice(-1)[0]):"Привіт!"}</b><div style="opacity:.7;font-size:12.5px">${ph?ph+" · номер підтверджено":"Реєструватися не треба. Номер підтвердиш під час замовлення"}</div></div><div class="bal"><b class="num">${uah(S.bonus)}</b><small>${S.bonus>0&&S.bexp?"бонуси до "+new Date(S.bexp).toLocaleDateString("uk-UA",{day:"numeric",month:"short"}):"бонуси"}</small></div></div>
+   <div class="prof"><div class="ava">Y</div><div style="min-width:0"><b style="font-size:16px">${S.co.name?esc(S.co.name.trim().split(/\s+/).slice(-1)[0]):"Привіт!"}</b><div style="opacity:.7;font-size:12.5px">${ph?ph+" · номер підтверджено":"Реєструватися не треба. Номер підтвердиш під час замовлення"}</div></div><div class="bal"><b class="num">${uah(S.bonus)}</b><small>${S.bonus>0&&S.bexp?"бонуси до "+new Date(S.bexp).toLocaleDateString("uk-UA",{day:"numeric",month:"short"}):"бонуси"}</small></div></div>
    ${clubCard()}
    <div class="card" style="padding-block:2px">
      ${S.orders.length?S.orders.slice(0,6).map(o=>`<button class="line" type="button" data-ord="${o.no}"><span class="ic">${ic("box")}</span><span class="tx"><b>${o.no} · <span class="num">${uah(o.total)}</span></b><small>${stx(o)}</small></span>${ic("chev")}</button>`).join(""):`<div class="line"><span class="ic">${ic("box")}</span><span class="tx"><b>Замовлень поки немає</b><small>Тут з’являться статус і ТТН посилки</small></span></div>`}
-     <button class="line" type="button" data-sizepick="wear"><span class="ic">${ic("ruler")}</span><span class="tx"><b>Мої розміри</b><small>${S.my.wear?"Одяг "+S.my.wear+(S.my.shoes?" · взуття "+S.my.shoes:""):"Юля підбере за зростом і вагою"}</small></span>${ic("chev")}</button>
+     <button class="line" type="button" data-sizepick="wear"><span class="ic">${ic("ruler")}</span><span class="tx"><b>Мої розміри</b><small>${S.my.wear?"Одяг "+S.my.wear+(S.my.shoes?" · взуття "+S.my.shoes:""):"YULA підбере за зростом і вагою"}</small></span>${ic("chev")}</button>
      <button class="line" type="button" data-go="likes"><span class="ic">${ic("heart")}</span><span class="tx"><b>Обране</b><small>${S.likes.size} товарів</small></span>${ic("chev")}</button>
    </div>
    ${CFG.parcel?`<button class="pcl" type="button" data-parcel style="width:100%;text-align:left;display:block"><div class="cap">Одна посилка</div><h4>Кожна наступна річ — мінус ${CFG.parcel} ₴</h4><p>Як це працює</p></button>`:""}
@@ -1224,10 +1224,10 @@ function openProduct(i){
     <div class="lbl">Колір <span>${p.col||"—"}</span></div>
     <div class="sws" id="sw">${p.sib.map(j=>{const q=P[j];return`<button type="button" aria-label="${q.col||q.n}" data-sib="${j}" aria-pressed="${j===i}" style="background:hsl(${q.h} ${q.sat}% ${q.l}%)"></button>`}).join("")}</div>
     <div class="lbl">Розмір <button type="button" data-stable="${i}">${ic("ruler","width:15px;height:15px;vertical-align:-3px")} Залишки й заміри</button></div>
-    <div class="sizes" id="sz">${sz.map(s=>{const st=stock(p,s);return`<button class="size ${st?"":"oos"}" type="button" data-s="${s}" aria-pressed="${s===pick}" aria-label="${s}${st?"":", немає в наявності"}">${s}${st&&st<=3?`<span class="few">${st} шт</span>`:""}${s===rec?'<span class="rec">Юля радить</span>':""}</button>`}).join("")}</div>
+    <div class="sizes" id="sz">${sz.map(s=>{const st=stock(p,s);return`<button class="size ${st?"":"oos"}" type="button" data-s="${s}" aria-pressed="${s===pick}" aria-label="${s}${st?"":", немає в наявності"}">${s}${st&&st<=3?`<span class="few">${st} шт</span>`:""}${s===rec?'<span class="rec">YULA радить</span>':""}</button>`}).join("")}</div>
     <div class="err" id="szErr" style="margin-top:8px" role="alert"></div>
-    <button class="yula" type="button" data-sizepick="${kind(p)}" data-for="${i}"><span class="ya">Ю</span><span><b>${rec?`Тобі ${S.my[kind(p)]}${rec!==S.my[kind(p)]?`, у цієї моделі це ${rec}`:""}`:"Юля підбере розмір"}</b><small>${rec?"Змінити параметри":"Скажи зріст і вагу, підкажу розмір"}</small></span></button>
-    <p style="margin:10px 0 0;font-size:12.5px;color:var(--muted)">${rs?`Як сідає за відгуками: «${FIT[rs.fit]}» — ${rs.fitN} з ${rs.n}.`:"Як сідає, напишуть перші покупці. Поки що орієнтуйся на підказку Юлі."}</p>
+    <button class="yula" type="button" data-sizepick="${kind(p)}" data-for="${i}"><span class="ya">Y</span><span><b>${rec?`Тобі ${S.my[kind(p)]}${rec!==S.my[kind(p)]?`, у цієї моделі це ${rec}`:""}`:"YULA підбере розмір"}</b><small>${rec?"Змінити параметри":"Скажи зріст і вагу, підкажу розмір"}</small></span></button>
+    <p style="margin:10px 0 0;font-size:12.5px;color:var(--muted)">${rs?`Як сідає за відгуками: «${FIT[rs.fit]}» — ${rs.fitN} з ${rs.n}.`:"Як сідає, напишуть перші покупці. Поки що орієнтуйся на підказку YULA."}</p>
 
     <div class="blk"><h5>Доставка і повернення</h5>
       <div class="line" style="padding-top:0"><span class="ic">${ic("locker")}</span><span class="tx"><b>Безкоштовна доставка</b><small>У поштоматі чи відділенні Нової пошти ${si.eta}. Кур’єр теж безкоштовно</small></span></div>
@@ -1236,7 +1236,7 @@ function openProduct(i){
     </div>
     ${mt.length?`<div class="blk"><h5>Пасує до цього${CFG.parcel?` <span style="font-weight:700;color:var(--green);font-size:12.5px;margin-left:4px">у ту саму посилку −${CFG.parcel} ₴</span>`:""}</h5><div class="hrow">${mt.map(mateTile).join("")}</div></div>`:""}
     <div class="blk"><h5>Хто продає</h5>
-      <div class="seller"><span class="lg" style="background:var(--pink);color:var(--ink)">Ю</span><span style="flex:1;min-width:0"><b>YULA</b><small>${esc(CFG.shop.legal||"Інтернет-магазин одягу. Відправляємо з України Новою поштою")}</small></span>${hasContacts()?`<button class="btn sm ghost" type="button" data-support>${ic("chat","width:15px;height:15px")}Написати</button>`:""}</div>
+      <div class="seller"><span class="lg" style="background:var(--pink);color:var(--ink)">Y</span><span style="flex:1;min-width:0"><b>YULA</b><small>${esc(CFG.shop.legal||"Інтернет-магазин одягу. Відправляємо з України Новою поштою")}</small></span>${hasContacts()?`<button class="btn sm ghost" type="button" data-support>${ic("chat","width:15px;height:15px")}Написати</button>`:""}</div>
     </div>
     <div class="blk"><h5>Про товар</h5><dl class="dl"><dt>Тканина</dt><dd>${p.mat||"Уточнюємо у виробника"}</dd><dt>Сезон</dt><dd>${p.season}</dd><dt>Артикул</dt><dd>${p.code}</dd><dt>Країна</dt><dd>${p.country}</dd></dl></div>
     <div class="blk"><h5>Відгуки${rs?` <span class="star" style="font-size:13px;margin-left:6px">${STAR}${r1(rs.r)}</span>`:""}</h5>${rv.length?rv.slice(-4).reverse().map(y=>`<div class="rv"><b>${y.r} з 5</b> · ${FIT[y.fit]}${y.t?`<div>${esc(y.t)}</div>`:""}<small>Розмір ${esc(y.size)} · ${new Date(y.at).toLocaleDateString("uk-UA")}</small></div>`).join(""):`<div style="background:var(--bg);border-radius:12px;padding:14px;text-align:center"><b style="font-size:14px">Відгуків ще немає</b><p style="margin:4px 0 0;font-size:13px;color:var(--muted)">Показуємо тільки відгуки тих, хто отримав посилку. За відгук нараховуємо 30 ₴ бонусами.</p></div>`}</div>
@@ -1256,7 +1256,7 @@ function openQuick(i,src){
   sheet(`<div class="grab"></div><div class="in" style="padding-top:8px">
     <div class="row" style="border:0;padding-top:4px">${tile(p)}<div class="info"><div class="t">${p.n}</div><div class="pr num" style="margin-top:4px">${uah(p.p)}</div></div></div>
     <div class="lbl" style="margin-top:4px">Обрати розмір</div>
-    <div class="sizes" id="qsz">${sz.map(s=>{const st=stock(p,s);return`<button class="size ${st?"":"oos"}" type="button" data-s="${s}" aria-pressed="false">${s}${st&&st<=3?`<span class="few">${st} шт</span>`:""}${s===rec?'<span class="rec">Юля радить</span>':""}</button>`}).join("")}</div>
+    <div class="sizes" id="qsz">${sz.map(s=>{const st=stock(p,s);return`<button class="size ${st?"":"oos"}" type="button" data-s="${s}" aria-pressed="false">${s}${st&&st<=3?`<span class="few">${st} шт</span>`:""}${s===rec?'<span class="rec">YULA радить</span>':""}</button>`}).join("")}</div>
     <button class="btn block" type="button" data-open="${i}" style="margin-top:18px;background:var(--soft);color:var(--ink)">Детальніше про товар</button></div>`,"small");
   $("#qsz").addEventListener("click",e=>{const b=e.target.closest(".size");if(!b)return;if(b.classList.contains("oos")){toast(`Розміру ${b.dataset.s} зараз немає`);return}closeSheet();fly(src,p);add(i,b.dataset.s);addedToast(b.dataset.s)});
 }
@@ -1264,12 +1264,12 @@ function sizeTable(i){
   const p=P[i];
   sheet(`<div class="grab"></div><div class="in" style="padding-top:8px"><h3 class="ph" style="margin-top:4px">Розміри й залишки</h3><p class="lead">Залишки показуємо за останнім оновленням складу. Заміри в сантиметрах додамо, щойно отримаємо їх від виробника.</p>
     <div class="stable"><table><thead><tr><th>Розмір</th><th>В наявності</th><th>Груди, см</th><th>Довжина, см</th></tr></thead><tbody>${Object.entries(p.sz).map(([s,q])=>`<tr><td>${s}</td><td class="num" style="${q?"":"color:var(--muted)"}">${q?q+" шт":"немає"}</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td></tr>`).join("")}</tbody></table></div>
-    <button class="yula" type="button" data-sizepick="${kind(p)}" data-for="${i}"><span class="ya">Ю</span><span><b>Підібрати розмір</b><small>Юля порадить за зростом і вагою</small></span></button></div>`,"small");
+    <button class="yula" type="button" data-sizepick="${kind(p)}" data-for="${i}"><span class="ya">Y</span><span><b>Підібрати розмір</b><small>YULA порадить за зростом і вагою</small></span></button></div>`,"small");
 }
 function sizePicker(k,forI){
   const isShoe=k==="shoes",isKid=k==="kids";
   sheet(`<div class="grab"></div><div class="in" style="padding-top:8px">
-   <div style="display:flex;gap:10px;align-items:center;margin-top:4px"><span class="ava" style="width:42px;height:42px;font-size:13px;color:#fff">Ю</span><div><b style="font-size:16px">Скажи зріст і вагу</b><div style="color:var(--muted);font-size:13px">Підкажу розмір. Дані бачиш тільки ти</div></div></div>
+   <div style="display:flex;gap:10px;align-items:center;margin-top:4px"><span class="ava" style="width:42px;height:42px;font-size:13px;color:#fff">Y</span><div><b style="font-size:16px">Скажи зріст і вагу</b><div style="color:var(--muted);font-size:13px">Підкажу розмір. Дані бачиш тільки ти</div></div></div>
    ${isShoe?`<div class="rlab"><span>Довжина стопи</span><span class="num" id="vA">24,5 см</span></div><input class="rng" type="range" id="rA" min="22" max="28" step=".5" value="24.5" aria-label="Довжина стопи">`:
    isKid?`<div class="rlab"><span>Зріст дитини</span><span class="num" id="vA">110 см</span></div><input class="rng" type="range" id="rA" min="90" max="130" step="1" value="110" aria-label="Зріст дитини">`:
    `<div class="rlab"><span>Зріст</span><span class="num" id="vA">168 см</span></div><input class="rng" type="range" id="rA" min="150" max="195" value="168" aria-label="Зріст">
@@ -1366,7 +1366,7 @@ function setSheet(k){
   sheet(`<div class="grab"></div><div class="in" style="padding-top:8px"><h3 class="ph" style="margin-top:4px">Готова посилка</h3><p class="lead">Обери розміри. Три речі їдуть разом, тому дві з них на ${CFG.parcel} ₴ дешевші.</p>
    ${ps.map((p,j)=>{const rec=recSize(p),av=sizesFor(p).filter(z=>stock(p,z)>0);return`<div class="row">${tile(p)}<div class="info"><div class="t">${p.n}</div><div class="pr num" style="margin-top:2px">${uah(p.p-(j?CFG.parcel:0))}${j?` <s class="was">${uah(p.p)}</s>`:""}</div><label class="f" style="margin:8px 0 0">Розмір<select class="f" data-setsz="${p.i}">${av.map(z=>`<option${z===rec?" selected":""}>${z}</option>`).join("")}</select></label></div></div>`}).join("")}
    <button class="btn pink block" type="button" id="setAdd" style="margin-top:14px">Додати три речі · ${uah(sum-2*CFG.parcel)}</button>
-   <button class="yula" type="button" data-sizepick="wear"><span class="ya">Ю</span><span><b>${S.my.wear?`Твій розмір ${S.my.wear}`:"Не знаєш розмір?"}</b><small>${S.my.wear?"Змінити параметри":"Скажи зріст і вагу, підкажу"}</small></span></button></div>`);
+   <button class="yula" type="button" data-sizepick="wear"><span class="ya">Y</span><span><b>${S.my.wear?`Твій розмір ${S.my.wear}`:"Не знаєш розмір?"}</b><small>${S.my.wear?"Змінити параметри":"Скажи зріст і вагу, підкажу"}</small></span></button></div>`);
   $("#setAdd").onclick=()=>{document.querySelectorAll("[data-setsz]").forEach(z=>add(+z.dataset.setsz,z.value));closeSheet();lastSub=totals().sub;go("cart");toast("Посилку зібрано")};
 }
 const addedToast=z=>toast(CFG.parcel&&S.cart.reduce((a,x)=>a+x.q,0)===1?`Є в кошику. Друга річ у посилку — мінус ${CFG.parcel} ₴`:`Є в кошику${z?" · розмір "+z:""}`);
@@ -1374,7 +1374,7 @@ function addedSheet(i,size){
   const p=P[i],n=parcels()[p.sl]||1,t=totals(),m=nextOff(p.sl)?mates(S.cart.filter(x=>P[x.i].sl===p.sl).map(x=>P[x.i]),8):[];
   sheet(`<div class="grab"></div><div class="in" style="padding-top:8px">
    <div class="row" style="border:0;padding:6px 0 0">${tile(p)}<div class="info"><div class="cut" style="margin:0 0 6px;display:inline-flex;padding:5px 10px">${ic("check","width:16px;height:16px")}Є в кошику</div><div class="t">${p.n}</div><div class="s">Розмір ${size} · у кошику на ${uah(t.pre)}</div></div></div>
-   ${m.length?`<div class="jl"><span class="ya">Ю</span><div><b>${n===1?`Друга річ у цю посилку — мінус ${CFG.parcel} ₴`:`У посилці вже −${uah(t.par)}. Ще одна річ — ще мінус ${CFG.parcel} ₴`}</b><small>Доставка та сама, тому ділимося економією.</small></div></div>
+   ${m.length?`<div class="jl"><span class="ya">Y</span><div><b>${n===1?`Друга річ у цю посилку — мінус ${CFG.parcel} ₴`:`У посилці вже −${uah(t.par)}. Ще одна річ — ще мінус ${CFG.parcel} ₴`}</b><small>Доставка та сама, тому ділимося економією.</small></div></div>
    <div class="hrow" style="margin-top:12px">${m.map(mateTile).join("")}</div>`:""}
    <div class="acts2" style="margin-top:16px"><button class="btn pink" type="button" data-go="cart">До кошика</button><button class="btn ghost" type="button" data-close>Дивитись далі</button></div></div>`,"small");
 }

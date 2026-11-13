@@ -524,9 +524,9 @@ function custs(){const m=new Map();
   return [...m.values()].sort((a,b)=>b.last-a.last)}
 const BSEG={all:["Усі",c=>true],rep:["Купували 2+ рази",c=>c.n>=2],sleep:["Мовчать 30+ днів",c=>now()-c.last>30*864e5],ok:["Зі згодою",c=>c.ok]};
 function tpls(){const site=/^https?:/.test(location.origin)?location.origin+"/":"",pr=(ST.promos||[]).find(p=>p.on&&p.end>now()),par=+ST.rules.parcel||0;
-  return [["Після отримання посилки",`Привіт! Це Юля з YULA. Посилка вже в тебе. Як сіло? Залиш відгук у замовленні, нарахуємо 30 ₴ бонусами. ${site}`],
-   ["Мовчать 30+ днів",`Привіт! Це Юля з YULA. Давно не бачились.${par?` Друга річ у посилці в нас дешевша на ${par} ₴, доставка 0 ₴.`:" Доставка 0 ₴."} Глянь, що нового: ${site}`],
-   pr?[`Акція «${pr.name}»`,`Привіт! Це Юля з YULA. ${pr.name}: до −${pr.pct}% до ${dmy(pr.end)}. Доставка 0 ₴. ${site}`]:null].filter(Boolean)}
+  return [["Після отримання посилки",`Привіт! Це YULA. Посилка вже в тебе. Як сіло? Залиш відгук у замовленні, нарахуємо 30 ₴ бонусами. ${site}`],
+   ["Мовчать 30+ днів",`Привіт! Це YULA. Давно не бачились.${par?` Друга річ у посилці в нас дешевша на ${par} ₴, доставка 0 ₴.`:" Доставка 0 ₴."} Глянь, що нового: ${site}`],
+   pr?[`Акція «${pr.name}»`,`Привіт! Це YULA. ${pr.name}: до −${pr.pct}% до ${dmy(pr.end)}. Доставка 0 ₴. ${site}`]:null].filter(Boolean)}
 const ovTabs=()=>`<div class="fchips" style="padding-top:0"><button class="fch" type="button" data-ov="orders" aria-pressed="${S.ov!=="buyers"}">Замовлення · ${ST.orders.length}</button><button class="fch" type="button" data-ov="buyers" aria-pressed="${S.ov==="buyers"}">Покупці · ${custs().length}</button></div>`;
 function vBuyers(){
   const all=custs(),list=all.filter(BSEG[S.bseg][1]),ok=list.filter(c=>c.ok),rep=all.filter(BSEG.rep[1]).length,T=tpls();

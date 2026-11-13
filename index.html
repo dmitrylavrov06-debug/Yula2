@@ -193,9 +193,9 @@ svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .star{color:var(--ink);font-weight:700;display:inline-flex;gap:2px;align-items:center}
 .star svg{width:12px;height:12px;fill:var(--ink)}
 .newb{font-weight:800;color:var(--ink);background:var(--butter);border-radius:4px;padding:0 5px;font-size:11px}
-.who{display:flex;gap:2px;margin-left:4px;min-width:0;overflow-x:auto;scrollbar-width:none}
+.who{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:2px;margin:8px 0 2px;background:rgba(255,255,255,.08);border-radius:999px;padding:3px}
 .who::-webkit-scrollbar{display:none}
-.who button{flex:none;padding:6px 8px;border-radius:999px;font-weight:700;font-size:13px;color:rgba(255,255,255,.74);min-height:34px;transition:background .2s,color .2s}
+.who button{min-width:0;padding:6px 4px;white-space:nowrap;text-align:center;border-radius:999px;font-weight:700;font-size:13px;color:rgba(255,255,255,.74);min-height:34px;transition:background .2s,color .2s}
 .who button[aria-selected="true"]{background:#fff;color:var(--ink)}
 .gh{margin:20px 0 10px;font-size:15px;font-weight:800}
 .cc small{color:var(--muted);font-weight:600;font-size:11.5px;margin-top:-3px}
@@ -571,9 +571,10 @@ label.f input,select.f{display:block;width:100%;margin-top:4px;padding:12px;bord
 <div class="app">
   <header class="hdr gut" id="hdr">
     <div class="r1">
-      <div class="mark">YULA<b></b></div><div class="who" id="who" role="tablist" aria-label="Для кого"></div><span class="sp"></span>
+      <div class="mark">YULA<b></b></div><span class="sp"></span>
       <button class="hb" type="button" data-go="likes" aria-label="Обране"><svg class="i" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-9-9.5C2 7 4.2 4.5 7 4.5c2 0 3.4 1.2 5 3 1.6-1.8 3-3 5-3 2.8 0 5 2.5 4 6C19.5 15.4 12 20 12 20z"/></svg></button>
     </div>
+    <div class="who" id="who" role="tablist" aria-label="Для кого"></div>
     <div class="r2">
       <label class="pill" id="pill" for="q">
         <input id="q" type="search" autocomplete="off" aria-label="Пошук товарів">
@@ -698,10 +699,10 @@ const PROMO=(()=>{const g={};P.forEach(p=>{if(p.o&&p.pe&&p.tot>0){const k=p.pn+"
   return top?{name:top[0].pn||"Акція",end:top[0].pe,pct:Math.max(...top.map(p=>Math.round((1-p.p/p.o)*100))),n:top.length}:null})();
 const dmy=t=>new Date(t).toLocaleDateString("uk-UA",{day:"numeric",month:"long"});
 const leftTxt=end=>{const t=Math.max(0,Math.floor((end-Date.now())/1000)),d=Math.floor(t/86400),h=Math.floor(t%86400/3600),m=Math.floor(t%3600/60);return d?`${d} дн ${h} год`:`${h} год ${m} хв`};
-function match(p,cat){if(!cat||cat==="all")return true;if(cat==="women")return p.c==="women"||p.c==="uni";if(cat==="men")return p.c==="men"||p.c==="uni";if(cat==="kids")return p.c==="kids";if(cat==="cheap")return p.p<=300;if(cat==="sale")return !!p.o;if(cat==="big")return Object.keys(p.sz).some(s=>/3XL|4XL|XL-XXL/.test(s)&&p.sz[s]>0);if(cat.startsWith("sub:"))return p.sub===cat.slice(4);return true}
+function match(p,cat){if(!cat||cat==="all")return true;if(cat==="women")return p.c==="women"||p.c==="uni";if(cat==="men")return p.c==="men"||p.c==="uni";if(cat==="kids")return p.c==="kids";if(cat==="uni")return p.c==="uni";if(cat==="cheap")return p.p<=300;if(cat==="sale")return !!p.o;if(cat==="big")return Object.keys(p.sz).some(s=>/3XL|4XL|XL-XXL/.test(s)&&p.sz[s]>0);if(cat.startsWith("sub:"))return p.sub===cat.slice(4);return true}
 const best=(cat,n=1)=>P.filter(p=>match(p,cat)&&p.tot>0).sort((a,b)=>b.tot-a.tot).slice(0,n);
-const WHO=[["women","Жінкам"],["men","Чоловікам"],["kids","Дітям"]].filter(([k])=>k!=="kids"||P.some(p=>p.c==="kids"&&p.tot>0));
-const WHON={all:"Усе",women:"Жінкам",men:"Чоловікам",kids:"Дітям"};
+const WHO=[["women","Жінкам"],["men","Чоловікам"],["uni","Унісекс"],["kids","Дітям"]].filter(([k])=>!["kids","uni"].includes(k)||P.some(p=>p.c===k&&p.tot>0));
+const WHON={all:"Усе",women:"Жінкам",men:"Чоловікам",uni:"Унісекс",kids:"Дітям"};
 const subsFor=who=>{const c=countBy(P.filter(p=>p.tot>0&&match(p,who)),p=>p.sub);return Object.keys(c).filter(x=>x!=="Інше").sort((a,b)=>c[b]-c[a]||a.localeCompare(b,"uk")).concat(c["Інше"]?["Інше"]:[])};
 const bestW=(cat,who,n=1)=>P.filter(p=>match(p,cat)&&match(p,who)&&p.tot>0).sort((a,b)=>b.tot-a.tot).slice(0,n);
 const circ=()=>[...subsFor(S.who).slice(0,9).map(x=>[x.replace(" та зіпки",""),"sub:"+x,bestW("sub:"+x,S.who)[0]?.i]),["Великі розміри","big",bestW("big",S.who)[0]?.i],["До 300 ₴","cheap",bestW("cheap",S.who)[0]?.i]].filter(x=>x[2]!=null);
@@ -950,7 +951,7 @@ function vList(){
       ${S.my.wear?`<button class="fch" type="button" data-fs="mine" aria-pressed="${!!L.mine}">Є мій розмір (${S.my.wear})</button>`:`<button class="fch" type="button" data-sizepick="wear">Вказати мій розмір</button>`}
       <button class="fch" type="button" data-fs="big" aria-pressed="${!!L.big}">Великі розміри</button>
     </div>
-    ${L.who&&L.who!=="all"?`<p class="scope">Показуємо «${WHON[L.who]}»${L.who!=="kids"?" та унісекс":""}. <button type="button" data-lwho="all">Показати все</button></p>`:""}
+    ${L.who&&L.who!=="all"?`<p class="scope">Показуємо «${WHON[L.who]}»${L.who==="women"||L.who==="men"?" та унісекс":""}. <button type="button" data-lwho="all">Показати все</button></p>`:""}
     ${items.length?`<div class="mas">${items.map(card).join("")}</div>`:narrowed?`<div class="empty"><div class="bigi">0</div><p>За такими фільтрами нічого немає</p><button class="btn sm" type="button" data-freset>Скинути фільтри</button></div>`:`<div class="empty"><div class="bigi">0</div><p>Нічого не знайшли.<br>Спробуй «худі» чи «костюм».</p><div class="fchips" style="justify-content:center;flex-wrap:wrap">${POP.map(w=>`<button class="fch" type="button" data-q="${w}">${w}</button>`).join("")}</div></div>`}
   </section>`;
 }

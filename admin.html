@@ -266,7 +266,7 @@ function load(){
   try{const s=JSON.parse(localStorage.getItem(LS)||"null");if(s&&s.sup)return s}catch(e){}
   const items=BASE.items.map(x=>({gid:"0:"+x.code+":"+hash(x.raw),n:x.n,raw:x.raw,s:x.s,sub:x.sub,c:x.c,h:x.h,sat:x.sat,l:x.l,pat:x.pat,cost:x.cost,sz:x.sz,pics:x.pics,ph:(x.ph||[]).map(f=>MYDROP+f),mat:x.mat,code:x.code,sl:0,colorOk:!(x.sat===30&&x.l===55),added:now()-3600e3}));
   return {sup:[{n:"MODAMIXX",lg:"MM",src:"MyDrop XML",file:"product_export.xml",offers:808,last:now()-3600e3,contact:"@MODAMIXX_ADMIN",pay:"Оплата при отриманні на постачальника або передплата",ret:"Уточнити умови повернення"}],
-    items,hide:{},rules:{pct:30,min:0,grp:20,cat:{}},published:null,dirty:true,
+    items,hide:{},rules:{pct:30,min:0,cat:{}},published:null,dirty:true,
     orders:[{no:"YL-10231",gid:items[0].gid,size:Object.keys(items[0].sz)[0],buyer:"Коваленко Марія",phone:"+380 67 123 45 67",np:"Київ, поштомат № 5521",pay:"Оплачено онлайн",st:0,ttn:""},
             {no:"YL-10229",gid:items[40].gid,size:Object.keys(items[40].sz)[1]||Object.keys(items[40].sz)[0],buyer:"Мельник Андрій",phone:"+380 50 222 33 44",np:"Львів, відділення №7",pay:"Передплата 200 ₴, решта при отриманні",st:1,ttn:""}]};
 }
@@ -276,7 +276,7 @@ function toast(t){$("#toastHost").innerHTML=`<div class="toast" role="status">${
 
 /* ===== pricing & checks ===== */
 const r9=x=>Math.ceil(x/10)*10-1;
-function priceOf(it){const R=ST.rules,pct=R.cat[it.sub]!=null&&R.cat[it.sub]!==""?+R.cat[it.sub]:R.pct;const p=r9(Math.max(it.cost*(1+pct/100),it.cost+(+R.min||0)));let g=r9(it.cost*(1+R.grp/100));if(g>=p)g=p-10;return{p,g,pct}}
+function priceOf(it){const R=ST.rules,pct=R.cat[it.sub]!=null&&R.cat[it.sub]!==""?+R.cat[it.sub]:R.pct;const p=r9(Math.max(it.cost*(1+pct/100),it.cost+(+R.min||0)));return{p,pct}}
 const tot=it=>Object.values(it.sz).reduce((a,b)=>a+b,0);
 function dupMap(){const m={},best={};for(const it of ST.items){const k=it.n.toLowerCase().replace(/\s+/g," ");(m[k]=m[k]||[]).push(it)}
   for(const k in m){if(m[k].length<2)continue;const arr=m[k].filter(i=>tot(i)>0).sort((a,b)=>a.cost-b.cost);const w=arr[0]||m[k][0];for(const i of m[k])if(i!==w)best[i.gid]=w}return best}
@@ -332,7 +332,7 @@ function vItems(){
    <div class="card" style="padding-block:2px">${shown.length?shown.map(({it,st})=>{const pr=priceOf(it),is=issues(it,d);return`<div class="prod">${thumb(it)}<div class="tx">
      <div class="t">${it.n}</div><div class="raw" title="${it.raw.replace(/"/g,"&quot;")}">У фіді: ${it.raw}</div>
      <div class="s"><span class="pill ${st==="live"?"ok":st==="review"?"warn":"mut"}">${st==="live"?"На сайті":st==="review"?"Перевірити":"Приховано"}</span><span>${it.sub}</span><span>${ST.sup[it.sl].n}</span><span>${it.code}</span></div>
-     <div class="money num">Дроп ${uah(it.cost)} → <b>${uah(pr.p)}</b> · +${uah(pr.p-it.cost)} (${Math.round((pr.p/it.cost-1)*100)}%) · разом ${uah(pr.g)}</div>
+     <div class="money num">Дроп ${uah(it.cost)} → <b>${uah(pr.p)}</b> · +${uah(pr.p-it.cost)} (${Math.round((pr.p/it.cost-1)*100)}%)</div>
      <div class="stk">${Object.entries(it.sz).map(([s,q])=>`<span class="${q===0?"z":q<=2?"low":""}">${s}${q?` · ${q}`:""}</span>`).join("")}</div>
      ${is.length?`<div class="iss">${ic("warn","width:14px;height:14px")}${is.map(x=>x[1]).join(" · ")}</div>`:""}
    </div><button class="tg" type="button" role="switch" aria-checked="${st==="live"}" data-toggle="${it.gid}" aria-label="Показувати на сайті"></button></div>`}).join("")+(list.length>S.lim?`<button class="more" type="button" data-more>Показати ще ${Math.min(40,list.length-S.lim)} з ${list.length-S.lim}</button>`:""):`<p style="text-align:center;color:var(--muted);padding:20px 0">Нічого не знайдено</p>`}</div></section>`;
@@ -340,13 +340,12 @@ function vItems(){
 function vRules(){
   const R=ST.rules,cats={};for(const it of ST.items)cats[it.sub]=(cats[it.sub]||0)+1;
   const d=dupMap(),live=ST.items.filter(i=>status(i,d)==="live");
-  const ex=[150,250,400,700].map(c=>{const pr=priceOf({cost:c,sub:"__"});return[c,pr.p,pr.g]});
+  const ex=[150,250,400,700].map(c=>[c,priceOf({cost:c,sub:"__"}).p]);
   const avgM=live.length?live.reduce((a,i)=>a+(priceOf(i).p-i.cost),0)/live.length:0;
   return `<section class="view gut"><h1 class="ph">Націнки</h1><p class="lead">Ціна для покупця рахується з дроп-ціни постачальника й округлюється до …9 ₴. Нові правила одразу застосовуються до всіх товарів.</p>
    <div class="card">
     <div class="rrow"><span>Загальна націнка</span><b class="num" id="vPct">${R.pct}%</b></div><input class="rng" type="range" id="rPct" min="10" max="120" step="5" value="${R.pct}" aria-label="Загальна націнка">
     <div class="rrow"><span>Мінімальний заробіток з речі</span><b class="num" id="vMin">${R.min} ₴</b></div><input class="rng" type="range" id="rMin" min="0" max="250" step="10" value="${R.min}" aria-label="Мінімальний заробіток">
-    <div class="rrow"><span>Ціна «Купити разом»</span><b class="num" id="vGrp">+${R.grp}%</b></div><input class="rng" type="range" id="rGrp" min="5" max="60" step="5" value="${R.grp}" aria-label="Націнка для групової ціни">
     <div class="ex" id="ex">${exHtml(ex)}</div>
     <p style="margin:10px 0 0;font-size:13px;color:${avgM<80?"var(--red)":"var(--muted)"}" id="avgM">Середній заробіток з речі на сайті: <b class="num">${uah(avgM)}</b>${avgM<80?" — цього замало, щоб окупити рекламу в Instagram":""}</p>
    </div>
@@ -355,7 +354,7 @@ function vRules(){
     ${Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([c,n])=>`<tr><td>${c}</td><td class="num">${n}</td><td><input type="number" inputmode="numeric" min="0" max="300" data-cat="${c}" value="${R.cat[c]??""}" placeholder="${R.pct}" aria-label="Націнка для ${c}"></td></tr>`).join("")}
     </tbody></table></div></section>`;
 }
-function exHtml(ex){return `<div style="font-size:12.5px;color:var(--muted);font-weight:700;margin-bottom:4px">Приклади</div>${ex.map(([c,p,g])=>`<div class="sum num"><span>Дроп ${uah(c)}</span><span><b>${uah(p)}</b> <span style="color:var(--muted)">· +${uah(p-c)} · разом ${uah(g)}</span></span></div>`).join("")}`}
+function exHtml(ex){return `<div style="font-size:12.5px;color:var(--muted);font-weight:700;margin-bottom:4px">Приклади</div>${ex.map(([c,p])=>`<div class="sum num"><span>Дроп ${uah(c)}</span><span><b>${uah(p)}</b> <span style="color:var(--muted)">· +${uah(p-c)}</span></span></div>`).join("")}`}
 const OST=["Нове","Передано постачальнику","Є ТТН","Отримано"];
 function orderMsg(o){const it=ST.items.find(i=>i.gid===o.gid);if(!it)return"";return `Замовлення ${o.no}\nТовар: ${it.raw}\nАртикул: ${it.code}, розмір ${o.size}\nОтримувач: ${o.buyer}\nТелефон: ${o.phone}\nНова пошта: ${o.np}\nОплата: ${o.pay}\nВідправник: YULA`}
 function vOrders(){
@@ -446,7 +445,7 @@ function addSupSheet(refresh){
 function publish(){
   const d=dupMap(),live=ST.items.filter(i=>status(i,d)==="live");
   if(!live.length){toast("Немає товарів для публікації");return}
-  const items=live.map(it=>{const pr=priceOf(it);return{n:it.n,raw:it.raw,s:it.s,sub:it.sub,c:it.c,h:it.h,sat:it.sat,l:it.l,pat:it.pat,cost:it.cost,p:pr.p,g:pr.g,sz:it.sz,pics:it.pics,ph:it.ph,mat:it.mat,code:it.code,sl:it.sl}});
+  const items=live.map(it=>{const pr=priceOf(it);return{n:it.n,raw:it.raw,s:it.s,sub:it.sub,c:it.c,h:it.h,sat:it.sat,l:it.l,pat:it.pat,cost:it.cost,p:pr.p,sz:it.sz,pics:it.pics,ph:it.ph,mat:it.mat,code:it.code,sl:it.sl}});
   const pub={at:now(),suppliers:ST.sup.map(s=>({n:s.n,lg:s.lg,legal:"Постачальник · реквізити уточнюються",city:"Україна",r:null,on:null,since:new Date().getFullYear(),vf:0})),items};
   try{localStorage.setItem(PUB,JSON.stringify(pub));ST.published=now();ST.dirty=false;save();updBadges();
     sheet(`<div class="grab"></div><div style="text-align:center;padding-top:16px"><div style="width:70px;height:70px;border-radius:50%;background:var(--green-soft);color:var(--green);display:grid;place-items:center;margin:0 auto">${ic("chk","width:34px;height:34px;stroke-width:2.6")}</div>
@@ -464,12 +463,12 @@ function bindView(){
   const q=$("#q");if(q){q.oninput=()=>{S.q=q.value;S.lim=40;const pos=q.selectionStart;render();const n=$("#q");n.focus();n.setSelectionRange(pos,pos)}}
   const ss=$("#supSel");if(ss)ss.onchange=()=>{S.sup=ss.value;render()};
   if(S.view==="rules"){
-    const upd=()=>{const R=ST.rules;R.pct=+$("#rPct").value;R.min=+$("#rMin").value;R.grp=+$("#rGrp").value;$("#vPct").textContent=R.pct+"%";$("#vMin").textContent=R.min+" ₴";$("#vGrp").textContent="+"+R.grp+"%";
-      $("#ex").innerHTML=exHtml([150,250,400,700].map(c=>{const pr=priceOf({cost:c,sub:"__"});return[c,pr.p,pr.g]}));
+    const upd=()=>{const R=ST.rules;R.pct=+$("#rPct").value;R.min=+$("#rMin").value;$("#vPct").textContent=R.pct+"%";$("#vMin").textContent=R.min+" ₴";
+      $("#ex").innerHTML=exHtml([150,250,400,700].map(c=>[c,priceOf({cost:c,sub:"__"}).p]));
       const d=dupMap(),live=ST.items.filter(i=>status(i,d)==="live"),m=live.length?live.reduce((a,i)=>a+(priceOf(i).p-i.cost),0)/live.length:0;
       $("#avgM").style.color=m<80?"var(--red)":"var(--muted)";$("#avgM").innerHTML=`Середній заробіток з речі на сайті: <b class="num">${uah(m)}</b>${m<80?" — цього замало, щоб окупити рекламу в Instagram":""}`;
       document.querySelectorAll("[data-cat]").forEach(i=>i.placeholder=R.pct);ST.dirty=true;updBadges()};
-    ["rPct","rMin","rGrp"].forEach(id=>{$("#"+id).oninput=upd;$("#"+id).onchange=save});
+    ["rPct","rMin"].forEach(id=>{$("#"+id).oninput=upd;$("#"+id).onchange=save});
     document.querySelectorAll("[data-cat]").forEach(inp=>inp.onchange=()=>{const v=inp.value.trim();if(v==="")delete ST.rules.cat[inp.dataset.cat];else ST.rules.cat[inp.dataset.cat]=Math.max(0,+v);ST.dirty=true;save();updBadges();toast(`Націнка для «${inp.dataset.cat}»: ${v===""?"загальна":v+"%"}`)});
   }
 }

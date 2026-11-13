@@ -1207,7 +1207,7 @@ function go(v){S.view=v;render();window.scrollTo({top:0})}
 function openList(o){if(o.who===undefined)o.who=S.who;o.f=o.f||{};S.list=o;if(S.view!=="list")S.prev=S.view;go("list")}
 
 function drawNav(){
-  $("#who").innerHTML=WHO.map(([k,l])=>`<button type="button" role="tab" data-who="${k}" aria-selected="${S.who===k}">${l}</button>`).join("");
+  $("#who").innerHTML=WHO.filter(w=>w[0]!=="uni").map(([k,l])=>`<button type="button" role="tab" data-who="${k}" aria-selected="${S.who===k}">${l}</button>`).join("");
   const subs=subsFor(S.who).slice(0,10);if(S.nt!=="all"&&!subs.includes(S.nt.slice(4)))S.nt="all";
   $("#ntabs").innerHTML=[["all","Усе"],...subs.map(x=>["sub:"+x,x.replace(" та зіпки","")])].map(([k,l])=>`<button class="nt" type="button" role="tab" data-nt="${k}" aria-selected="${k===S.nt}">${l}</button>`).join("")+'<span class="ind" id="ind"></span>';
   moveInd($("#ntabs"),".nt[aria-selected=true]",$("#ind"));

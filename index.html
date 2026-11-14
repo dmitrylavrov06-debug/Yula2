@@ -246,6 +246,42 @@ svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .slide h3.tiers{display:grid;gap:2px;line-height:.92}
 .slide h3.tiers span{display:block}
 .slide h3.tiers small{display:block;font:800 11px var(--f-b);letter-spacing:.12em;opacity:.75;margin-bottom:1px}
+.hero.one .slide{cursor:pointer}
+.cta .left{margin-left:4px;font:700 12px var(--f-b);letter-spacing:0;opacity:.92;background:rgba(17,17,17,.18);border-radius:999px;padding:3px 9px}
+.pstr{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--paper);border-radius:14px;padding:10px 12px;margin-top:10px}
+.pstr .bxi{width:44px;height:38px;flex:none;position:relative}
+.pstr .bxi .bx{position:static;width:44px;height:38px}
+.pstr>span:nth-child(2){flex:1;min-width:0}
+.pstr b{display:block;font:800 14px var(--f-d)}
+.pstr small{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.pstr small i{font-style:normal;font:800 11.5px var(--f-d);background:var(--pink);color:var(--ink);border-radius:6px;padding:2px 6px}
+.pstr svg.i{width:18px;height:18px;flex:none;color:var(--muted)}
+.gzoom{position:absolute;left:12px;bottom:12px;z-index:3;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.gzoom svg.i{width:18px;height:18px}
+.frame.photo{cursor:zoom-in}
+.thumbs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-top:10px}
+.thumbs::-webkit-scrollbar{display:none}
+.thumbs button{flex:0 0 52px;height:64px;border-radius:10px;overflow:hidden;opacity:.55;transition:opacity .2s,box-shadow .2s}
+.thumbs button[aria-pressed="true"]{opacity:1;box-shadow:inset 0 0 0 2px var(--ink)}
+.thumbs .tile{width:100%;height:100%;display:block;border-radius:0}
+.thumbs .tile>svg{display:none}
+.meta2{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;margin-top:6px;color:var(--muted)}
+.meta2 .fitc{background:var(--green-soft,#E3F3EB);color:var(--green);font-weight:800;border-radius:6px;padding:1px 7px}
+.perks{display:grid;gap:8px;margin-top:16px}
+.perks .save,.perks .pline,.perks .parts{margin-top:0}
+.viewer{position:fixed;inset:0;z-index:80;background:#0d0b0a;animation:fade .2s}
+.vtrack{display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.vtrack::-webkit-scrollbar{display:none}
+.vs{flex:0 0 100%;height:100%;scroll-snap-align:start;overflow:hidden;display:grid;place-items:center;touch-action:pan-x pan-y pinch-zoom}
+.vs img{max-width:100%;max-height:100%;object-fit:contain;user-select:none;-webkit-user-select:none}
+.vs.z{overflow:auto;display:block;cursor:grab}
+.vs.z img{max-width:none;max-height:none;width:240%;height:auto}
+.vtop{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:8px;padding:calc(12px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));color:#fff;background:linear-gradient(rgba(0,0,0,.55),transparent)}
+.vtop span{margin-right:auto;font-weight:700;font-size:14px}
+.vtop button{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.14);display:grid;place-items:center;color:#fff}
+.vtop svg.i{width:20px;height:20px}
+.dpop{position:fixed;z-index:70;transform:translate(-50%,0);background:var(--pink);color:var(--ink);font:900 15px var(--f-d);padding:5px 10px;border-radius:10px;pointer-events:none;box-shadow:0 6px 16px rgba(255,46,126,.35);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.viewer{animation:none}}
 .ya{width:34px;height:34px;border-radius:50%;background:var(--pink);color:var(--ink);display:grid;place-items:center;font:900 12px var(--f-d);flex:none}
 .hello{display:flex;gap:10px;align-items:center;background:var(--ink);color:#fff;border-radius:14px;padding:12px;margin-top:10px}
 .hello b{display:block;font-size:14px}
@@ -886,34 +922,24 @@ function vHome(){
    <div class="trust gut"><span>${ic("truck")}Доставка безкоштовна</span>${CFG.parcel?`<span>${ic("box")}Друга річ −${tierPct(1)}%, третя −${tierPct(2)}%</span>`:""}<span>${ic("locker")}У поштоматі за 2–3 дні</span><span>${ic("ret")}Повернення 14 днів</span><span>${ic("eye")}Огляд на пошті</span><span>${ic("shield")}Безпечна оплата</span></div>
    ${S.onb?`<div class="gut"><div class="hello"><span class="ya">Y</span><div><b>Привіт, це YULA</b><small>${S.bonus>0?`На старт у тебе ${uah(S.bonus)} бонусів: ними можна оплатити до ${CFG.bonusCap}% замовлення.`:"Підкажу з розміром і зберу посилку вигідніше."}</small></div><button class="xx" type="button" data-hello aria-label="Закрити">${ic("x")}</button></div></div>`:""}
    ${homeStrips()}
-   <div class="hero" id="hero"><div class="track" id="track">
+   <div class="hero one" id="hero"><div class="track" id="track">
      ${PROMO?`<button class="slide s1 on" type="button" data-list="sale" data-title="${esc(PROMO.name)}">
-       <div class="rib anim">${esc(PROMO.name.toUpperCase())} · ДО ${new Date(PROMO.end).toLocaleDateString("uk-UA",{day:"2-digit",month:"2-digit"})}</div>
+       <div class="rib anim">${esc(PROMO.name.toUpperCase())} · ЩЕ <span class="num" id="pleft">${leftTxt(PROMO.end).toUpperCase()}</span></div>
        <div class="mega anim"><small>ЗНИЖКА ДО</small><b>−${PROMO.pct}%</b></div>
        <div class="stk anim"><span>ДОСТАВКА<br><b style="font-size:20px">0 ₴</b></span></div>
        <div class="cta">ДИВИТИСЬ <em>→</em></div>
+     </button>`:CFG.parcel?`<button class="slide s2 on" type="button" data-parcel>
+       <h3 class="anim tiers">${TIERS.slice(0,2).map((t,k)=>`<span><small>${["ДРУГА РІЧ","ТРЕТЯ РІЧ"][k]}</small>−${t}%</span>`).join("")}</h3>
+       ${BOX}
+       <p class="anim">${TIERS.length>2?`<b>Далі до −${TOP}%</b>`:""}Знижка на кожну наступну річ в одній посилці</p>
      </button>`:`<button class="slide s1 on" type="button" data-list="all" data-title="Усі товари">
        <div class="rib anim">${P.filter(p=>p.tot>0).length} МОДЕЛЕЙ В НАЯВНОСТІ</div>
        <div class="mega anim"><small>ВІД</small><b>${minF}₴</b></div>
        <div class="stk anim"><span>ДОСТАВКА<br><b style="font-size:20px">0 ₴</b></span></div>
        <div class="cta">ДИВИТИСЬ <em>→</em></div>
      </button>`}
-     ${CFG.parcel?`<button class="slide s2" type="button" data-parcel>
-       <h3 class="anim tiers">${TIERS.slice(0,2).map((t,k)=>`<span><small>${["ДРУГА РІЧ","ТРЕТЯ РІЧ"][k]}</small>−${t}%</span>`).join("")}</h3>
-       ${BOX}
-       <p class="anim">${TIERS.length>2?`<b>Далі до −${TOP}%</b>`:""}Знижка на кожну наступну річ в одній посилці</p>
-     </button>`:`<button class="slide s2" type="button" data-wheel>
-       <h3 class="anim">КРУТНИ<br>БАРАБАН</h3>
-       <div class="mw" aria-hidden="true"></div>
-       <p class="anim"><b>До 100 ₴ бонусів</b>Раз на день, без покупки й запрошень</p>
-     </button>`}
-     <button class="slide s3" type="button" data-list="big" data-title="Великі розміри">
-       <h3 class="anim">РОЗМІРИ<br>ДО 4XL</h3>
-       <div class="spool"><i></i><b></b></div>
-       <p class="anim">${P.filter(p=>match(p,"big")).length} моделей у великих розмірах</p>
-     </button>
-   </div><div class="dots" id="dots"><i class="on"></i><i></i><i></i></div></div>
-   ${PROMO?`<div class="gut"><button class="pstrip" type="button" data-list="sale" data-title="${esc(PROMO.name)}"><b>${esc(PROMO.name)}: до −${PROMO.pct}%</b><span>ще <span class="num" id="pleft">${leftTxt(PROMO.end)}</span></span></button></div>`:""}
+   </div></div>
+   ${PROMO&&CFG.parcel?`<div class="gut"><button class="pstr" type="button" data-parcel><span class="bxi">${BOX}</span><span><b>Одна посилка — весь образ</b><small>${TIERS.map((t,k)=>`<i>${["2-га","3-тя","далі"][k]||"далі"} −${t}%</i>`).join("")}</small></span>${ic("chev")}</button></div>`:""}
 
    <div class="circles gut">${circ().map(([n,c,pi])=>{const p=P[pi];return`<button class="cc" type="button" data-list="${c}" data-title="${n}"><span class="ring tile" style="--h:${p.h}">${art(p)}${img(p)}</span>${n}</button>`}).join("")}</div>
 
@@ -946,6 +972,7 @@ function vCats(){
   </section>`;
 }
 /* list: audience, category, size, price, colour, order */
+IC.zoom='<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5M11 8.5v5M8.5 11h5"/>';
 IC.sliders='<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>';
 const SZO=["XS","XS-S","S","M","M-L","L","XL","XL-XXL","XXL","3XL","4XL"],U2={XS:"42",S:"44",M:"46",L:"48",XL:"50"};
 const szKey=z=>SZO.includes(z)?[0,SZO.indexOf(z)]:/^\d+$/.test(z)?[1,+z]:[2,0];
@@ -1248,6 +1275,7 @@ const CN={0:"чорний",5:"червоний",20:"шоколад",25:"конь
 function fitSize(p,rec){if(!rec)return null;if(p.sz[rec]!==undefined)return rec;const R={"XS-S":["XS","S"],"M-L":["M","L"],"XL-XXL":["XL","XXL"]};for(const k in R)if(R[k].includes(rec)&&p.sz[k]!==undefined)return k;const U={XS:"42",S:"44",M:"46",L:"48",XL:"50"};if(U[rec]&&p.sz[U[rec]]!==undefined)return U[rec];return null}
 const recSize=p=>fitSize(p,S.my[kind(p)]);
 function openProduct(i){
+  S._open=i;
   {const k0=KEY(P[i]);S.seen=[k0,...(S.seen||[]).filter(k=>k!==k0)].slice(0,12);save()}
   const p=P[i],sz=sizesFor(p),si=shipInfo(),rec=recSize(p),rs=rvStat(p),rv=rvOf(p),inCart=S.cart.some(x=>x.i===i),pOff=inCart?0:gain(p),mt=mates([p],8);let pick=sz.length===1&&stock(p,sz[0])?sz[0]:(rec&&stock(p,rec)?rec:null),hue=p.h;
   const sim=P.filter(x=>x.sub===p.sub&&x.base!==p.base&&x.tot>0&&x.p<=p.p*1.1).sort((a,b)=>a.p-b.p).slice(0,6);
@@ -1256,23 +1284,25 @@ function openProduct(i){
   sheet(`<div class="gal"><div class="gtrack" id="gt">
      ${frames}
      <div class="frame"><div class="tagcard"><div><b>YULA</b>${p.mat||"Склад уточнюється"}<br>Артикул: ${p.code}<br>${p.season}<br>Їде з України</div></div><span class="lab">Бирка</span></div>
-   </div><span class="gcount num" id="gc">1 / ${nfr}</span></div>
+   </div><span class="gcount num" id="gc">1 / ${nfr}</span>${nph?`<button class="gzoom" type="button" data-zoom="0" aria-label="Відкрити фото на весь екран">${ic("zoom")}</button>`:""}</div>
+   ${nph>1?`<div class="thumbs gut" id="th">${p.ph.map((f,k)=>`<button type="button" data-th="${k}" aria-label="Фото ${k+1}" aria-pressed="${k===0}"><span class="tile" style="--h:${hue}">${img(p,k)}</span></button>`).join("")}</div>`:""}
    <div class="in">
     <div class="dp num"><b>${uah(p.p)}</b>${p.o?`<s>${uah(p.o)}</s><span class="off" style="margin:0">−${off(p)}%</span>`:""}</div>
-    ${p.o?`<div class="save">${ic("bolt","width:16px;height:16px")}<span>Економія ${uah(p.o-p.p)}. ${esc(p.pn||"Акція")} до ${dmy(p.pe)}, потім ${uah(p.o)}</span></div>`:""}
-    <div class="parts">${S.bonus>0&&CFG.bonusCap?`З бонусами — <b class="num">${uah(p.p-Math.min(S.bonus,Math.floor(p.p*CFG.bonusCap/100)))}</b>${CFG.cashback?" · ":""}`:""}${CFG.cashback?`<span style="color:var(--green);font-weight:700">+${cashb(p.p)} ₴ бонусами за онлайн-оплату</span>`:""}</div>
-    ${pOff?`<div class="xbig">${ic("box")}<span><b>З твоєю посилкою: ${uah(p.p-pOff)} <s>${uah(p.p)}</s> −${pctOf(pOff,p.p)}%</b><small>Їде разом з речами з кошика, доставка та сама</small></span></div>`:CFG.parcel?`<button class="pline" type="button" data-parcel>${ic("box")}<span>${tiersTxt().replace(/^./,c=>c.toUpperCase())} — <b>у ту саму посилку</b></span>${ic("chev")}</button>`:""}
-    <p class="dname">${p.n}</p>
-    <div class="ps" style="font-size:13px;margin-top:6px">${rs?`<span class="star">${STAR}${r1(rs.r)}</span><span>${rs.n} ${rs.n===1?"відгук":rs.n<5?"відгуки":"відгуків"}</span>`:`<span class="newb">Новинка на YULA</span><span>відгуків ще немає</span>`}</div>
-    <div class="bline"><span class="bdg vf">${ic("box")}В наявності ${p.tot} шт</span>${p.c==="women"?'<span class="bdg ua">Жіноча модель</span>':p.c==="uni"?'<span class="bdg ua">Унісекс</span>':""}</div>
-    
+    <p class="dname">${p.sib.length>1?esc(p.base):esc(p.n)}</p>
+    <div class="ps meta2">${rs?`<span class="star">${STAR}${r1(rs.r)}</span><span>${rs.n} ${rs.n===1?"відгук":rs.n<5?"відгуки":"відгуків"}</span><span class="fitc">${FIT[rs.fit]}</span>`:`<span class="newb">Новинка на YULA</span>`}<span>В наявності ${p.tot} шт</span>${p.c==="women"?"<span>Жіноча модель</span>":p.c==="uni"?"<span>Унісекс</span>":""}</div>
+    ${pOff?`<div class="xbig">${ic("box")}<span><b>З твоєю посилкою: ${uah(p.p-pOff)} <s>${uah(p.p)}</s> −${pctOf(pOff,p.p)}%</b><small>Їде разом з речами з кошика, доставка та сама</small></span></div>`:""}
     <div class="lbl">Колір <span>${p.col||"—"}</span></div>
     <div class="sws" id="sw">${p.sib.map(j=>{const q=P[j];return`<button type="button" aria-label="${q.col||q.n}" data-sib="${j}" aria-pressed="${j===i}" style="background:hsl(${q.h} ${q.sat}% ${q.l}%)"></button>`}).join("")}</div>
     <div class="lbl">Розмір <button type="button" data-stable="${i}">${ic("ruler","width:15px;height:15px;vertical-align:-3px")} Залишки й заміри</button></div>
     <div class="sizes" id="sz">${sz.map(s=>{const st=stock(p,s);return`<button class="size ${st?"":"oos"}" type="button" data-s="${s}" aria-pressed="${s===pick}" aria-label="${s}${st?"":", немає в наявності"}">${s}${st&&st<=3?`<span class="few">${st} шт</span>`:""}${s===rec?'<span class="rec">YULA радить</span>':""}</button>`}).join("")}</div>
     <div class="err" id="szErr" style="margin-top:8px" role="alert"></div>
     <button class="yula" type="button" data-sizepick="${kind(p)}" data-for="${i}"><span class="ya">Y</span><span><b>${rec?`Тобі ${S.my[kind(p)]}${rec!==S.my[kind(p)]?`, у цієї моделі це ${rec}`:""}`:"YULA підбере розмір"}</b><small>${rec?"Змінити параметри":"Скажи зріст і вагу, підкажу розмір"}</small></span></button>
-    <p style="margin:10px 0 0;font-size:12.5px;color:var(--muted)">${rs?`Як сідає за відгуками: «${FIT[rs.fit]}» — ${rs.fitN} з ${rs.n}.`:"Як сідає, напишуть перші покупці. Поки що орієнтуйся на підказку YULA."}</p>
+    ${rs?`<p style="margin:10px 0 0;font-size:12.5px;color:var(--muted)">Як сідає за відгуками: «${FIT[rs.fit]}» — ${rs.fitN} з ${rs.n}.</p>`:""}
+    <div class="perks">
+     ${p.o?`<div class="save">${ic("bolt","width:16px;height:16px")}<span>Економія ${uah(p.o-p.p)}. ${esc(p.pn||"Акція")} до ${dmy(p.pe)}, потім ${uah(p.o)}</span></div>`:""}
+     ${!pOff&&CFG.parcel?`<button class="pline" type="button" data-parcel>${ic("box")}<span>${tiersTxt().replace(/^./,c=>c.toUpperCase())} — <b>у ту саму посилку</b></span>${ic("chev")}</button>`:""}
+     ${(S.bonus>0&&CFG.bonusCap)||CFG.cashback?`<div class="parts">${S.bonus>0&&CFG.bonusCap?`З бонусами — <b class="num">${uah(p.p-Math.min(S.bonus,Math.floor(p.p*CFG.bonusCap/100)))}</b>${CFG.cashback?" · ":""}`:""}${CFG.cashback?`<span style="color:var(--green);font-weight:700">+${cashb(p.p)} ₴ бонусами за онлайн-оплату</span>`:""}</div>`:""}
+    </div>
 
     <div class="blk"><h5>Доставка і повернення</h5>
       <div class="line" style="padding-top:0"><span class="ic">${ic("locker")}</span><span class="tx"><b>Безкоштовна доставка</b><small>У поштоматі чи відділенні Нової пошти ${si.eta}. Кур’єр теж безкоштовно</small></span></div>
@@ -1286,14 +1316,33 @@ function openProduct(i){
     <div class="blk"><h5>Про товар</h5><dl class="dl"><dt>Тканина</dt><dd>${p.mat||"Уточнюємо у виробника"}</dd><dt>Сезон</dt><dd>${p.season}</dd><dt>Артикул</dt><dd>${p.code}</dd><dt>Країна</dt><dd>${p.country}</dd></dl></div>
     <div class="blk"><h5>Відгуки${rs?` <span class="star" style="font-size:13px;margin-left:6px">${STAR}${r1(rs.r)}</span>`:""}</h5>${rv.length?rv.slice(-4).reverse().map(y=>`<div class="rv"><b>${y.r} з 5</b> · ${FIT[y.fit]}${y.t?`<div>${esc(y.t)}</div>`:""}<small>Розмір ${esc(y.size)} · ${new Date(y.at).toLocaleDateString("uk-UA")}</small></div>`).join(""):`<div style="background:var(--bg);border-radius:12px;padding:14px;text-align:center"><b style="font-size:14px">Відгуків ще немає</b><p style="margin:4px 0 0;font-size:13px;color:var(--muted)">Показуємо тільки відгуки тих, хто отримав посилку. За відгук нараховуємо 30 ₴ бонусами.</p></div>`}</div>
     ${sim.length?`<div class="blk"><h5>Схожі моделі</h5><div class="hrow">${sim.map(x=>`<button class="fc" type="button" data-open="${x.i}" style="flex-basis:100px">${tile(x)}<div class="pr num" style="font-size:13px">${uah(x.p)}</div></button>`).join("")}</div></div>`:""}
-    <div class="buybar"><button class="btn ghost" type="button" id="b1"><b class="num">${uah(p.p)}</b><span>У кошик</span></button><button class="btn pink" type="button" id="b2"><b>Купити зараз</b><span>одразу до оформлення</span></button></div>
+    <div class="buybar"><button class="btn ghost" type="button" id="b1"><b class="num">${uah(p.p-pOff)}</b><span id="b1s">${pick?"У кошик · "+pick:"У кошик"}</span></button><button class="btn pink" type="button" id="b2"><b>Купити зараз</b><span>одразу до оформлення</span></button></div>
    </div>`);
   const gt=$("#gt");gt.addEventListener("scroll",()=>{$("#gc").textContent=Math.round(gt.scrollLeft/gt.clientWidth)+1+" / "+nfr},{passive:true});
   $("#sw").addEventListener("click",e=>{const b=e.target.closest("[data-sib]");if(!b)return;const j=+b.dataset.sib;if(j!==i)openProduct(j)});
-  $("#sz").addEventListener("click",e=>{const b=e.target.closest(".size");if(!b)return;if(b.classList.contains("oos")){toast(`Розміру ${b.dataset.s} зараз немає`);return}pick=b.dataset.s;$("#sz").querySelectorAll(".size").forEach(x=>x.setAttribute("aria-pressed",x===b));$("#szErr").textContent=""});
+  $("#sz").addEventListener("click",e=>{const b=e.target.closest(".size");if(!b)return;if(b.classList.contains("oos")){toast(`Розміру ${b.dataset.s} зараз немає`);return}pick=b.dataset.s;$("#sz").querySelectorAll(".size").forEach(x=>x.setAttribute("aria-pressed",x===b));$("#szErr").textContent="";$("#b1s").textContent="У кошик · "+pick});
+  const th=$("#th");if(th)th.addEventListener("click",e=>{const b=e.target.closest("[data-th]");if(b)gt.scrollTo({left:+b.dataset.th*gt.clientWidth,behavior:motion()?"smooth":"auto"})});
+  gt.addEventListener("scroll",()=>{const k=Math.round(gt.scrollLeft/gt.clientWidth);if(th)th.querySelectorAll("[data-th]").forEach(x=>x.setAttribute("aria-pressed",+x.dataset.th===k));const z=document.querySelector(".gzoom");if(z)z.dataset.zoom=Math.min(k,nph-1)},{passive:true});
+  gt.addEventListener("click",e=>{const f=e.target.closest(".frame.photo");if(!f)return;viewer(p,[...gt.children].indexOf(f))});
   const need=()=>{if(!pick){$("#szErr").textContent="Обери розмір";$("#sz").scrollIntoView({block:"center",behavior:motion()?"smooth":"auto"});if(motion())$("#sz").animate([{transform:"translateX(0)"},{transform:"translateX(-6px)"},{transform:"translateX(6px)"},{transform:"translateX(0)"}],{duration:300});return false}return true};
   $("#b1").onclick=()=>{if(!need())return;fly($("#f0"),p,hue);add(i,pick,hue);addedSheet(i,pick)};
   $("#b2").onclick=()=>{if(!need())return;add(i,pick,hue);closeSheet();lastSub=totals().sub;go("checkout")};
+}
+/* full-screen photos: swipe between them, double tap or the button to zoom, then drag */
+function viewer(p,k){
+  const ph=p.ph||[];if(!ph.length)return;
+  const v=document.createElement("div");v.className="viewer";v.setAttribute("role","dialog");v.setAttribute("aria-modal","true");v.setAttribute("aria-label","Фото товару");
+  v.innerHTML=`<div class="vtrack">${ph.map((f,j)=>`<div class="vs"><img src="${esc(f.startsWith("http")?f:PHOTO+f)}" alt="${esc(p.n)}, фото ${j+1}" draggable="false"></div>`).join("")}</div>
+   <div class="vtop"><span class="num" id="vc">${k+1} / ${ph.length}</span><button type="button" class="vz" aria-label="Збільшити">${ic("zoom")}</button><button type="button" class="vx" aria-label="Закрити">${ic("x")}</button></div>`;
+  document.body.appendChild(v);const tr=v.querySelector(".vtrack");tr.scrollLeft=k*tr.clientWidth;
+  const cur=()=>tr.children[Math.round(tr.scrollLeft/tr.clientWidth)];
+  const zoom=(s,x,y)=>{const on=!s.classList.contains("z");s.classList.toggle("z",on);tr.style.overflowX=on?"hidden":"";
+    if(on){const r=s.getBoundingClientRect();requestAnimationFrame(()=>{s.scrollLeft=(x-r.left)/r.width*s.scrollWidth-r.width/2;s.scrollTop=(y-r.top)/r.height*s.scrollHeight-r.height/2})}};
+  tr.addEventListener("scroll",()=>{v.querySelector("#vc").textContent=Math.round(tr.scrollLeft/tr.clientWidth)+1+" / "+ph.length},{passive:true});
+  let lt=0;tr.addEventListener("click",e=>{const s=e.target.closest(".vs");if(!s)return;const t=Date.now();if(t-lt<320){zoom(s,e.clientX,e.clientY);lt=0}else lt=t});
+  v.querySelector(".vz").onclick=()=>{const s=cur();zoom(s,innerWidth/2,innerHeight/2)};
+  const close=()=>{v.remove();document.removeEventListener("keydown",kd,true)};const kd=e=>{if(e.key==="Escape"){e.stopImmediatePropagation();e.preventDefault();close()}};
+  v.querySelector(".vx").onclick=close;document.addEventListener("keydown",kd,true);v.querySelector(".vx").focus();
 }
 function openQuick(i,src){
   const p=P[i],sz=sizesFor(p),rec=recSize(p);
@@ -1434,10 +1483,12 @@ function reviewCards(o){o.rev=o.rev||{};
 
 /* ===== cart ops / effects ===== */
 function add(i,size,h){
+  const d0=parcelDisc();
   h=h??P[i].h;const ex=S.cart.find(x=>x.i===i&&x.size===size&&x.h===h);
   if(ex)ex.q++;else S.cart.push({i,size,q:1,h});
   count();persistCart();
   const mk=document.querySelector(".mark b");if(mk&&motion())mk.animate([{transform:"rotate(0)"},{transform:"rotate(360deg)"}],{duration:720,easing:"cubic-bezier(.3,1.3,.5,1)"});
+  const d1=parcelDisc();if(d1>d0)setTimeout(()=>discPop(d1-d0),motion()?640:0);
   if(S.view==="cart")render();
 }
 function persistCart(){try{localStorage.setItem(LS+"cart",JSON.stringify(S.cart.map(x=>({k:KEY(P[x.i]),size:x.size,q:x.q,h:x.h}))))}catch(e){}}
@@ -1445,10 +1496,17 @@ try{const c=JSON.parse(localStorage.getItem(LS+"cart")||"[]");if(Array.isArray(c
 function count(){const n=S.cart.reduce((a,x)=>a+x.q,0),c=$("#cnt");c.textContent=n;c.hidden=!n;c.classList.remove("bump");void c.offsetWidth;c.classList.add("bump")}
 function fly(src,p,h){
   if(!src||!motion())return;const r=src.getBoundingClientRect(),t=$("#tabCart").getBoundingClientRect();
-  const f=document.createElement("div");f.className="fly tile";f.style.setProperty("--h",h??p.h);f.innerHTML=art(p,h);
+  const f=document.createElement("div");f.className="fly tile";f.style.setProperty("--h",h??p.h);f.innerHTML=art(p,h)+img(p,0);
   const x0=r.left+r.width/2-33,y0=r.top+r.height/2-33,x1=t.left+t.width/2-33,y1=t.top+8-33;f.style.left=x0+"px";f.style.top=y0+"px";document.body.appendChild(f);
-  const dx=x1-x0,dy=y1-y0;f.animate([{transform:"translate(0,0) scale(1.2)"},{transform:`translate(${dx*.45}px,${dy*.45-90}px) scale(.8)`,offset:.55},{transform:`translate(${dx}px,${dy}px) scale(.2)`,opacity:.5}],{duration:680,easing:"cubic-bezier(.5,0,.6,1)"}).onfinish=()=>f.remove();
+  const dx=x1-x0,dy=y1-y0;f.animate([{transform:"translate(0,0) scale(1.2)"},{transform:`translate(${dx*.45}px,${dy*.45-90}px) scale(.8)`,offset:.55},{transform:`translate(${dx}px,${dy}px) scale(.2)`,opacity:.5}],{duration:680,easing:"cubic-bezier(.5,0,.6,1)"}).onfinish=()=>{f.remove();landCart()};
 }
+/* the bag catches the item: squash and bounce */
+function landCart(){const s=$("#tabCart svg");if(!s||!motion())return;s.animate([{transform:"scale(1)"},{transform:"scale(1.28,.78) translateY(3px)"},{transform:"scale(.9,1.14) translateY(-3px)"},{transform:"scale(1.04,.97)"},{transform:"scale(1)"}],{duration:520,easing:"cubic-bezier(.3,1.4,.5,1)"})}
+/* when the parcel discount grows, the saving pops out of the cart */
+function discPop(v){if(!v)return;const t=$("#tabCart");if(!t)return;const r=t.getBoundingClientRect(),el=document.createElement("div");el.className="dpop num";el.textContent="−"+uah(v);
+  el.style.left=r.left+r.width/2+"px";el.style.top=r.top-6+"px";document.body.appendChild(el);
+  if(!motion()){setTimeout(()=>el.remove(),1400);return}
+  el.animate([{transform:"translate(-50%,8px) scale(.6)",opacity:0},{transform:"translate(-50%,-18px) scale(1.12)",opacity:1,offset:.3},{transform:"translate(-50%,-26px) scale(1)",opacity:1,offset:.75},{transform:"translate(-50%,-40px) scale(.96)",opacity:0}],{duration:1500,easing:"cubic-bezier(.2,.8,.3,1)"}).onfinish=()=>el.remove()}
 function confetti(el){
   if(!el||!motion())return;const r=el.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+10;const cols=["#FF2E7E","#FFE14D","#111111","#0B7F55"];
   for(let k=0;k<26;k++){const c=document.createElement("i");c.className="conf";c.style.background=cols[k%4];c.style.left=cx+"px";c.style.top=cy+"px";document.body.appendChild(c);
@@ -1474,6 +1532,7 @@ document.addEventListener("click",e=>{
   if(b=T("[data-copy]")){copy(b.dataset.copy,b.dataset.msg);return}
   if(b=T("[data-toast]")){toast(b.dataset.toast);return}
   
+  if(b=T("[data-zoom]")){const p=document.querySelector("#gt")&&S._open!=null?P[S._open]:null;if(p)viewer(p,+b.dataset.zoom);return}
   if(T("[data-parcel]")){parcelSheet();return}
   if(T("[data-support]")){supportSheet();return}
   if(b=T("[data-set]")){setSheet(+b.dataset.set);return}
@@ -1554,7 +1613,7 @@ document.addEventListener("submit",e=>{const f=e.target.closest("form[data-rev]"
 
 /* ===== clocks, eco, network ===== */
 function tickClock(){
-  const pl=$("#pleft");if(pl&&PROMO)pl.textContent=leftTxt(PROMO.end);
+  const pl=$("#pleft");if(pl&&PROMO)pl.textContent=pl.closest(".rib")?leftTxt(PROMO.end).toUpperCase():leftTxt(PROMO.end);
   const n=new Date(),m=new Date(n);m.setHours(24,0,0,0);const c=$("#clock");
   if(c)c.innerHTML=hms(Math.floor((m-n)/1000)).map(x=>`<b>${x}</b>`).join("<span>:</span>");
 }

@@ -162,6 +162,11 @@ label.f input,label.f select{display:block;width:100%;margin-top:4px;padding:11p
 .fold summary::-webkit-details-marker{display:none}
 .aud{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px;font-size:12.5px;color:var(--muted)}
 .aud b{color:var(--ink)}
+.cab{padding-block:10px;border-top:1px solid var(--line)}
+.cab:first-of-type{border-top:0;padding-top:0}
+.cab .top{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.cabf{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .bulk{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;font-size:13px;color:var(--ink2)}
 .hintbar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--amber-soft);color:var(--ink);border-radius:12px;padding:10px 12px;margin-top:10px;font-size:13px}
 .tpl{padding-block:10px;border-top:1px solid var(--line)}
@@ -268,8 +273,9 @@ const TAX=[
  [/(^|[^\p{L}])(топ|боді)($|[^\p{L}])/u,"Топи"]
 ];
 let CUSTOM=[];
-function kindOf(n){const l=n.toLowerCase();
+function kindOf(n,cat){const l=n.toLowerCase();
  for(const r of CUSTOM)if(r.w&&l.includes(r.w))return[CSHAPE[r.cat]||"tee",r.cat];
+ {const seg=String(cat||"").split(" / ").pop().trim();if(seg!=="Інше"&&CATS.includes(seg))return[CSHAPE[seg]||"tee",seg]}
  for(const [re,cat,sh] of TAX)if(re.test(l))return[sh||CSHAPE[cat],cat];
  return["tee","Інше"]}
 const GEN=[["uni","Унісекс"],["women","Жінкам"],["men","Чоловікам"],["kids","Дітям"]];
@@ -297,7 +303,7 @@ function normalizeOffers(groups,sl,prefix=""){
     if(/леопард/i.test(raw)){pat="dot";if(!ck){h=32;sat=55;l=58}}
     const sz={};for(const o of os){const s=normSize(o.size);sz[s]=(sz[s]||0)+(o.avail?o.qty:0)}
     const sizes=Object.fromEntries(Object.entries(sz).sort((a,b)=>scmp(a[0],b[0])));
-    const [s,sub]=kindOf(raw);let name=niceName(raw,ck);if(clabel&&!name.toLowerCase().includes(clabel))name+=", "+clabel;
+    const [s,sub]=kindOf(raw,os[0].cat);let name=niceName(raw,ck);if(clabel&&!name.toLowerCase().includes(clabel))name+=", "+clabel;
     const pics=os[0].pics;
     out.push({gid:sl+":"+gid,n:name,raw,s,sub,c:"uni",cat:os[0].cat||"",h,sat,l,pat,cost:os[0].price,sz:sizes,pics:pics.length,ph:pics.slice(0,6).map(u=>u.startsWith("http")?u:prefix+u),mat:matOf(raw),code:(os[0].code||"").replace(/\(.*\)/,""),sl,colorOk:!!ck,added:now()});
   }
@@ -333,7 +339,7 @@ function load(){
     if(!Array.isArray(s.rules.tiers)){s.rules.tiers=[20,25,30];s.rules.xfloor=30;s.dirty=true}
     if(!s.promos){s.promos=[];if(s.rules.pct===30&&!Object.keys(s.rules.cat||{}).length){s.rules.pct=55;s.promos=[launchPromo()]}s.dirty=true}
     s.catRules=s.catRules||[];CUSTOM=s.catRules;
-    for(const it of s.items)if(!it.subm){const [sh,sub]=kindOf(it.raw);it.s=sh;it.sub=sub}
+    for(const it of s.items)if(!it.subm){const [sh,sub]=kindOf(it.raw,it.cat);it.s=sh;it.sub=sub}
     const BC={};for(const b of BASE.items)BC[b.raw+"|"+b.code]=b.cat||"";
     for(const it of s.items)if(it.cat==null&&it.sl===0)it.cat=BC[it.raw+"|"+it.code]??"";
     if(s.sup[0]&&s.sup[0].g==null&&s.sup[0].n==="MODAMIXX")s.sup[0].g="men";
@@ -376,7 +382,7 @@ function pullOrders(){let inb=[];try{inb=JSON.parse(localStorage.getItem("yula_o
   if(ch)save();return ch}
 function save(){try{localStorage.setItem(LS,JSON.stringify(ST))}catch(e){toast("Не вдалося зберегти: браузер заблокував сховище")}}
 const S={view:"home",f:"all",sup:"all",cat:"all",g:"all",q:"",lim:40,rulesOpen:false,ov:"orders",bseg:"all"};
-function recat(){let n=0;for(const it of ST.items)if(!it.subm){const [sh,sub]=kindOf(it.raw);if(sub!==it.sub)n++;it.s=sh;it.sub=sub}return n}
+function recat(){let n=0;for(const it of ST.items)if(!it.subm){const [sh,sub]=kindOf(it.raw,it.cat);if(sub!==it.sub)n++;it.s=sh;it.sub=sub}return n}
 function toast(t){$("#toastHost").innerHTML=`<div class="toast" role="status">${t}</div>`;clearTimeout(toast.t);toast.t=setTimeout(()=>$("#toastHost").innerHTML="",2600)}
 
 /* ===== pricing & checks ===== */
@@ -424,6 +430,39 @@ function vHome(){
    <div class="card"><h3>${ic("up")}Додати постачальника</h3><p style="margin:0 0 10px;font-size:13.5px;color:var(--muted)">Встав посилання на фід MyDrop чи Prom або завантаж файл. Розберемо товари, розміри й залишки і почистимо назви.</p><button class="btn pink block" type="button" data-addsup>Додати за посиланням</button></div>
   </section>`;
 }
+/* ===== supplier cabinets: for suppliers without a CRM ===== */
+const AK="yula_admin_key";let CAB={list:null,err:"",loading:false};
+const akey=()=>{try{return localStorage.getItem(AK)||""}catch(e){return""}};
+const cabOn=()=>/^https?:$/.test(location.protocol);
+async function capi(path,opt={}){const o={method:opt.method||"GET",headers:{"X-Admin-Key":akey()},cache:"no-store"};if(opt.json!==undefined){o.body=JSON.stringify(opt.json);o.headers["Content-Type"]="application/json"}
+  let r;try{r=await fetch("/api/"+path,o)}catch(e){throw new Error("Немає зв’язку із сервером кабінетів")}let d=null;try{d=await r.json()}catch(e){}
+  if(r.status===401){try{localStorage.removeItem(AK)}catch(e){}}if(!r.ok){const er=new Error((d&&d.error)||(r.status===404||r.status===502?"Сервер кабінетів не запущено. Оновіть сервер командою розгортання":"Помилка "+r.status));er.status=r.status;throw er}return d}
+async function loadCabs(){if(!akey()||CAB.loading)return;CAB.loading=true;try{CAB.list=await capi("admin/suppliers");CAB.err=""}catch(e){CAB.err=e.message;CAB.list=null}CAB.loading=false;if(S.view==="sup")render()}
+const invite=c=>location.origin+"/supplier.html#t="+c.token;
+const inviteMsg=c=>`Привіт! Це YULA. Ось ваш кабінет постачальника: ${invite(c)}\nТам можна додати товари з фото, ціну дропу, розміри й залишки. Що змінюєте в кабінеті, ми бачимо автоматично. Посилання особисте, не пересилайте його іншим.`;
+const supOfCab=id=>ST.sup.findIndex(x=>x.cab===id);
+function cabBlock(){
+  if(!cabOn())return`<div class="card"><h3>Кабінети постачальників<span class="r">без CRM</span></h3><p style="margin:0;font-size:13.5px;color:var(--ink2)">Працює на вашому сервері: там постачальник сам заносить товари, ціну, розміри й залишки, а ви бачите їх тут.</p></div>`;
+  if(!akey())return`<div class="card"><h3>Кабінети постачальників<span class="r">без CRM</span></h3>
+    <p style="margin:0 0 10px;font-size:13.5px;color:var(--ink2)">Для постачальників, у яких немає CRM чи вивантаження. Ви створюєте кабінет і надсилаєте посилання, постачальник з телефона додає товари з фото, ціну дропу, розміри й залишки. Товари самі з’являються тут і оновлюються кожні 30 хвилин.</p>
+    <form id="akf" novalidate><label class="f" for="aKey">Ключ адміністратора<input id="aKey" autocomplete="off" placeholder="його показала команда розгортання"></label><div class="err" id="akErr" role="alert"></div><button class="btn block" type="submit">Увійти</button></form>
+    <p style="margin:10px 0 0;font-size:12.5px;color:var(--muted)">Забули ключ? На сервері виконайте <code>cat /etc/yula/admin.key</code></p></div>`;
+  if(!CAB.list&&!CAB.err){loadCabs();return`<div class="card"><h3>Кабінети постачальників</h3><p style="margin:0;color:var(--muted)">Завантажуємо…</p></div>`}
+  if(CAB.err)return`<div class="card"><h3>Кабінети постачальників</h3><p class="err" style="margin:0 0 10px">${esc(CAB.err)}</p><button class="btn sm" type="button" data-cabreload>Спробувати ще раз</button></div>`;
+  return`<div class="card"><h3>Кабінети постачальників<span class="r">${CAB.list.length}</span></h3>
+    ${CAB.list.length?CAB.list.map(c=>{const k=supOfCab(c.id);return`<div class="cab"><div class="top"><b>${esc(c.name)}</b>${c.active?`<span class="pill ok">Активний</span>`:`<span class="pill mut">Вимкнено</span>`}</div>
+      <div class="money" style="color:var(--ink2);margin-top:2px">${c.products} товарів · ${c.last_product?"оновлено "+ago(c.last_product*1000):"ще нічого не додав"} · заходив ${c.seen?ago(c.seen*1000):"ще ні"}</div>
+      <div class="acts" style="margin-top:8px"><button class="btn sm" type="button" data-cabcopy="${c.id}">${ic("copy","width:15px;height:15px")}Посилання для постачальника</button>${k>=0?`<button class="btn sm soft" type="button" data-syncurl="${k}">${ic("sync","width:15px;height:15px")}<span>Оновити товари</span></button>`:`<button class="btn sm soft" type="button" data-cablink="${c.id}">Підключити до магазину</button>`}<button class="btn sm soft" type="button" data-cabreset="${c.id}">Нове посилання</button><button class="btn sm ghost" type="button" data-cabact="${c.id}" data-on="${c.active?0:1}">${c.active?"Вимкнути":"Увімкнути"}</button></div></div>`}).join(""):`<p style="margin:0 0 10px;font-size:13.5px;color:var(--ink2)">Ще немає жодного. Створіть кабінет і надішліть посилання постачальнику в Telegram чи Viber.</p>`}
+    <form id="cabf" novalidate class="cabf"><div class="row2"><label class="f" for="cName">Назва постачальника<input id="cName" maxlength="80" placeholder="Наприклад, Knit UA" autocomplete="off"></label><label class="f" for="cTg">Контакт<input id="cTg" maxlength="60" placeholder="@manager" autocomplete="off"></label></div>
+     <div class="err" id="cErr" role="alert"></div><button class="btn pink block" type="submit">${ic("plus")}Створити кабінет</button></form></div>`}
+function cabLink(c){const k=supOfCab(c.id);if(k>=0)return k;
+  ST.sup.push({n:c.name,lg:c.name.replace(/[^\p{L}\p{N}]/gu,"").slice(0,2).toUpperCase()||"??",src:"Кабінет YULA",url:"/api/feed/"+c.feed_key+".xml",cab:c.id,offers:0,last:0,contact:c.tg||"",g:"uni",pay:"Обговорити з постачальником",ret:"Уточнити умови повернення"});
+  save();return ST.sup.length-1}
+function inviteSheet(c){sheet(`<div class="grab"></div><h1 class="ph" style="margin-top:6px">Посилання для ${esc(c.name)}</h1>
+   <p class="lead">Надішліть це повідомлення постачальнику. Він відкриє посилання з телефона й одразу потрапить у свій кабінет, без реєстрації й паролів.</p>
+   <div class="tpl" style="border:0;padding:0"><p style="background:var(--bg);border-radius:12px;padding:12px;white-space:pre-wrap">${esc(inviteMsg(c))}</p>
+   <button class="btn pink block" type="button" data-copytext="${esc(inviteMsg(c))}">${ic("copy","width:15px;height:15px")}Скопіювати повідомлення</button></div>
+   <p style="margin:12px 0 0;font-size:12.5px;color:var(--muted)">Посилання — це ключ до кабінету. Якщо воно потрапило до сторонніх, натисніть «Нове посилання»: старе перестане працювати.</p>`)}
 function vSup(){
   const d=dupMap();
   return `<section class="view gut"><h1 class="ph">Постачальники</h1><p class="lead">Канали, з якими ви працюєте. Оновлюйте фід, щоб підтягнути нові товари й залишки.</p>
@@ -436,7 +475,8 @@ function vSup(){
     <div class="aud">${GEN.map(([v,l])=>`<span>${l} <b class="num">${its.filter(i=>i.c===v).length}</b></span>`).join("")}</div>
     <div class="acts">${s.url?`<button class="btn sm" type="button" data-syncurl="${k}">${ic("sync","width:15px;height:15px")}<span>Оновити з посилання</span></button>`:""}<button class="btn sm soft" type="button" data-editsup="${k}">${ic("link","width:15px;height:15px")}${s.url?"Змінити посилання":"Додати посилання"}</button><label class="btn sm soft" style="cursor:pointer">${ic("up","width:15px;height:15px")}Файл<input type="file" accept=".xml,.yml,text/xml" data-refresh="${k}" hidden></label><button class="btn sm soft" type="button" data-supitems="${k}">Товари</button>${k>0?`<button class="btn sm ghost" type="button" data-delsup="${k}">${ic("trash","width:15px;height:15px")}Видалити</button>`:""}</div>
    </div>`}).join("")}
-   <button class="btn pink block" type="button" data-addsup style="margin-top:12px">${ic("plus")}Додати постачальника</button></section>`;
+   <button class="btn pink block" type="button" data-addsup style="margin-top:12px">${ic("plus")}Додати постачальника з фідом</button>
+   ${cabBlock()}</section>`;
 }
 function itemsList(d){let list=ST.items.map(it=>({it,st:status(it,d)}));
   if(S.sup!=="all")list=list.filter(x=>x.it.sl===+S.sup);
@@ -622,6 +662,9 @@ function closeSheet(){$("#ovHost").innerHTML=""}
 const PROXY=[["https://backend.mydrop.com.ua/vendor/api/export/","/feed-proxy/mydrop/"],["https://my.prom.ua/","/feed-proxy/prom/"]];
 function proxify(u){for(const [from,to] of PROXY)if(u.startsWith(from))return to+u.slice(from.length);return null}
 async function fetchFeed(u){
+  if(/^\/api\/feed\/[A-Za-z0-9_-]+\.xml$/.test(u)){let r;try{r=await fetch(u,{cache:"no-store"})}catch(e){throw new Error("Немає зв’язку із сервером YULA")}
+    if(r.status===404)throw new Error("Кабінет вимкнено або видалено");if(!r.ok)throw new Error("Сервер кабінетів відповів "+r.status);
+    const tx=await r.text();if(!/<offer[\s>]/.test(tx))throw new Error("Постачальник ще не додав товарів");return tx}
   if(!/^https:\/\//.test(u))throw new Error("Посилання має починатися з https://");
   const p=proxify(u),tries=[];if(p&&/^https?:$/.test(location.protocol))tries.push(p);tries.push(u);let last=null;
   for(const t of tries){try{const r=await fetch(t,{cache:"no-store"});if(!r.ok)throw new Error("сервер постачальника відповів "+r.status);const tx=await r.text();if(!/<offer[\s>]/.test(tx))throw new Error("за посиланням немає товарів");return tx}catch(e){last=e}}
@@ -651,7 +694,7 @@ async function syncSup(k,silent){
   const s=ST.sup[k];if(!s||!s.url)return;
   const btn=document.querySelector(`[data-syncurl="${k}"]`);if(btn){btn.disabled=true;btn.lastChild.textContent="Оновлюємо…"}
   try{const r=mergeImport(await fetchFeed(s.url),k,{});if(!silent||r.added||r.gone)toast(`${s.n}: нових ${r.added}, оновлено ${r.updated}, зникло ${r.gone}`);render()}
-  catch(e){s.err=e.message;save();if(!silent)toast(e.message);render()}
+  catch(e){if(s.cab&&/ще не додав/.test(e.message)){s.err="";if(!silent)toast(e.message)}else{s.err=e.message;if(!silent)toast(e.message)}save();render()}
 }
 function addSupSheet(refresh){
   const s=refresh!=null?ST.sup[refresh]:null;
@@ -735,6 +778,12 @@ document.addEventListener("click",e=>{
   if(T("[data-publish]")){publish();return}
   if(T("[data-unpub]")){try{localStorage.removeItem(PUB)}catch(x){}ST.dirty=true;save();closeSheet();render();toast("Сайт знову показує вбудований каталог");return}
   if(T("[data-addsup]")){addSupSheet();return}
+  if(T("[data-cabreload]")){CAB={list:null,err:"",loading:false};render();return}
+  if(b=T("[data-cabcopy]")){const c=CAB.list.find(x=>x.id===+b.dataset.cabcopy);if(c)inviteSheet(c);return}
+  if(b=T("[data-cablink]")){const c=CAB.list.find(x=>x.id===+b.dataset.cablink);if(c){const k=cabLink(c);render();if(c.products)syncSup(k);else toast("Підключено. Товари з’являться, щойно постачальник їх додасть")}return}
+  if(b=T("[data-copytext]")){const t=b.dataset.copytext;try{navigator.clipboard.writeText(t).then(()=>toast("Скопійовано"),()=>toast("Виділіть текст і скопіюйте вручну"))}catch(x){toast("Виділіть текст і скопіюйте вручну")}return}
+  if(b=T("[data-cabreset]")){const id=+b.dataset.cabreset;b.disabled=true;capi(`admin/suppliers/${id}/reset`,{method:"POST",json:{}}).then(c=>{const i=CAB.list.findIndex(x=>x.id===id);CAB.list[i]=Object.assign(CAB.list[i],c);render();inviteSheet(CAB.list[i]);toast("Старе посилання більше не працює")},e=>{b.disabled=false;toast(e.message)});return}
+  if(b=T("[data-cabact]")){const id=+b.dataset.cabact,on=b.dataset.on==="1";b.disabled=true;capi(`admin/suppliers/${id}/active`,{method:"POST",json:{active:on}}).then(()=>{CAB.list=null;loadCabs();toast(on?"Кабінет увімкнено":"Кабінет вимкнено, товари постачальника більше не оновлюються")},e=>{b.disabled=false;toast(e.message)});return}
   if(T("[data-shopset]")){shopSheet();return}
   if(b=T("[data-filter]")){S.f=b.dataset.filter;S.lim=40;if(S.view!=="items")S.view="items";render();return}
   if(b=T("[data-syncurl]")){syncSup(+b.dataset.syncurl,false);return}
@@ -763,6 +812,11 @@ document.addEventListener("change",e=>{const sg=e.target.closest("[data-supg]");
   const r=e.target.closest("[data-refresh]");if(r&&r.files[0]){const k=+r.dataset.refresh;addSupSheet(k);const dt=new DataTransfer();dt.items.add(r.files[0]);const fi=$("#sFile");fi.files=dt.files;fi.dispatchEvent(new Event("change"));}});
 document.addEventListener("submit",e=>{const f=e.target.closest("[data-ttn]");if(!f)return;e.preventDefault();const k=+f.dataset.ttn,v=f.querySelector("input").value.replace(/\D/g,"");if(v.length!==14){toast("ТТН має містити 14 цифр");return}const o=ST.orders[k];o.ttn=v.replace(/(\d{4})(\d{4})(\d{4})(\d{2})/,"$1 $2 $3 $4");o.st="ttn";save();render();toast("ТТН збережено, покупець отримає SMS")});
 document.addEventListener("submit",e=>{
+  if(e.target.id==="akf"){e.preventDefault();const v=$("#aKey").value.trim();if(!v){$("#akErr").textContent="Вставте ключ";return}try{localStorage.setItem(AK,v)}catch(x){}
+    capi("admin/check").then(()=>{CAB={list:null,err:"",loading:false};render();toast("Готово")},er=>{$("#akErr").textContent=er.message});return}
+  if(e.target.id==="cabf"){e.preventDefault();const name=$("#cName").value.trim();if(!name){$("#cErr").textContent="Вкажіть назву постачальника";return}
+    const btn=e.target.querySelector("button[type=submit]");btn.disabled=true;
+    capi("admin/suppliers",{method:"POST",json:{name,tg:$("#cTg").value.trim()}}).then(c=>{c.products=0;c.last_product=0;CAB.list=[c,...(CAB.list||[])];cabLink(c);render();inviteSheet(c)},er=>{btn.disabled=false;$("#cErr").textContent=er.message});return}
   if(e.target.id==="shf"){e.preventDefault();const g=id=>$("#"+id).value.trim().slice(0,160);ST.shop={legal:g("sLegal"),phone:g("sPhone"),tg:g("sTg").replace(/^https?:\/\/t\.me\//,"@"),ig:g("sIg").replace(/^https?:\/\/(www\.)?instagram\.com\//,"@").replace(/\/$/,""),hours:g("sHours"),ch:g("sCh").replace(/^https?:\/\/t\.me\//,"@")};ST.dirty=true;save();closeSheet();render();toast("Збережено. Натисніть «Опублікувати», щоб покупці побачили");return}
   if(e.target.id==="rf"){e.preventDefault();const w=$("#rW").value.trim().toLowerCase(),cat=$("#rC").value;if(w.length<2){toast("Введи слово з назви товару, хоча б 2 літери");return}
     ST.catRules=ST.catRules.filter(r=>r.w!==w);ST.catRules.push({w,cat});CUSTOM=ST.catRules;const n=recat();ST.dirty=true;S.rulesOpen=true;save();render();toast(n?`«${w}» → ${cat}: перенесено ${n} товарів`:`Правило додано. Товарів зі словом «${w}» поки немає`)}

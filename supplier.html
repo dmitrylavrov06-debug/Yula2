@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Кабінет постачальника YULA</title>
+<link rel="preload" href="fonts/FixelText-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/FixelDisplay-ExtraBold.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:"Fixel Text";font-weight:400;font-display:swap;src:url("fonts/FixelText-Regular.woff2") format("woff2")}
+@font-face{font-family:"Fixel Text";font-weight:500;font-display:swap;src:url("fonts/FixelText-Medium.woff2") format("woff2")}
+@font-face{font-family:"Fixel Text";font-weight:600;font-display:swap;src:url("fonts/FixelText-SemiBold.woff2") format("woff2")}
+@font-face{font-family:"Fixel Text";font-weight:700;font-display:swap;src:url("fonts/FixelText-Bold.woff2") format("woff2")}
+@font-face{font-family:"Fixel Text";font-weight:800;font-display:swap;src:url("fonts/FixelText-ExtraBold.woff2") format("woff2")}
+@font-face{font-family:"Fixel Display";font-weight:700;font-display:swap;src:url("fonts/FixelDisplay-Bold.woff2") format("woff2")}
+@font-face{font-family:"Fixel Display";font-weight:800 900;font-display:swap;src:url("fonts/FixelDisplay-ExtraBold.woff2") format("woff2")}
+:root{--bg:#F7F4EF;--paper:#fff;--ink:#111;--ink2:#2B2926;--muted:#6F6A64;--line:#E6E0D7;--soft:#EFEAE2;--pink:#FF2E7E;--pink-deep:#B8104F;--blush:#FFE4EE;--butter:#FFE14D;--green:#086B47;--green-soft:#E3F3EB;--red:#B42318;--red-soft:#FDECEA;--amber:#8A5A00;--amber-soft:#FFF3D6;
+  --f-d:"Fixel Display","Fixel Text",system-ui,sans-serif;--f-b:"Fixel Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color-scheme:light}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.45 var(--f-b);padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:none;border:0;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:720px;margin:0 auto}
+header{background:var(--ink);color:#fff;padding-top:calc(12px + env(safe-area-inset-top,0px));padding-bottom:14px;position:sticky;top:0;z-index:20}
+.hd{display:flex;align-items:center;gap:10px}
+.mark{font:900 22px var(--f-d);letter-spacing:.08em;display:flex;align-items:center;gap:7px;font-feature-settings:"ss01"}
+.mark b{width:10px;height:10px;background:var(--pink);clip-path:polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)}
+.hd .who{margin-left:auto;text-align:right;min-width:0}
+.hd .who b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd .who small{display:block;font-size:11.5px;opacity:.7}
+h1{font:900 24px/1.1 var(--f-d);margin:18px 0 4px;letter-spacing:-.01em;text-wrap:balance}
+.lead{margin:0;color:var(--ink2);font-size:14px}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+.kpi{background:var(--paper);border-radius:14px;padding:10px 12px;text-align:left}
+.kpi small{display:block;font-size:12px;color:var(--muted);font-weight:600}
+.kpi b{font:900 22px var(--f-d)}
+.kpi[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--ink)}
+.kpi.warn b{color:var(--red)}
+.search{position:relative;margin-top:12px}
+.search input{width:100%;padding:12px 14px;border:0;border-radius:12px;background:var(--paper);font-size:16px}
+.card{background:var(--paper);border-radius:16px;padding:14px;margin-top:12px}
+.prod{display:grid;grid-template-columns:72px minmax(0,1fr);gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.prod:first-child{border-top:0;padding-top:2px}
+.ph{width:72px;height:90px;border-radius:10px;background:var(--soft);object-fit:cover;display:grid;place-items:center;color:var(--muted);font-size:11px;text-align:center}
+.prod .t{font-weight:700;font-size:14.5px;line-height:1.25}
+.prod .m{font-size:12.5px;color:var(--muted);margin-top:2px}
+.szs{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.sz{min-width:44px;padding:6px 8px;border-radius:9px;background:var(--soft);font-size:12.5px;font-weight:700;text-align:center;line-height:1.15}
+.sz small{display:block;font-weight:600;color:var(--muted);font-size:11px}
+.sz.zero{background:var(--red-soft);color:var(--red)}
+.sz.zero small{color:var(--red)}
+.pacts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:10px 16px;border-radius:12px;background:var(--ink);color:#fff;font-weight:800;font-size:14.5px}
+.btn.sm{min-height:38px;padding:7px 12px;font-size:13.5px;border-radius:10px}
+.btn.ghost{background:var(--paper);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.btn.soft{background:var(--soft);color:var(--ink)}
+.btn.pink{background:var(--pink);color:var(--ink)}
+.btn.block{width:100%}
+.btn:disabled{opacity:.45;cursor:default}
+.empty{text-align:center;padding:30px 10px;color:var(--ink2)}
+.empty b{display:block;font:900 18px var(--f-d);margin-bottom:6px;color:var(--ink)}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--paper);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding-bottom:env(safe-area-inset-bottom,0px);z-index:30}
+nav.tabs button{padding:8px 4px 10px;font-size:12px;font-weight:700;color:var(--muted);display:grid;justify-items:center;gap:2px}
+nav.tabs button[aria-current="page"]{color:var(--ink)}
+nav.tabs svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs .add{color:var(--ink)}
+nav.tabs .add span{width:44px;height:30px;border-radius:10px;background:var(--pink);display:grid;place-items:center}
+label.f{display:block;font-size:13px;font-weight:700;color:var(--ink2);margin-bottom:12px}
+label.f input,label.f select,label.f textarea{display:block;width:100%;margin-top:5px;padding:11px 12px;border:1.5px solid var(--line);border-radius:11px;background:var(--bg);font-size:16px;font-weight:400}
+label.f textarea{min-height:84px;resize:vertical}
+label.f input:focus,label.f select:focus,label.f textarea:focus,.qty input:focus{outline:2px solid var(--ink);outline-offset:1px}
+.hint{font-size:12.5px;color:var(--muted);font-weight:500;margin-top:4px}
+.row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;background:var(--soft);border-radius:12px;padding:4px;margin-top:5px}
+.seg button{padding:9px 4px;border-radius:9px;font-weight:700;font-size:13px}
+.seg button[aria-pressed="true"]{background:var(--paper);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{padding:7px 11px;border-radius:999px;background:var(--soft);font-weight:700;font-size:13px;min-height:36px}
+.chip[aria-pressed="true"]{background:var(--ink);color:#fff}
+.sect{font:800 15px var(--f-d);margin:18px 0 8px}
+.qty{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px;margin-top:8px}
+.qty label{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px;background:var(--bg);border-radius:11px;padding:6px 6px 6px 12px;font-weight:800}
+.qty input{width:100%;min-width:0;padding:8px;border:1.5px solid var(--line);border-radius:9px;background:var(--paper);font-size:16px;text-align:center}
+.stk{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;align-items:center;gap:6px;padding:8px 0;border-top:1px solid var(--line)}
+.stk:first-of-type{border-top:0}
+.stk b{font-size:15px}
+.stk input{width:64px;padding:8px;border:1.5px solid var(--line);border-radius:9px;text-align:center;font-size:16px}
+.stk button{width:44px;height:44px;border-radius:10px;background:var(--soft);font-size:20px;font-weight:800}
+.photos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:8px}
+.photos figure{margin:0;position:relative;aspect-ratio:3/4;border-radius:10px;overflow:hidden;background:var(--soft)}
+.photos img{width:100%;height:100%;object-fit:cover;display:block}
+.photos figure button{position:absolute;right:4px;top:4px;width:30px;height:30px;border-radius:50%;background:rgba(17,17,17,.75);color:#fff;font-weight:800;line-height:1}
+.photos figure .first{position:absolute;left:4px;bottom:4px;background:var(--butter);border-radius:6px;font-size:10.5px;font-weight:800;padding:2px 6px}
+.photos .addp{aspect-ratio:3/4;border-radius:10px;border:1.5px dashed var(--ink);display:grid;place-items:center;font-weight:800;font-size:13px;text-align:center;padding:4px}
+.photos .busy{display:grid;place-items:center;font-size:12px;color:var(--muted)}
+.err{color:var(--red);font-weight:700;font-size:13.5px;min-height:1px}
+.bar{position:sticky;bottom:calc(64px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,var(--bg) 30%);padding:18px 0 8px;display:grid;gap:8px;z-index:5}
+.sheet-bg{position:fixed;inset:0;background:rgba(17,17,17,.45);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--paper);width:100%;max-width:720px;border-radius:20px 20px 0 0;max-height:88vh;overflow:auto;padding:8px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:4px auto 10px}
+.sheet h3{font:900 19px var(--f-d);margin:4px 0 2px}
+.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 16px;border-radius:12px;font-weight:700;font-size:14px;z-index:60;max-width:calc(100% - 32px);text-align:center}
+.note{background:var(--amber-soft);border-radius:12px;padding:10px 12px;font-size:13px;margin-top:12px}
+.gate{min-height:70vh;display:grid;place-items:center;text-align:center}
+.gate .card{max-width:420px}
+@media (min-width:720px){.kpis{gap:12px}}
+</style>
+</head>
+<body>
+<header><div class="wrap gut hd"><div class="mark">YULA<b></b></div><div class="who" id="who"></div></div></header>
+<main class="wrap gut" id="main"><div class="gate"><p>Завантаження…</p></div></main>
+<nav class="tabs" id="tabs" hidden aria-label="Розділи">
+ <button type="button" data-tab="list" aria-current="page"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Товари</button>
+ <button type="button" data-tab="new" class="add"><span><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>Додати</button>
+ <button type="button" data-tab="me"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Профіль</button>
+</nav>
+<script>
+"use strict";
+const CATS=["Худі та зіпки","Світшоти","Светри й кофти","Лонгсліви","Футболки","Поло","Сорочки","Майки","Топи","Костюми","Комплекти","Штани","Джинси","Легінси","Шорти","Сукні","Спідниці","Куртки","Пальта","Жилети","Комбінезони","Термобілизна","Дім і сон","Білизна","Купальники","Шкарпетки","Кросівки й кеди","Черевики","Тапочки й сандалі","Сумки","Рюкзаки","Шапки й аксесуари","Інше"];
+const AUD=[["women","Жінкам"],["men","Чоловікам"],["uni","Унісекс"],["kids","Дітям"]];
+const SIZESETS=[["Літерні",["XS","S","M","L","XL","XXL","3XL","4XL"]],["Подвійні",["XS-S","M-L","XL-XXL"]],["Числові",["42","44","46","48","50","52","54","56"]],["Взуття",["36","37","38","39","40","41","42","43","44","45"]],["Дитячі (зріст)",["110","116","122","128","134","140","146","152","158","164"]],["Один розмір",["Один"]]];
+const LOW=3,TK="yula_sup_token";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uah=n=>Math.round(n).toLocaleString("uk-UA").replace(/[\s ]/g," ")+" ₴";
+const ago=t=>{if(!t)return"ще не було";const d=Math.floor(Date.now()/1000-t);return d<90?"щойно":d<3600?Math.round(d/60)+" хв тому":d<86400?Math.round(d/3600)+" год тому":new Date(t*1000).toLocaleDateString("uk-UA",{day:"numeric",month:"long"})};
+let TOKEN="",ME=null,PRODS=[],VIEW="list",FILTER="all",Q="",EDIT=null,DRAFT=null,BUSY=false;
+
+/* the token comes in the invite link (#t=...) and then stays only in this browser */
+function readToken(){
+  const m=location.hash.match(/(?:^#|&)t=([A-Za-z0-9_-]{20,})/);
+  if(m){TOKEN=m[1];try{localStorage.setItem(TK,TOKEN)}catch(e){}history.replaceState(null,"",location.pathname)}
+  else{try{TOKEN=localStorage.getItem(TK)||""}catch(e){TOKEN=""}}
+}
+async function api(path,opt={}){
+  const o={method:opt.method||"GET",headers:{"X-Sup-Token":TOKEN},cache:"no-store"};
+  if(opt.json!==undefined){o.body=JSON.stringify(opt.json);o.headers["Content-Type"]="application/json"}
+  if(opt.blob){o.body=opt.blob;o.headers["Content-Type"]=opt.blob.type||"image/jpeg"}
+  let r;try{r=await fetch("/api/"+path,o)}catch(e){throw new Error("Немає зв’язку з сервером. Перевірте інтернет")}
+  let d=null;try{d=await r.json()}catch(e){}
+  if(!r.ok){const er=new Error((d&&d.error)||"Помилка "+r.status);er.status=r.status;throw er}
+  return d;
+}
+let tt=null;function toast(t){let el=$(".toast");if(!el){el=document.createElement("div");el.className="toast";el.setAttribute("role","status");document.body.appendChild(el)}el.textContent=t;clearTimeout(tt);tt=setTimeout(()=>el.remove(),2600)}
+
+function gate(title,text){$("#tabs").hidden=true;$("#who").innerHTML="";$("#main").innerHTML=`<div class="gate"><div class="card"><h1 style="margin-top:4px">${title}</h1><p class="lead">${text}</p></div></div>`}
+
+async function boot(){
+  readToken();
+  if(!TOKEN)return gate("Кабінет постачальника","Щоб увійти, відкрийте посилання, яке вам надіслав YULA. Реєструватися не треба.");
+  try{[ME,PRODS]=await Promise.all([api("sup/me"),api("sup/products")])}
+  catch(e){if(e.status===401||e.status===403){try{localStorage.removeItem(TK)}catch(x){}return gate("Не вдалося увійти",esc(e.message))}return gate("Немає зв’язку",esc(e.message)+'<br><br><button class="btn" type="button" onclick="location.reload()">Спробувати ще раз</button>')}
+  $("#tabs").hidden=false;go(PRODS.length?"list":"new");
+}
+const total=p=>Object.values(p.sizes).reduce((a,b)=>a+b,0);
+const status=p=>{const t=total(p);return !t?"out":Object.values(p.sizes).some(q=>q>0&&q<=LOW)||t<=LOW?"low":"ok"};
+
+function go(v,id){
+  VIEW=v;EDIT=id??null;if(v!=="new"&&v!=="edit")DRAFT=null;
+  document.querySelectorAll("#tabs [data-tab]").forEach(b=>b.toggleAttribute("aria-current",b.dataset.tab===(v==="edit"?"new":v)));
+  document.querySelectorAll("#tabs [data-tab]").forEach(b=>{if(b.hasAttribute("aria-current"))b.setAttribute("aria-current","page")});
+  render();window.scrollTo(0,0);
+}
+function render(){
+  $("#who").innerHTML=ME?`<b>${esc(ME.name)}</b><small>кабінет постачальника</small>`:"";
+  $("#main").innerHTML=VIEW==="me"?vMe():VIEW==="list"?vList():vForm();
+  if(VIEW==="new"||VIEW==="edit")bindForm();
+}
+
+/* ---------- list ---------- */
+function vList(){
+  const c={all:PRODS.length,low:PRODS.filter(p=>status(p)==="low").length,out:PRODS.filter(p=>status(p)==="out").length};
+  const q=Q.toLowerCase(),list=PRODS.filter(p=>(FILTER==="all"||status(p)===FILTER)&&(!q||(p.title+" "+p.color+" "+p.code+" "+p.cat).toLowerCase().includes(q)));
+  return `<h1>Ваші товари</h1><p class="lead">Що тут змінюєте, те YULA бачить: ціни й залишки оновлюються на сайті автоматично.</p>
+   <div class="kpis">
+    <button class="kpi" type="button" data-f="all" aria-pressed="${FILTER==="all"}"><small>Усього</small><b>${c.all}</b></button>
+    <button class="kpi${c.low?" warn":""}" type="button" data-f="low" aria-pressed="${FILTER==="low"}"><small>Закінчуються</small><b>${c.low}</b></button>
+    <button class="kpi${c.out?" warn":""}" type="button" data-f="out" aria-pressed="${FILTER==="out"}"><small>Немає</small><b>${c.out}</b></button>
+   </div>
+   ${PRODS.length>6?`<div class="search"><input id="q" type="search" placeholder="Пошук за назвою, кольором, артикулом" value="${esc(Q)}" aria-label="Пошук товарів"></div>`:""}
+   <div class="card">${list.length?list.map(prodRow).join(""):PRODS.length?`<div class="empty"><b>Нічого не знайшли</b>Змініть пошук або фільтр</div>`:`<div class="empty"><b>Товарів ще немає</b>Додайте перший: фото, ціну дропу й розміри з кількістю.<br><br><button class="btn pink" type="button" data-tab="new">Додати товар</button></div>`}</div>`;
+}
+function prodRow(p){
+  return `<div class="prod">${p.photos[0]?`<img class="ph" src="/media/${esc(p.photos[0])}" alt="" loading="lazy">`:`<div class="ph">без фото</div>`}
+   <div style="min-width:0"><div class="t">${esc(p.title)}${p.color?", "+esc(p.color):""}</div>
+    <div class="m">${uah(p.price)} · ${esc(p.cat)}${p.code?" · "+esc(p.code):""} · оновлено ${ago(p.updated)}</div>
+    <div class="szs">${Object.entries(p.sizes).map(([z,q])=>`<span class="sz${q?"":" zero"}">${esc(z)}<small>${q?q+" шт":"немає"}</small></span>`).join("")}</div>
+    <div class="pacts"><button class="btn sm" type="button" data-stock="${p.id}">Залишки</button><button class="btn sm soft" type="button" data-edit="${p.id}">Змінити</button><button class="btn sm soft" type="button" data-copy="${p.id}">Ще колір</button></div>
+   </div></div>`;
+}
+
+/* ---------- quick stock ---------- */
+function stockSheet(id){
+  const p=PRODS.find(x=>x.id===id);if(!p)return;const S={...p.sizes};
+  const bg=document.createElement("div");bg.className="sheet-bg";
+  const draw=()=>{bg.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="Залишки"><div class="grab"></div><h3>${esc(p.title)}${p.color?", "+esc(p.color):""}</h3><p class="lead" style="font-size:13px">Скільки штук кожного розміру зараз є</p>
+    <div style="margin-top:10px">${Object.keys(S).map(z=>`<div class="stk"><b>${esc(z)}</b><button type="button" data-d="-1" data-z="${esc(z)}" aria-label="Менше ${esc(z)}">−</button><input inputmode="numeric" data-q="${esc(z)}" value="${S[z]}" aria-label="Кількість ${esc(z)}"><button type="button" data-d="1" data-z="${esc(z)}" aria-label="Більше ${esc(z)}">+</button></div>`).join("")}</div>
+    <div style="display:grid;gap:8px;margin-top:14px"><button class="btn pink block" type="button" data-save>Зберегти</button><button class="btn soft block" type="button" data-zero>Усе закінчилось</button><button class="btn ghost block" type="button" data-close>Скасувати</button></div></div>`};
+  draw();document.body.appendChild(bg);document.body.style.overflow="hidden";
+  const close=()=>{bg.remove();document.body.style.overflow=""};
+  bg.addEventListener("input",e=>{const z=e.target.dataset.q;if(z!=null){S[z]=Math.max(0,parseInt(e.target.value.replace(/\D/g,""))||0)}});
+  bg.addEventListener("click",async e=>{
+    if(e.target===bg||e.target.closest("[data-close]"))return close();
+    const b=e.target.closest("[data-d]");if(b){const z=b.dataset.z;S[z]=Math.max(0,(S[z]||0)+(+b.dataset.d));bg.querySelector(`[data-q="${CSS.escape(z)}"]`).value=S[z];return}
+    if(e.target.closest("[data-zero]")){Object.keys(S).forEach(z=>S[z]=0);draw();return}
+    if(e.target.closest("[data-save]")){const btn=e.target.closest("[data-save]");btn.disabled=true;
+      try{const r=await api(`sup/products/${p.id}/stock`,{method:"PATCH",json:{sizes:S}});Object.assign(p,r);close();render();toast("Залишки збережено")}catch(x){btn.disabled=false;toast(x.message)}}
+  });
+}
+
+/* ---------- product form ---------- */
+const blank=()=>({title:"",color:"",cat:"",aud:"",price:"",sizes:{},material:"",descr:"",code:"",photos:[]});
+function vForm(){
+  if(!DRAFT){const p=EDIT!=null&&PRODS.find(x=>x.id===EDIT);DRAFT=p?JSON.parse(JSON.stringify(p)):blank()}
+  const d=DRAFT,ed=VIEW==="edit";
+  return `<h1>${ed?"Змінити товар":"Новий товар"}</h1><p class="lead">${ed?"Зміни з’являться на сайті після наступного оновлення YULA.":"Один колір — один товар. Інші кольори додасте кнопкою «Ще колір»."}</p>
+  <form id="pf" novalidate>
+   <div class="card">
+    <div class="sect" style="margin-top:2px">Фото</div>
+    <div class="photos" id="photos"></div>
+    <p class="hint" id="phWarn" hidden style="color:var(--amber);font-weight:700">Додайте ще хоча б одне фото: з одним фото YULA перевіряє товар вручну, і він з’являється на сайті пізніше.</p>
+    <p class="hint">Перше фото — головне. Річ цілком, при денному світлі, без чужих логотипів і водяних знаків. До 8 фото.</p>
+    <input type="file" id="pfile" accept="image/*" multiple hidden>
+   </div>
+   <div class="card">
+    <label class="f">Назва<input id="fTitle" maxlength="120" value="${esc(d.title)}" placeholder="Худі оверсайз на флісі" autocomplete="off"><span class="hint">Без кольору й розміру — їх вкажете нижче</span></label>
+    <div class="row2"><label class="f">Колір<input id="fColor" maxlength="60" value="${esc(d.color)}" placeholder="чорний" autocomplete="off"></label>
+     <label class="f">Ціна дропу, ₴<input id="fPrice" inputmode="numeric" value="${esc(d.price)}" placeholder="420" autocomplete="off"><span class="hint">Скільки платить YULA</span></label></div>
+    <label class="f">Категорія<select id="fCat"><option value="">Оберіть…</option>${CATS.map(c=>`<option ${c===d.cat?"selected":""}>${c}</option>`).join("")}</select></label>
+    <div class="f" style="font-size:13px;font-weight:700;color:var(--ink2);margin-bottom:12px">Для кого<div class="seg" id="fAud">${AUD.map(([k,l])=>`<button type="button" data-aud="${k}" aria-pressed="${d.aud===k}">${l}</button>`).join("")}</div></div>
+   </div>
+   <div class="card">
+    <div class="sect" style="margin-top:2px">Розміри й кількість</div>
+    <div class="hint" style="margin-top:0">Натисніть розміри, які є, і вкажіть, скільки штук</div>
+    ${SIZESETS.map(([n,zs])=>`<div class="hint" style="margin-top:10px;font-weight:700;color:var(--ink2)">${n}</div><div class="chips">${zs.map(z=>`<button class="chip" type="button" data-z="${z}" aria-pressed="${z in d.sizes}">${z}</button>`).join("")}</div>`).join("")}
+    <div class="row2" style="margin-top:10px;align-items:end"><label class="f" style="margin:0">Свій розмір<input id="fOwn" maxlength="20" placeholder="напр. 48-50" autocomplete="off"></label><button class="btn soft" type="button" id="addOwn">Додати</button></div>
+    <div class="qty" id="qty"></div>
+   </div>
+   <div class="card">
+    <div class="row2"><label class="f">Матеріал<input id="fMat" maxlength="120" value="${esc(d.material)}" placeholder="бавовна 80%, поліестер 20%" autocomplete="off"></label>
+     <label class="f">Артикул<input id="fCode" maxlength="40" value="${esc(d.code)}" placeholder="необов’язково" autocomplete="off"></label></div>
+    <label class="f" style="margin-bottom:0">Опис<textarea id="fDescr" maxlength="2000" placeholder="Посадка, тканина, заміри в сантиметрах: довжина, ширина в грудях">${esc(d.descr)}</textarea></label>
+   </div>
+   <div class="err" id="fErr" role="alert" style="margin-top:12px"></div>
+   <div class="bar"><button class="btn pink block" type="submit" id="fSave">${ed?"Зберегти зміни":"Зберегти товар"}</button>
+    ${ed?`<div class="row2"><button class="btn ghost" type="button" id="fCopy">Ще колір</button><button class="btn soft" type="button" id="fDel">Видалити</button></div>`:`<button class="btn ghost block" type="button" id="fMore">Зберегти й додати інший колір</button>`}</div>
+  </form>`;
+}
+function syncDraft(){const d=DRAFT,v=id=>($("#"+id)||{}).value;if(!$("#pf"))return;
+  d.title=v("fTitle").trim();d.color=v("fColor").trim();d.cat=v("fCat");d.price=v("fPrice").replace(/[^\d]/g,"");d.material=v("fMat").trim();d.code=v("fCode").trim();d.descr=v("fDescr").trim();
+  document.querySelectorAll("#qty input").forEach(i=>{d.sizes[i.dataset.q]=Math.max(0,parseInt(i.value.replace(/\D/g,""))||0)})}
+function drawQty(){const d=DRAFT,ks=Object.keys(d.sizes);
+  $("#qty").innerHTML=ks.length?ks.map(z=>`<label>${esc(z)}<input inputmode="numeric" data-q="${esc(z)}" value="${d.sizes[z]||""}" placeholder="0" aria-label="Кількість ${esc(z)}"></label>`).join(""):`<div class="hint">Розміри ще не обрано</div>`}
+function drawPhotos(busy=0){const d=DRAFT;
+  $("#photos").innerHTML=d.photos.map((f,k)=>`<figure><img src="/media/${esc(f)}" alt="Фото ${k+1}">${k===0?'<span class="first">Головне</span>':""}<button type="button" data-rmph="${k}" aria-label="Видалити фото ${k+1}">×</button>${k?`<button type="button" data-mainph="${k}" aria-label="Зробити головним" style="left:4px;right:auto;bottom:4px;top:auto;width:auto;border-radius:6px;padding:2px 6px;font-size:10.5px">Головне</button>`:""}</figure>`).join("")
+   +Array.from({length:busy},()=>`<figure class="busy">Завантажую…</figure>`).join("")
+   +(d.photos.length+busy<8?`<button class="addp" type="button" id="addPh">+ Фото</button>`:"");
+  const w=$("#phWarn");if(w)w.hidden=!(d.photos.length===1&&!busy)}
+/* shrink photos on the phone before upload: 1400 px, JPEG */
+function shrink(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();
+  im.onload=()=>{const k=Math.min(1,1400/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement("canvas");c.width=Math.round(im.naturalWidth*k);c.height=Math.round(im.naturalHeight*k);
+    const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(b=>b?res(b):rej(new Error("Не вдалося обробити фото")),"image/jpeg",.84)};
+  im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error("Цей файл не схожий на фото"))};im.src=u})}
+async function upload(files){
+  const d=DRAFT,room=8-d.photos.length,list=[...files].slice(0,room);if(!list.length)return;
+  let left=list.length;drawPhotos(left);
+  for(const f of list){try{const b=await shrink(f),r=await api("sup/photos",{method:"POST",blob:b});d.photos.push(r.file)}catch(e){toast(e.message)}left--;drawPhotos(left)}
+}
+function bindForm(){
+  drawQty();drawPhotos();
+  const f=$("#pf"),fi=$("#pfile");
+  f.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+    if(b.id==="addPh"){fi.click();return}
+    if(b.dataset.rmph!=null){DRAFT.photos.splice(+b.dataset.rmph,1);drawPhotos();return}
+    if(b.dataset.mainph!=null){const k=+b.dataset.mainph,[x]=DRAFT.photos.splice(k,1);DRAFT.photos.unshift(x);drawPhotos();return}
+    if(b.dataset.aud){DRAFT.aud=b.dataset.aud;f.querySelectorAll("[data-aud]").forEach(x=>x.setAttribute("aria-pressed",x===b));return}
+    if(b.dataset.z){syncDraft();const z=b.dataset.z;if(z in DRAFT.sizes)delete DRAFT.sizes[z];else DRAFT.sizes[z]=0;b.setAttribute("aria-pressed",z in DRAFT.sizes);drawQty();return}
+    if(b.id==="addOwn"){syncDraft();const z=$("#fOwn").value.trim().slice(0,20);if(z&&!(z in DRAFT.sizes)){DRAFT.sizes[z]=0;drawQty()}$("#fOwn").value="";return}
+    if(b.id==="fMore"){save(true);return}
+    if(b.id==="fCopy"){syncDraft();copyColor(DRAFT);return}
+    if(b.id==="fDel"){delSheet();return}
+  });
+  fi.onchange=()=>{upload(fi.files);fi.value="";$("#fErr").textContent=""};
+  f.addEventListener("input",()=>{const e=$("#fErr");if(e&&e.textContent)e.textContent=""});
+  f.addEventListener("submit",e=>{e.preventDefault();save(false)});
+}
+function check(d){
+  if(!d.photos.length)return"Додайте хоча б одне фото";
+  if(!d.title)return"Вкажіть назву";
+  if(!d.price||+d.price<10)return"Вкажіть ціну дропу";
+  if(!d.cat)return"Оберіть категорію";
+  if(!d.aud)return"Оберіть, для кого товар";
+  if(!Object.keys(d.sizes).length)return"Оберіть хоча б один розмір";
+  return"";
+}
+async function save(more){
+  if(BUSY)return;syncDraft();const d=DRAFT,er=check(d);$("#fErr").textContent=er;if(er)return;
+  BUSY=true;const btn=$("#fSave");btn.disabled=true;
+  try{const body={title:d.title,color:d.color,cat:d.cat,aud:d.aud,price:+d.price,sizes:d.sizes,material:d.material,descr:d.descr,code:d.code,photos:d.photos};
+    const r=VIEW==="edit"?await api("sup/products/"+EDIT,{method:"PUT",json:body}):await api("sup/products",{method:"POST",json:body});
+    const i=PRODS.findIndex(x=>x.id===r.id);if(i>=0)PRODS[i]=r;else PRODS.unshift(r);
+    if(more){copyColor(r);toast("Збережено. Тепер інший колір")}else{go("list");toast("Збережено")}}
+  catch(e){$("#fErr").textContent=e.message}
+  finally{BUSY=false;const b=$("#fSave");if(b)b.disabled=false}
+}
+function copyColor(p){DRAFT={...JSON.parse(JSON.stringify(p)),id:undefined,color:"",photos:[],sizes:Object.fromEntries(Object.keys(p.sizes).map(z=>[z,0]))};VIEW="new";EDIT=null;
+  document.querySelectorAll("#tabs [data-tab]").forEach(b=>b.dataset.tab==="new"?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));render();window.scrollTo(0,0);setTimeout(()=>{const c=$("#fColor");if(c)c.focus()},50)}
+function delSheet(){
+  const bg=document.createElement("div");bg.className="sheet-bg";
+  bg.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div><h3>Видалити товар?</h3><p class="lead">Він зникне з сайту YULA після наступного оновлення. Якщо товар просто закінчився, краще поставте залишок 0 — тоді його легко повернути.</p>
+   <div style="display:grid;gap:8px;margin-top:14px"><button class="btn block" type="button" data-close>Залишити</button><button class="btn soft block" type="button" data-yes>Так, видалити</button></div></div>`;
+  document.body.appendChild(bg);
+  bg.addEventListener("click",async e=>{if(e.target===bg||e.target.closest("[data-close]"))return bg.remove();
+    if(e.target.closest("[data-yes]")){try{await api("sup/products/"+EDIT,{method:"DELETE"});PRODS=PRODS.filter(x=>x.id!==EDIT);bg.remove();go("list");toast("Видалено")}catch(x){toast(x.message)}}});
+}
+
+/* ---------- profile ---------- */
+function vMe(){const m=ME;
+  return `<h1>Профіль</h1><p class="lead">YULA бачить ці дані, коли передає вам замовлення.</p>
+   <form id="mf" class="card" novalidate>
+    <label class="f">Телефон менеджера<input id="mPhone" type="tel" maxlength="30" value="${esc(m.phone)}" placeholder="+380 67 123 45 67" autocomplete="tel"></label>
+    <label class="f">Telegram<input id="mTg" maxlength="60" value="${esc(m.tg)}" placeholder="@manager" autocomplete="off"></label>
+    <label class="f">Як і коли відправляєте<textarea id="mShip" maxlength="300" placeholder="Нова пошта, щодня до 17:00. Замовлення після 17:00 — наступного дня">${esc(m.ship_note)}</textarea></label>
+    <label class="f">Повернення й обмін<textarea id="mRet" maxlength="300" placeholder="14 днів, обмін розміру за рахунок покупця">${esc(m.ret_note)}</textarea></label>
+    <div class="err" id="mErr" role="alert"></div>
+    <button class="btn pink block" type="submit">Зберегти</button>
+   </form>
+   <div class="note">Посилання на кабінет — це ваш ключ. Не пересилайте його іншим людям. Якщо воно потрапило до сторонніх, попросіть у YULA нове: старе одразу перестане працювати.</div>
+   <button class="btn ghost block" type="button" id="logout" style="margin-top:12px">Вийти з цього пристрою</button>`;
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.tab){if(b.dataset.tab==="new"){DRAFT=null;go("new")}else go(b.dataset.tab);return}
+  if(b.dataset.f){FILTER=b.dataset.f;render();return}
+  if(b.dataset.stock){stockSheet(+b.dataset.stock);return}
+  if(b.dataset.edit){DRAFT=null;go("edit",+b.dataset.edit);return}
+  if(b.dataset.copy){copyColor(PRODS.find(x=>x.id===+b.dataset.copy));return}
+  if(b.id==="logout"){try{localStorage.removeItem(TK)}catch(x){}TOKEN="";gate("Ви вийшли","Щоб увійти знову, відкрийте посилання від YULA.");return}
+});
+document.addEventListener("input",e=>{if(e.target.id==="q"){Q=e.target.value;const pos=e.target.selectionStart;render();const q=$("#q");if(q){q.focus();q.setSelectionRange(pos,pos)}}});
+document.addEventListener("submit",async e=>{if(e.target.id!=="mf")return;e.preventDefault();
+  const v=id=>$("#"+id).value.trim();
+  try{ME=await api("sup/me",{method:"PUT",json:{phone:v("mPhone"),tg:v("mTg"),ship_note:v("mShip"),ret_note:v("mRet")}});toast("Збережено")}catch(x){$("#mErr").textContent=x.message}});
+window.addEventListener("beforeunload",e=>{if((VIEW==="new"||VIEW==="edit")&&DRAFT&&(DRAFT.title||DRAFT.photos.length)&&!BUSY){syncDraft();if(VIEW==="new"&&(DRAFT.title||DRAFT.photos.length)){e.preventDefault();e.returnValue=""}}});
+boot();
+</script>
+</body>
+</html>

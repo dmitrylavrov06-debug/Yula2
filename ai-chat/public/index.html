@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#131316">
+<title>{{BOT_NAME}}</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237c3aed'/%3E%3Cstop offset='1' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='9' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='5' fill='white'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+
+<!-- Экран входа -->
+<section id="login" class="login hidden">
+  <div class="login-card">
+    <div class="mark big"></div>
+    <h1>{{BOT_NAME}}</h1>
+    <p class="muted">Ваш ИИ-ассистент для кода, текстов и идей</p>
+    <a id="tgLogin" class="btn tg" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M9.8 15.6 9.4 20c.6 0 .9-.3 1.2-.6l2.9-2.7 6 4.4c1.1.6 1.9.3 2.2-1L24 3.6c.4-1.6-.6-2.3-1.7-1.9L1.2 9.9c-1.5.6-1.5 1.5-.3 1.9l5.4 1.7L18.8 5.6c.6-.4 1.1-.2.7.2"/></svg>
+      Войти через Telegram
+    </a>
+    <p id="loginHint" class="muted small hidden">Откройте Telegram и нажмите «Старт» у бота.<br>Эта страница обновится сама.</p>
+    <p id="loginErr" class="err small hidden"></p>
+  </div>
+</section>
+
+<!-- Приложение -->
+<div id="app" class="app hidden">
+  <aside id="side" class="side">
+    <div class="side-top">
+      <div class="brand"><div class="mark"></div><span>{{BOT_NAME}}</span></div>
+      <button class="icon only-mobile" id="closeSide" aria-label="Закрыть">✕</button>
+    </div>
+    <button class="new-chat" id="newChat">
+      <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      Новый чат
+    </button>
+    <div class="side-label">Недавние</div>
+    <nav id="chatList" class="chat-list"></nav>
+    <div class="side-bottom">
+      <div class="quota" id="quota">
+        <div class="quota-row"><span id="quotaText">—</span><button class="link" id="upgradeBtn">Улучшить</button></div>
+      </div>
+      <button class="me" id="meBtn">
+        <div class="avatar" id="avatar">?</div>
+        <div class="me-info"><div id="meName">—</div><div class="muted small" id="mePlan">Free</div></div>
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="m7 10 5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      </button>
+      <div class="menu hidden" id="meMenu">
+        <button data-act="plans">💎 Тарифы</button>
+        <button data-act="admin" class="hidden" id="adminItem">📊 Админка</button>
+        <button data-act="logout">↩ Выйти</button>
+      </div>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="icon only-mobile" id="openSide" aria-label="Меню">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <div class="title" id="chatTitle"></div>
+      <button class="icon only-mobile" id="newChatTop" aria-label="Новый чат">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </header>
+
+    <div class="scroll" id="scroll">
+      <div class="welcome" id="welcome">
+        <div class="mark big"></div>
+        <h2 id="greet">Чем могу помочь?</h2>
+      </div>
+      <div class="thread" id="thread"></div>
+    </div>
+
+    <div class="composer-wrap" id="composerWrap">
+      <form class="composer" id="composer">
+        <div class="attachments" id="attachments"></div>
+        <textarea id="input" rows="1" placeholder="Напишите сообщение…" autocomplete="off"></textarea>
+        <div class="composer-row">
+          <button type="button" class="icon" id="attachBtn" title="Прикрепить файлы или ZIP">
+            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M21 11.5 12.6 20a5.5 5.5 0 0 1-7.8-7.8l8.5-8.5a3.7 3.7 0 0 1 5.2 5.2l-8.5 8.5a1.8 1.8 0 0 1-2.6-2.6l7.8-7.8" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+          </button>
+          <select id="model" class="model" title="Модель"></select>
+          <div class="grow"></div>
+          <button type="submit" class="send" id="send" aria-label="Отправить">
+            <svg class="i-send" viewBox="0 0 24 24" width="18" height="18"><path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg class="i-stop" viewBox="0 0 24 24" width="14" height="14"><rect x="4" y="4" width="16" height="16" rx="3" fill="currentColor"/></svg>
+          </button>
+        </div>
+      </form>
+      <div class="foot muted small">ИИ может ошибаться. Проверяйте важное.</div>
+      <input type="file" id="file" multiple hidden>
+    </div>
+    <div class="drop hidden" id="drop">Отпустите, чтобы прикрепить файлы</div>
+  </main>
+</div>
+
+<!-- Модальное окно -->
+<div class="modal hidden" id="modal">
+  <div class="modal-card">
+    <button class="icon modal-x" id="modalX">✕</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+<div class="toast hidden" id="toast"></div>
+
+<script src="/app.js"></script>
+</body>
+</html>

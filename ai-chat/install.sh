@@ -338,6 +338,10 @@ __SERVER__
 
 q() { local v=${1//\\/\\\\}; v=${v//\"/\\\"}; printf '"%s"' "$v"; }
 if [ -n "$DOMAIN" ]; then LISTEN_HOST=127.0.0.1; else LISTEN_HOST=0.0.0.0; fi
+systemctl stop my-ai 2>/dev/null || true
+APP_PORT=3000
+while ss -ltn "( sport = :$APP_PORT )" | grep -q ":$APP_PORT"; do APP_PORT=$((APP_PORT+1)); done
+echo "--> Порт: $APP_PORT"
 {
   echo "API_KEY=$(q "$API_KEY")"
   echo "BASE_URL=$(q "$BASE_URL")"
@@ -345,7 +349,7 @@ if [ -n "$DOMAIN" ]; then LISTEN_HOST=127.0.0.1; else LISTEN_HOST=0.0.0.0; fi
   [ -n "$SYSTEM_PROMPT" ] && echo "SYSTEM_PROMPT=$(q "$SYSTEM_PROMPT")"
   [ -n "$MODEL" ] && echo "MODEL=$(q "$MODEL")"
   [ -n "$ACCESS_PASSWORD" ] && echo "ACCESS_PASSWORD=$(q "$ACCESS_PASSWORD")"
-  echo "PORT=3000"
+  echo "PORT=$APP_PORT"
   echo "HOST=$LISTEN_HOST"
 } > "$APP_DIR/.env"
 chown -R "$APP_USER":"$APP_USER" "$APP_DIR"
@@ -372,12 +376,32 @@ systemctl daemon-reload
 systemctl enable --now my-ai >/dev/null 2>&1
 systemctl restart my-ai
 
-if [ -n "$DOMAIN" ]; then
+if [ -n "$DOMAIN" ] && systemctl is-active --quiet nginx; then
+  echo "--> Найден nginx, добавляю сайт $DOMAIN"
+  cat > /etc/nginx/sites-available/my-ai <<__NGX__
+server {
+  listen 80;
+  server_name $DOMAIN;
+  location / {
+    proxy_pass http://127.0.0.1:$APP_PORT;
+    proxy_http_version 1.1;
+    proxy_set_header Host \$host;
+    proxy_buffering off;
+    proxy_read_timeout 300s;
+  }
+}
+__NGX__
+  ln -sf /etc/nginx/sites-available/my-ai /etc/nginx/sites-enabled/my-ai
+  nginx -t && systemctl reload nginx
+  apt-get install -y -qq certbot python3-certbot-nginx >/dev/null || true
+  certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --register-unsafely-without-email --redirect || echo "⚠ HTTPS не выдан — проверьте, что домен указывает на этот сервер"
+  URL="https://$DOMAIN"
+elif [ -n "$DOMAIN" ]; then
   echo "--> Устанавливаю Caddy (HTTPS)"
   apt-get install -y -qq caddy >/dev/null
   cat > /etc/caddy/Caddyfile <<__CADDY__
 $DOMAIN {
-  reverse_proxy 127.0.0.1:3000 {
+  reverse_proxy 127.0.0.1:$APP_PORT {
     flush_interval -1
   }
 }
@@ -386,18 +410,23 @@ __CADDY__
   if command -v ufw >/dev/null && ufw status | grep -q active; then ufw allow 80,443/tcp >/dev/null; fi
   URL="https://$DOMAIN"
 else
-  if command -v ufw >/dev/null && ufw status | grep -q active; then ufw allow 3000/tcp >/dev/null; fi
+  if command -v ufw >/dev/null && ufw status | grep -q active; then ufw allow $APP_PORT/tcp >/dev/null; fi
   IP=$(hostname -I | awk '{print $1}')
-  URL="http://$IP:3000"
+  URL="http://$IP:$APP_PORT"
 fi
 
-sleep 1
-if systemctl is-active --quiet my-ai; then
+OK=0
+for i in $(seq 1 10); do
+  sleep 1
+  if systemctl is-active --quiet my-ai && ss -ltn "( sport = :$APP_PORT )" | grep -q ":$APP_PORT"; then OK=1; break; fi
+done
+if [ "$OK" = 1 ]; then
   echo
   echo "✅ Готово! Откройте: $URL"
   echo "   Логи:        journalctl -u my-ai -f"
   echo "   Настройки:   sudo nano $APP_DIR/.env  затем  sudo systemctl restart my-ai"
 else
-  echo "❌ Сервис не запустился. Смотрите: journalctl -u my-ai -n 50"
+  echo "❌ Сервис не запустился. Node: $(node -v). Последние строки лога:"
+  journalctl -u my-ai -n 30 --no-pager
   exit 1
 fi
